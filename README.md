@@ -1,11 +1,20 @@
 # Komelia - Komga media client
 
+> Fork notice:
+> This repository is maintained independently at `yexi-by/Komelia`.
+> It is based on the upstream project `Snd-R/Komelia`.
+>
+> Chinese documentation: [`README.zh-CN.md`](README.zh-CN.md)
+>
+> Upstream repository: https://github.com/Snd-R/Komelia
+
 ### Downloads:
 
-- Latest prebuilt release is available at https://github.com/Snd-R/Komelia/releases
-- Google Play Store https://play.google.com/store/apps/details?id=io.github.snd_r.komelia
-- F-Droid https://f-droid.org/packages/io.github.snd_r.komelia/
-- AUR package https://aur.archlinux.org/packages/komelia
+- Fork release page: https://github.com/yexi-by/Komelia/releases
+- Upstream release page: https://github.com/Snd-R/Komelia/releases
+- Upstream Google Play Store: https://play.google.com/store/apps/details?id=io.github.snd_r.komelia
+- Upstream F-Droid: https://f-droid.org/packages/io.github.snd_r.komelia/
+- Upstream AUR package: https://aur.archlinux.org/packages/komelia
 
 ## Screenshots
 
