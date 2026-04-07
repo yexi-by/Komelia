@@ -80,6 +80,7 @@ import snd.komga.client.collection.KomgaCollection
 import snd.komga.client.library.KomgaLibrary
 import snd.komga.client.series.KomgaSeries
 import kotlin.math.max
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun SeriesContent(
@@ -111,6 +112,7 @@ fun SeriesContent(
     val width = LocalWindowWidth.current
     val booksLoadState = booksState.state.collectAsState().value
     val bookMenuActions = remember { booksState.bookMenuActions() }
+    val seriesStrings = LocalStrings.current.screens.series
 
     val booksData = remember(booksLoadState) {
         if (booksLoadState is LoadState.Success<BooksData>) booksLoadState.value
@@ -173,6 +175,7 @@ fun SeriesContent(
                             onBookSelect = booksState::onBookSelect,
                             booksFilterState = booksState.filterState,
                             bookContextMenuActions = bookMenuActions,
+                            seriesStrings = seriesStrings,
                         )
 
                         SeriesTab.COLLECTIONS -> item(span = { GridItemSpan(maxLineSpan) }) {
@@ -227,6 +230,7 @@ fun SeriesToolBar(
     seriesMenuActions: SeriesMenuActions,
     onDownload: () -> Unit,
 ) {
+    val menuStrings = LocalStrings.current.menus.series
     Row(
         modifier = Modifier.padding(start = 10.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -278,7 +282,7 @@ fun SeriesToolBar(
 
                 if (permissionRequested) {
                     ConfirmationDialog(
-                        "Download series \"${series.metadata.title}\"?",
+                        menuStrings.downloadTitle(series.metadata.title),
                         onDialogConfirm = onDownload,
                         onDialogDismiss = { showDownloadConfirmationDialog = false }
                     )
@@ -386,19 +390,20 @@ fun SeriesChipTags(
     series: KomgaSeries,
     onFilterClick: (SeriesScreenFilter) -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         if (series.metadata.publisher.isNotBlank()) {
             DescriptionChips(
-                label = "Publisher",
+                label = commonStrings.publisher,
                 chipValue = stringEntry(series.metadata.publisher),
                 onClick = { onFilterClick(SeriesScreenFilter(publisher = listOf(it))) },
             )
         }
 
         DescriptionChips(
-            label = "Genres",
+            label = commonStrings.genres,
             chipValues = series.metadata.genres.map { stringEntry(it) },
             onChipClick = { onFilterClick(SeriesScreenFilter(genres = listOf(it))) },
         )
@@ -411,7 +416,7 @@ fun SeriesChipTags(
 
         val uriHandler = LocalUriHandler.current
         DescriptionChips(
-            label = "Links",
+            label = commonStrings.links,
             chipValues = series.metadata.links.map { LabeledEntry(it, it.label) },
             onChipClick = { entry -> uriHandler.openUri(entry.url) },
             icon = Icons.Default.Link,
@@ -424,7 +429,7 @@ fun SeriesChipTags(
             .groupBy { it.role }
             .forEach { (_, author) ->
                 DescriptionChips(
-                    label = "Writers",
+                    label = commonStrings.writers,
                     chipValues = author.map { LabeledEntry(it, it.name) },
                     onChipClick = { onFilterClick(SeriesScreenFilter(authors = listOf(it))) },
                     modifier = Modifier.cursorForHand()
@@ -436,7 +441,7 @@ fun SeriesChipTags(
             .groupBy { it.role }
             .forEach { (_, author) ->
                 DescriptionChips(
-                    label = "Pencillers",
+                    label = commonStrings.pencillers,
                     chipValues = author.map { LabeledEntry(it, it.name) },
                     onChipClick = { onFilterClick(SeriesScreenFilter(authors = listOf(it))) },
                     modifier = Modifier.cursorForHand()
@@ -462,14 +467,14 @@ private fun TabRow(
                 FilterChip(
                     onClick = { onTabChange(SeriesTab.BOOKS) },
                     selected = currentTab == SeriesTab.BOOKS,
-                    label = { Text("Books") },
+                    label = { Text(LocalStrings.current.common.books) },
                     colors = chipColors,
                     border = null,
                 )
                 FilterChip(
                     onClick = { onTabChange(SeriesTab.COLLECTIONS) },
                     selected = currentTab == SeriesTab.COLLECTIONS,
-                    label = { Text("Collections") },
+                    label = { Text(LocalStrings.current.common.collections) },
                     colors = chipColors,
                     border = null,
                 )

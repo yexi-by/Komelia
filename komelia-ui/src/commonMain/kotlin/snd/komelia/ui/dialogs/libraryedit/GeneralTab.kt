@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.StateHolder
 import snd.komelia.ui.dialogs.filebrowser.FileBrowserDialogContent
 import snd.komelia.ui.dialogs.tabs.DialogTab
@@ -26,8 +27,9 @@ import snd.komelia.ui.dialogs.tabs.TabItem
 class GeneralTab(
     private val vm: LibraryEditDialogViewModel,
 ) : DialogTab {
+    @Composable
     override fun options() = TabItem(
-        title = "GENERAL",
+        title = LocalStrings.current.common.general,
         icon = Icons.Default.Category
     )
 
@@ -46,6 +48,8 @@ private fun GeneralTabContent(
     rootFolder: StateHolder<String>,
 ) {
     var showFileBrowserDialog by remember { mutableStateOf(false) }
+    val strings = LocalStrings.current.dialogs.libraryEdit
+    val commonStrings = LocalStrings.current.common
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -54,7 +58,7 @@ private fun GeneralTabContent(
         TextField(
             value = name.value,
             onValueChange = name.setValue,
-            label = { Text("Name") },
+            label = { Text(strings.name) },
             isError = name.errorMessage != null,
             supportingText = { name.errorMessage?.let { Text(it) } },
             modifier = Modifier.fillMaxWidth()
@@ -64,7 +68,7 @@ private fun GeneralTabContent(
             TextField(
                 value = rootFolder.value,
                 onValueChange = rootFolder.setValue,
-                label = { Text("Root folder") },
+                label = { Text(strings.rootFolder) },
                 isError = rootFolder.errorMessage != null,
                 supportingText = { rootFolder.errorMessage?.let { Text(it) } },
                 modifier = Modifier.weight(7f)
@@ -74,7 +78,7 @@ private fun GeneralTabContent(
                 onClick = { showFileBrowserDialog = true },
                 modifier = Modifier.padding(horizontal = 10.dp),
             ) {
-                Text("Browse")
+                Text(commonStrings.browse)
             }
         }
     }
@@ -87,3 +91,6 @@ private fun GeneralTabContent(
     }
 
 }
+
+
+

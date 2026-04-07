@@ -8,6 +8,7 @@
   } from '$lib/components/book-reader/book-toc/book-toc';
   import {dialogManager} from '$lib/data/dialog-manager';
   import {skipKeyDownListener$} from '$lib/data/store';
+  import {epubStrings$} from '$lib/i18n/strings';
   import {dummyFn, getWeightedAverage} from '$lib/functions/utils';
   import {onMount} from 'svelte';
   import Fa from 'svelte-fa';
@@ -107,11 +108,11 @@
 </script>
 
 <div class="flex justify-between p-4">
-  <div>Chapter Progress: {currentChapterCharacterProgress} ({currentChapterProgress}%)</div>
+  <div>{$epubStrings$.reader.chapterProgress}: {currentChapterCharacterProgress} ({currentChapterProgress}%)</div>
   <div
       tabindex="0"
       role="button"
-      title="Close Table of Contents"
+      title={$epubStrings$.reader.closeTableOfContents}
       class="flex items-end md:items-center"
       on:click={closeTocMenu}
       on:keyup={dummyFn}
@@ -146,7 +147,7 @@
   <div
       tabindex="0"
       role="button"
-      title={prevChapterAvailable ? `${verticalMode ? 'Next' : 'Previous'} Chapter` : ''}
+      title={prevChapterAvailable ? `${verticalMode ? $epubStrings$.reader.nextChapter : $epubStrings$.reader.previousChapter}` : ''}
       class:opacity-30={!prevChapterAvailable}
       on:click={() => changeChapter(prevChapterAvailable, verticalMode ? 1 : -1)}
       on:keyup={dummyFn}
@@ -156,7 +157,7 @@
   <div
       tabindex="0"
       role="button"
-      title={nextChapterAvailable ? `${verticalMode ? 'Previous' : 'Next'} Chapter` : ''}
+      title={nextChapterAvailable ? `${verticalMode ? $epubStrings$.reader.previousChapter : $epubStrings$.reader.nextChapter}` : ''}
       class:opacity-30={!nextChapterAvailable}
       on:click={() => changeChapter(nextChapterAvailable, verticalMode ? -1 : 1)}
       on:keyup={dummyFn}

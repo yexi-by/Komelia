@@ -55,6 +55,7 @@ import snd.komelia.komga.api.model.KomeliaBook
 import snd.komelia.offline.sync.model.DownloadEvent
 import snd.komelia.ui.LocalBookDownloadEvents
 import snd.komelia.ui.LocalLibraries
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalWindowWidth
 import snd.komelia.ui.common.BookReadButton
 import snd.komelia.ui.common.components.NoPaddingChip
@@ -143,6 +144,7 @@ private fun BookImageOverlay(
     showSeriesTitle: Boolean = false,
     content: @Composable () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     Box(contentAlignment = Alignment.TopStart) {
         content()
         if (showTitle)
@@ -186,7 +188,7 @@ private fun BookImageOverlay(
                 }
                 if (book.deleted || libraryIsDeleted) {
                     CardOutlinedText(
-                        text = "Unavailable",
+                        text = commonStrings.unavailable,
                         textColor = MaterialTheme.colorScheme.error
                     )
                 }
@@ -395,6 +397,7 @@ private fun BookDetailedListDetails(
     onBookReadClick: ((Boolean) -> Unit)? = null,
 ) {
     val width = LocalWindowWidth.current
+    val commonStrings = LocalStrings.current.common
     Column(Modifier.padding(start = 10.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -413,8 +416,9 @@ private fun BookDetailedListDetails(
             verticalAlignment = Alignment.CenterVertically
         ) {
             item {
+                val pagesLabel = if (book.media.pagesCount == 1) commonStrings.page else commonStrings.pages
                 Text(
-                    "${book.media.pagesCount} pages",
+                    commonStrings.itemsCount(book.media.pagesCount, pagesLabel),
                     style = MaterialTheme.typography.bodySmall
                 )
             }

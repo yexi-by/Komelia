@@ -21,7 +21,9 @@ import snd.komelia.homefilters.HomeScreenFilter
 import snd.komelia.homefilters.SeriesHomeScreenFilter
 import snd.komelia.komga.api.KomgaCollectionsApi
 import snd.komelia.komga.api.KomgaSeriesApi
+import snd.komelia.ui.home.localizedLabel
 import snd.komelia.ui.home.edit.SeriesMatchConditionState.SeriesConditionType
+import snd.komelia.ui.strings.RuntimeAppStrings
 import snd.komga.client.common.KomgaPageRequest
 import snd.komga.client.common.KomgaSort
 import snd.komga.client.common.KomgaSort.Direction.ASC
@@ -40,7 +42,10 @@ class SeriesFilterEditState(
     initialFilter: SeriesHomeScreenFilter?,
     initialSeries: List<KomgaSeries>?
 ) : FilterEditState {
-    override val label = MutableStateFlow(initialFilter?.label ?: "Series Filter")
+    override val label = MutableStateFlow(
+        initialFilter?.localizedLabel(RuntimeAppStrings.strings.value.screens.home)
+            ?: RuntimeAppStrings.strings.value.screens.home.defaultSeriesFilter
+    )
 
     val filter: MutableStateFlow<SeriesFilterStateType> = MutableStateFlow(
         initialFilter?.let { initial ->
@@ -606,3 +611,4 @@ class SeriesMatchConditionState(
 
     }
 }
+

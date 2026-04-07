@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import snd.komelia.ui.common.components.DropdownChoiceMenu
 import snd.komelia.ui.common.components.LabeledEntry
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.home.EqualityOpState
 import snd.komelia.ui.home.NumericOpState
 import snd.komelia.ui.home.edit.AuthorConditionState
@@ -326,6 +327,7 @@ fun SeriesIdConditionContent(
     onConditionTypeChange: (BookConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     BookConditionLayout(
         type = BookConditionType.Series,
         onTypeChange = onConditionTypeChange,
@@ -338,14 +340,14 @@ fun SeriesIdConditionContent(
             options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.name) },
             onOptionChange = { state.setOp(it.value) },
             inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
-            label = { Text("Operator") }
+            label = { Text(commonStrings.operator) }
         )
         SearchableOptionSelectionField(
             searchText = state.searchText.collectAsState().value,
             onSearchTextChange = state::onSearchTextChange,
             options = remember(options) { options.map { LabeledEntry(it, it.name) } },
             onValueChange = state::onSeriesSelect,
-            label = "Series"
+            label = commonStrings.series
         )
     }
 }
@@ -356,6 +358,7 @@ private fun BookAuthorConditionContent(
     onConditionTypeChange: (BookConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     BookConditionLayout(
         type = BookConditionType.Author,
         onTypeChange = onConditionTypeChange,
@@ -413,6 +416,7 @@ fun NumberSortConditionContent(
     onConditionTypeChange: (BookConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     BookConditionLayout(
         type = BookConditionType.NumberSort,
         onTypeChange = onConditionTypeChange,
@@ -424,12 +428,12 @@ fun NumberSortConditionContent(
             options = NumericOpState.Op.entries.map { LabeledEntry(it, it.name) },
             onOptionChange = { state.setOp(it.value) },
             inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
-            label = { Text("Operator") }
+            label = { Text(commonStrings.operator) }
         )
         FloatTextField(
             value = state.value.collectAsState().value,
             onValueChange = state::setValue,
-            label = "Number",
+            label = commonStrings.number,
         )
     }
 }
@@ -440,6 +444,8 @@ fun PosterConditionContent(
     onConditionTypeChange: (BookConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
+    val filterStrings = LocalStrings.current.filters
     BookConditionLayout(
         type = BookConditionType.Poster,
         onTypeChange = onConditionTypeChange,
@@ -452,47 +458,47 @@ fun PosterConditionContent(
             options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.name) },
             onOptionChange = { state.setOp(it.value) },
             inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
-            label = { Text("Operator") }
+            label = { Text(commonStrings.operator) }
         )
 
         DropdownChoiceMenu(
             selectedOption = remember(currentValue) {
                 LabeledEntry(
                     currentValue?.type,
-                    currentValue?.type?.name ?: "Any"
+                    currentValue?.type?.name ?: filterStrings.anyValue
                 )
             },
             options = remember {
                 listOf(
                     LabeledEntry<PosterMatch.Type?>(
                         null,
-                        "Any"
+                        filterStrings.anyValue
                     )
                 ).plus(PosterMatch.Type.entries.map { LabeledEntry(it, it.name) }
                 )
             },
             onOptionChange = { state.setType(it.value) },
             inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
-            label = { Text("Type") }
+            label = { Text(commonStrings.type) }
         )
 
         DropdownChoiceMenu(
             selectedOption = remember(currentValue) {
                 LabeledEntry(
                     currentValue?.selected,
-                    currentValue?.selected?.toString() ?: "Any"
+                    currentValue?.selected?.toString() ?: filterStrings.anyValue
                 )
             },
             options = remember {
                 listOf(
-                    LabeledEntry(null, "Any"),
-                    LabeledEntry(true, "True"),
-                    LabeledEntry(false, "False"),
+                    LabeledEntry(null, filterStrings.anyValue),
+                    LabeledEntry(true, commonStrings.trueValue),
+                    LabeledEntry(false, commonStrings.falseValue),
                 )
             },
             onOptionChange = { state.setSelected(it.value) },
             inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
-            label = { Text("Selected") }
+            label = { Text(commonStrings.selected) }
         )
 
     }
@@ -504,6 +510,7 @@ fun ReadListConditionContent(
     onConditionTypeChange: (BookConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     BookConditionLayout(
         type = BookConditionType.ReadList,
         onTypeChange = onConditionTypeChange,
@@ -516,14 +523,14 @@ fun ReadListConditionContent(
             options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.name) },
             onOptionChange = { state.setOp(it.value) },
             inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
-            label = { Text("Operator") }
+            label = { Text(commonStrings.operator) }
         )
         SearchableOptionSelectionField(
             searchText = state.searchText.collectAsState().value,
             onSearchTextChange = state::onSearchTextChange,
             options = remember(options) { options.map { LabeledEntry(it, it.name) } },
             onValueChange = state::onReadListSelect,
-            label = "Read List"
+            label = commonStrings.readList
         )
 
     }

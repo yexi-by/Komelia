@@ -24,6 +24,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import snd.komelia.ui.LoadState
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.common.components.ErrorContent
 import snd.komelia.ui.common.components.LoadingMaxSizeIndicator
@@ -41,6 +42,7 @@ class ColorCorrectionScreen(
         val vm = rememberScreenModel { viewModelFactory.getCurvesViewModel(bookId, page) }
         LaunchedEffect(Unit) { vm.initialize() }
         val navigator = LocalNavigator.currentOrThrow
+        val strings = LocalStrings.current.screens.color
 
         val coroutineScope = rememberCoroutineScope()
         Column {
@@ -59,12 +61,12 @@ class ColorCorrectionScreen(
                 ) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        "Leave",
+                        strings.leave,
                     )
                 }
                 Spacer(Modifier.width(10.dp).align(Alignment.Start).nonInteractive())
                 Text(
-                    text = "Color Correction",
+                    text = strings.colorCorrection,
                     modifier = Modifier.heightIn(max = 32.dp).align(Alignment.Start).nonInteractive()
                 )
 

@@ -7,21 +7,24 @@ import androidx.compose.runtime.collectAsState
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import snd.komelia.ui.LoadState
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
+import snd.komelia.ui.error.formatExceptionMessage
 import snd.komelia.ui.settings.SettingsScreenContainer
 import snd.komelia.updates.AppVersion
 
 class AppUpdatesScreen : Screen {
     @Composable
     override fun Content() {
+        val strings = LocalStrings.current
         val viewModelFactory = LocalViewModelFactory.current
         val vm = rememberScreenModel { viewModelFactory.getSettingsUpdatesViewModel() }
         LaunchedEffect(Unit) { vm.initialize() }
 
         val state = vm.state.collectAsState().value
-        SettingsScreenContainer("App Updates") {
+        SettingsScreenContainer(strings.screens.settings.updates) {
             when (state) {
-                is LoadState.Error -> Text("Error ${state.exception.message}")
+                is LoadState.Error -> Text(formatExceptionMessage(state.exception))
                 LoadState.Loading, LoadState.Uninitialized, is LoadState.Success -> AppUpdatesContent(
                     checkForUpdates = vm.checkForUpdatesOnStartup.collectAsState().value,
                     onCheckForUpdatesChange = vm::onCheckForUpdatesOnStartupChange,

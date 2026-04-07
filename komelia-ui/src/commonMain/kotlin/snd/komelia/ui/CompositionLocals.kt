@@ -12,7 +12,8 @@ import snd.komelia.KomgaAuthenticationState
 import snd.komelia.offline.sync.model.DownloadEvent
 import snd.komelia.ui.platform.PlatformType
 import snd.komelia.ui.platform.WindowSizeClass
-import snd.komelia.ui.strings.EnStrings
+import snd.komelia.ui.strings.AppStrings
+import snd.komelia.ui.strings.RuntimeAppStrings
 import snd.komga.client.library.KomgaLibrary
 import snd.komga.client.sse.KomgaEvent
 
@@ -24,7 +25,7 @@ val LocalKomfIntegration = compositionLocalOf { flowOf(false) }
 val LocalKeyEvents = compositionLocalOf<SharedFlow<KeyEvent>> { error("Key events are not set") }
 val LocalWindowWidth = compositionLocalOf<WindowSizeClass> { error("Window size is not set") }
 val LocalWindowHeight = compositionLocalOf<WindowSizeClass> { error("Window size is not set") }
-val LocalStrings = staticCompositionLocalOf { EnStrings }
+val LocalStrings = staticCompositionLocalOf<AppStrings> { RuntimeAppStrings.strings.value }
 val LocalPlatform = compositionLocalOf<PlatformType> { error("Platform type is not set") }
 val LocalTheme = compositionLocalOf { Theme.DARK }
 val LocalWindowState = compositionLocalOf<AppWindowState> { error("Window state was not initialized") }

@@ -76,6 +76,7 @@ import snd.komelia.ui.home.edit.SeriesRecentlyUpdatedFilterState
 import snd.komelia.ui.platform.PlatformType.MOBILE
 import snd.komelia.ui.platform.cursorForHand
 import snd.komelia.ui.platform.cursorForMove
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun FilterEditContent(
@@ -102,6 +103,8 @@ private fun Toolbar(
     onEditEnd: () -> Unit,
     onReset: () -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val homeStrings = LocalStrings.current.screens.home
     Row(
         modifier = Modifier.animateContentSize(),
         horizontalArrangement = Arrangement.spacedBy(5.dp),
@@ -126,7 +129,7 @@ private fun Toolbar(
             onClick = { onEditEnd() },
             modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
         ) {
-            Text("Done")
+            Text(commonStrings.done)
             Icon(Icons.Default.Check, null)
         }
 
@@ -135,12 +138,12 @@ private fun Toolbar(
             onClick = { showResetDialog = true },
             modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
         ) {
-            Text("Reset to default")
+            Text(commonStrings.resetToDefault)
             Icon(Icons.Default.Restore, null)
         }
         if (showResetDialog) {
             ConfirmationDialog(
-                body = "Reset homescreen filters to default?",
+                body = homeStrings.resetHomescreenFiltersBody,
                 onDialogConfirm = onReset,
                 onDialogDismiss = { showResetDialog = false }
             )
@@ -186,6 +189,7 @@ fun AddConditionButton(
     onConditionAdd: (FilterEditViewModel.FilterType) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val commonStrings = LocalStrings.current.common
     var dropDownExpanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(
         expanded = dropDownExpanded,
@@ -198,7 +202,7 @@ fun AddConditionButton(
                 .cursorForHand()
                 .menuAnchor(PrimaryNotEditable)
         ) {
-            Text("Add Filter")
+            Text(commonStrings.addFilter)
         }
 
         ExposedDropdownMenu(
@@ -226,6 +230,7 @@ private fun ReorderableCollectionItemScope.FilterContent(
     isDragging: Boolean,
     onFilterRemove: () -> Unit,
 ) {
+    val homeStrings = LocalStrings.current.screens.home
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     var showEdit by remember { mutableStateOf(false) }
     val label = filterState.label.collectAsState().value
@@ -273,7 +278,7 @@ private fun ReorderableCollectionItemScope.FilterContent(
                 if (showEdit) {
                     OutlinedTextField(
                         value = labelText,
-                        label = { Text("Label") },
+                        label = { Text(LocalStrings.current.common.label) },
                         onValueChange = {
                             labelText = it
                             filterState.label.value = it
@@ -295,7 +300,7 @@ private fun ReorderableCollectionItemScope.FilterContent(
                 onClick = { showEdit = !showEdit },
                 modifier = Modifier.cursorForHand()
             ) {
-                Text("Edit")
+                Text(LocalStrings.current.common.edit)
                 Icon(
                     imageVector = if (showEdit) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
                     contentDescription = null,
@@ -308,7 +313,7 @@ private fun ReorderableCollectionItemScope.FilterContent(
                 },
                 modifier = Modifier.cursorForHand()
             ) {
-                Text("Delete")
+                Text(LocalStrings.current.common.delete)
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = null,
@@ -327,7 +332,7 @@ private fun ReorderableCollectionItemScope.FilterContent(
 
     if (showDeleteConfirmation) {
         ConfirmationDialog(
-            body = "Delete ${label}?",
+            body = homeStrings.deleteNamedItem(label),
             onDialogConfirm = onFilterRemove,
             onDialogDismiss = { showDeleteConfirmation = false })
     }

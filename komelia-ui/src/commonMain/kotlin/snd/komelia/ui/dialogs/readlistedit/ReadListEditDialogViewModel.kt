@@ -13,6 +13,8 @@ import snd.komelia.ui.LoadState
 import snd.komelia.ui.dialogs.PosterEditState
 import snd.komelia.ui.dialogs.PosterTab
 import snd.komelia.ui.dialogs.tabs.DialogTab
+import snd.komelia.ui.strings.RuntimeAppStrings
+import snd.komelia.ui.strings.ValidationStrings
 import snd.komga.client.common.KomgaPageRequest
 import snd.komga.client.common.patch
 import snd.komga.client.readlist.KomgaReadList
@@ -24,6 +26,7 @@ class ReadListEditDialogViewModel(
     private val readListApi: KomgaReadListApi,
     private val notifications: AppNotifications,
     cardWidth: Flow<Dp>,
+    private val validationStrings: ValidationStrings = RuntimeAppStrings.strings.value.validation,
 ) {
     private var state by mutableStateOf<LoadState<Unit>>(LoadState.Uninitialized)
     var name by mutableStateOf(readList.name)
@@ -31,8 +34,8 @@ class ReadListEditDialogViewModel(
     private var readLists by mutableStateOf<List<KomgaReadList>>(emptyList())
     val nameValidationError by derivedStateOf {
         when {
-            name.isBlank() -> "Required"
-            name != readList.name && readLists.any { it.name == this.name } -> "A read list with this name already exists"
+            name.isBlank() -> validationStrings.required
+            name != readList.name && readLists.any { it.name == this.name } -> validationStrings.readListAlreadyExists
             else -> null
         }
     }
@@ -92,3 +95,4 @@ class ReadListEditDialogViewModel(
             .forEach { thumb -> readListApi.deleteThumbnail(readList.id, thumb.id) }
     }
 }
+

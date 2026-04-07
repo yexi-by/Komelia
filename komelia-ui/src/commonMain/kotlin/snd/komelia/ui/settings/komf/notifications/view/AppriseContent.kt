@@ -44,6 +44,7 @@ import snd.komelia.ui.dialogs.AppDialog
 import snd.komelia.ui.platform.WindowSizeClass.COMPACT
 import snd.komelia.ui.platform.cursorForHand
 import snd.komelia.ui.settings.komf.notifications.NotificationContextState
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun AppriseContent(
@@ -62,12 +63,15 @@ fun AppriseContent(
     onTemplateSend: () -> Unit,
     onTemplateSave: () -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val notificationStrings = LocalStrings.current.komf.notifications
+    val appriseStrings = notificationStrings.apprise
 
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
 
-        Text("Urls")
+        Text(appriseStrings.urls)
         urls.forEach { url ->
 
             Row {
@@ -88,12 +92,12 @@ fun AppriseContent(
             onClick = { showAddUrlDialog = true },
             modifier = Modifier.cursorForHand()
         ) {
-            Text("Add Url")
+            Text(appriseStrings.addUrl)
         }
         SwitchWithLabel(
             checked = uploadSeriesCover,
             onCheckedChange = onUploadSeriesCoverChange,
-            label = { Text("Upload series cover") }
+            label = { Text(notificationStrings.uploadSeriesCover) }
         )
 
         if (showAddUrlDialog) {
@@ -123,6 +127,9 @@ fun AddUrlDialog(
     onDismissRequest: () -> Unit,
     onUrlAdd: (String) -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val appriseStrings = LocalStrings.current.komf.notifications.apprise
+    val validationStrings = LocalStrings.current.validation
     var newWebhook by remember { mutableStateOf("") }
 
     val interactionSource = remember { MutableInteractionSource() }
@@ -140,7 +147,7 @@ fun AddUrlDialog(
                 modifier = Modifier.padding(10.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Text("Add URL", style = MaterialTheme.typography.headlineSmall)
+                Text(appriseStrings.addUrlDialogTitle, style = MaterialTheme.typography.headlineSmall)
                 HorizontalDivider()
             }
         },
@@ -151,18 +158,18 @@ fun AddUrlDialog(
                 TextField(
                     value = newWebhook,
                     onValueChange = { newWebhook = it },
-                    label = { Text("URL") },
+                    label = { Text(LocalStrings.current.common.url) },
                     modifier = Modifier.fillMaxWidth(),
                     isError = isError,
                     interactionSource = interactionSource,
-                    supportingText = { if (isError) Text("failed to parse URL") },
+                    supportingText = { if (isError) Text(validationStrings.failedToParseUrl) },
                     visualTransformation = if (isFocused) VisualTransformation.None else PasswordVisualTransformation(),
                 )
                 if (isError) {
                     CheckboxWithLabel(
                         checked = confirmInvalidUrl,
                         onCheckedChange = { confirmInvalidUrl = !confirmInvalidUrl },
-                        label = { Text("apply anyway") }
+                        label = { Text(appriseStrings.applyAnyway) }
                     )
                 }
             }
@@ -176,7 +183,7 @@ fun AddUrlDialog(
                 TextButton(
                     onClick = onDismissRequest,
                     modifier = Modifier.cursorForHand(),
-                    content = { Text("Cancel") }
+                    content = { Text(LocalStrings.current.common.cancel) }
                 )
 
                 FilledTonalButton(
@@ -187,7 +194,7 @@ fun AddUrlDialog(
                     modifier = Modifier.cursorForHand(),
                     enabled = !isError || confirmInvalidUrl
                 ) {
-                    Text("Confirm")
+                    Text(commonStrings.confirm)
                 }
             }
         }
@@ -206,14 +213,16 @@ private fun TemplatesEditor(
     onTemplateSend: () -> Unit,
     onTemplateSave: () -> Unit,
 ) {
+    val notificationStrings = LocalStrings.current.komf.notifications
+    val appriseStrings = notificationStrings.apprise
     var showNotificationContextDialog by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text("Notification Template", style = MaterialTheme.typography.titleLarge)
+        Text(notificationStrings.notificationTemplate, style = MaterialTheme.typography.titleLarge)
         Column {
-            Text("Uses Apprise executable installed on the system.\nTemplates are rendered using Apache Velocity")
+            Text(appriseStrings.usesAppriseDescription)
             Text(
-                "Apprise github page",
+                appriseStrings.appriseGithubPage,
                 color = MaterialTheme.colorScheme.secondary,
                 textDecoration = TextDecoration.Underline,
                 modifier = Modifier.clickable {
@@ -221,7 +230,7 @@ private fun TemplatesEditor(
                 }.padding(2.dp).cursorForHand()
             )
             Text(
-                "Velocity Template Language syntax reference",
+                notificationStrings.velocityTemplateLanguageSyntaxReference,
                 color = MaterialTheme.colorScheme.secondary,
                 textDecoration = TextDecoration.Underline,
                 modifier = Modifier.clickable {
@@ -233,14 +242,14 @@ private fun TemplatesEditor(
             TextField(
                 value = titleTemplate,
                 onValueChange = onTitleTemplateChange,
-                label = { Text("Title") },
+                label = { Text(LocalStrings.current.common.title) },
                 maxLines = 1,
                 modifier = Modifier.fillMaxWidth()
             )
             TextField(
                 value = bodyTemplate,
                 onValueChange = onBodyTemplateChange,
-                label = { Text("Body") },
+                label = { Text(LocalStrings.current.common.body) },
                 minLines = 2,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -254,7 +263,7 @@ private fun TemplatesEditor(
                 onClick = { showNotificationContextDialog = true },
                 modifier = Modifier.cursorForHand()
             ) {
-                Text("Notification Context")
+                Text(notificationStrings.notificationContext)
 
             }
 
@@ -262,7 +271,7 @@ private fun TemplatesEditor(
                 onClick = onTemplateSend,
                 modifier = Modifier.cursorForHand()
             ) {
-                Text("Test Send")
+                Text(notificationStrings.testSend)
             }
 
             FilledTonalButton(
@@ -270,7 +279,7 @@ private fun TemplatesEditor(
                 enabled = true,
                 modifier = Modifier.cursorForHand()
             ) {
-                Text("Save")
+                Text(LocalStrings.current.common.save)
             }
         }
     }

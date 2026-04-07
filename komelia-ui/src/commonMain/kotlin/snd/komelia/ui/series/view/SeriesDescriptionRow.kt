@@ -56,6 +56,7 @@ fun SeriesDescriptionRow(
     modifier: Modifier
 ) {
     val strings = LocalStrings.current.seriesView
+    val seriesStrings = LocalStrings.current.screens.series
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(5.dp),
@@ -63,7 +64,7 @@ fun SeriesDescriptionRow(
     ) {
 
         if (releaseDate != null)
-            Text("Release Year: ${releaseDate.year}", fontSize = 10.sp)
+            Text(seriesStrings.releaseYear(releaseDate.year), fontSize = 10.sp)
 
         FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             ElevatedButton(
@@ -108,7 +109,7 @@ fun SeriesDescriptionRow(
             ageRating?.let { age ->
                 SuggestionChip(
                     onClick = { onFilterClick(SeriesScreenFilter(ageRating = listOf(age))) },
-                    label = { Text("$age+") }
+                    label = { Text(seriesStrings.ageRating(age)) }
                 )
             }
 
@@ -128,7 +129,7 @@ fun SeriesDescriptionRow(
             if (deleted) {
                 SuggestionChip(
                     onClick = {},
-                    label = { Text("Unavailable") },
+                    label = { Text(seriesStrings.unavailable) },
                     border = null,
                     colors = SuggestionChipDefaults.suggestionChipColors(
                         containerColor = MaterialTheme.colorScheme.errorContainer
@@ -140,7 +141,7 @@ fun SeriesDescriptionRow(
         if (alternateTitles.isNotEmpty()) {
             SelectionContainer {
                 Column {
-                    Text("Alternative titles", fontWeight = FontWeight.Bold)
+                    Text(seriesStrings.alternativeTitles, fontWeight = FontWeight.Bold)
                     alternateTitles.forEach {
                         Row {
                             Text(
@@ -166,11 +167,12 @@ fun SeriesSummary(
     bookSummary: String,
     bookSummaryNumber: String,
 ) {
-    val summaryText = remember(seriesSummary) {
+    val seriesStrings = LocalStrings.current.screens.series
+    val summaryText = remember(seriesSummary, bookSummary, bookSummaryNumber) {
         if (seriesSummary.isNotBlank()) {
             seriesSummary
         } else if (bookSummary.isNotBlank()) {
-            "Summary from book ${bookSummaryNumber}:\n" + bookSummary
+            seriesStrings.summaryFromBook(bookSummaryNumber, bookSummary)
         } else null
     }
     if (summaryText != null) {

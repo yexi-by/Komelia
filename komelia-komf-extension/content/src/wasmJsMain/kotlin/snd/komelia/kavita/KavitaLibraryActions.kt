@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLElement
 import snd.komelia.KomfActiveDialog
+import snd.komelia.strings.RuntimeExtensionStrings
 import snd.komf.api.KomfServerLibraryId
 
 class KavitaLibraryActions(
@@ -14,13 +15,13 @@ class KavitaLibraryActions(
     val element: HTMLButtonElement = document.createElement("button") as HTMLButtonElement
     private val dropdown = KavitaDropdown(
         listOf(
-            KavitaDropdown.DropdownItem("Auto-Identify", this::onIdentifyClick),
-            KavitaDropdown.DropdownItem("Reset Metadata", this::onResetClick),
+            KavitaDropdown.DropdownItem(RuntimeExtensionStrings.strings.value.content.autoIdentifyTitle, this::onIdentifyClick),
+            KavitaDropdown.DropdownItem(RuntimeExtensionStrings.strings.value.content.resetMetadataTitle, this::onResetClick),
         )
     )
 
     init {
-        element.title = "Komf Identify"
+        element.title = RuntimeExtensionStrings.strings.value.content.kavitaIdentifyTitle
         element.classList.value = "btn btn-icon btn-small"
         element.innerHTML = """<i aria-hidden="true" class="fa fa-pen-to-square"></i>"""
         element.addEventListener("focus") { event -> (event.target as HTMLElement).blur() }
@@ -49,13 +50,17 @@ class KavitaLibraryActions(
 
     private fun onIdentifyClick() {
         val libraryId = getLibraryId()
-        if (libraryId == null) currentDialog.value = KomfActiveDialog.ErrorDialog("Failed to fine libraryId")
+        if (libraryId == null) currentDialog.value = KomfActiveDialog.ErrorDialog(
+            RuntimeExtensionStrings.strings.value.content.libraryIdNotFound
+        )
         else currentDialog.value = KomfActiveDialog.LibraryIdentify(libraryId)
     }
 
     private fun onResetClick() {
         val libraryId = getLibraryId()
-        if (libraryId == null) currentDialog.value = KomfActiveDialog.ErrorDialog("Failed to fine libraryId")
+        if (libraryId == null) currentDialog.value = KomfActiveDialog.ErrorDialog(
+            RuntimeExtensionStrings.strings.value.content.libraryIdNotFound
+        )
         else currentDialog.value = KomfActiveDialog.LibraryReset(libraryId)
     }
 
@@ -71,3 +76,4 @@ class KavitaLibraryActions(
         return libraryId?.let { KomfServerLibraryId(it) }
     }
 }
+

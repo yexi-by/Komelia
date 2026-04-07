@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import io.github.vinceglb.filekit.PlatformFile
 import snd.komelia.formatDecimal
 import snd.komelia.offline.sync.model.DownloadEvent
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.dialogs.permissions.StoragePermissionRequestDialog
 import snd.komga.client.book.KomgaBookId
 import kotlin.coroutines.cancellation.CancellationException
@@ -42,10 +43,11 @@ fun OfflineDownloadsContent(
     downloads: Collection<DownloadEvent>,
     onDownloadCancel: (KomgaBookId) -> Unit,
 ) {
+    val settingsStrings = LocalStrings.current.screens.settings
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         if (storageLocation != null) {
             Column {
-                Text("Storage location")
+                Text(settingsStrings.storageLocation)
                 Text(
                     rememberStorageLabel(storageLocation),
                     modifier = Modifier.padding(start = 10.dp),
@@ -63,8 +65,8 @@ fun OfflineDownloadsContent(
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Button(onClick = { showDirectoryPickerDialog = true }) { Text("Change location") }
-            Button(onClick = onStorageLocationReset) { Text("Reset to internal") }
+            Button(onClick = { showDirectoryPickerDialog = true }) { Text(settingsStrings.changeLocation) }
+            Button(onClick = onStorageLocationReset) { Text(settingsStrings.resetToInternal) }
         }
 
         HorizontalDivider()
@@ -101,6 +103,7 @@ private fun DownloadProgress(
 private fun RowScope.DownloadProgressIndicator(
     event: DownloadEvent.BookDownloadProgress,
 ) {
+    val topBarStrings = LocalStrings.current.screens.topBar
     Column(modifier = Modifier.weight(1f)) {
         Text(event.book.metadata.title)
         if (event.total == 0L) {
@@ -117,25 +120,27 @@ private fun RowScope.DownloadProgressIndicator(
             val completedMiB = remember(event.completed) {
                 (event.completed.toFloat() / 1024 / 1024).formatDecimal(2)
             }
-            Text("${completedMiB}MiB / ${totalMiB}MiB")
+            Text(topBarStrings.downloadProgress(completedMiB, totalMiB))
         }
     }
 }
 
 @Composable
 private fun DownloadCompleted(event: DownloadEvent.BookDownloadCompleted) {
+    val settingsStrings = LocalStrings.current.screens.settings
     Column {
         Text(event.book.metadata.title)
-        Text("Download Complete ")
+        Text(settingsStrings.downloadComplete)
     }
 }
 
 @Composable
 private fun DownloadError(event: DownloadEvent.BookDownloadError) {
+    val settingsStrings = LocalStrings.current.screens.settings
     Column {
         Text(event.book?.metadata?.title ?: event.bookId.value)
         val errorMessage = remember {
-            if (event.error is CancellationException) "Cancelled"
+            if (event.error is CancellationException) settingsStrings.cancelled
             else "${event.error::class.simpleName}: ${event.error.message}"
         }
         Text(errorMessage, color = MaterialTheme.colorScheme.error)

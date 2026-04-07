@@ -36,6 +36,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import snd.komelia.komga.api.model.KomeliaBook
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.platform.cursorForHand
 import snd.komga.client.book.MediaProfile.EPUB
 import snd.webview.webviewIsAvailable
@@ -82,6 +83,7 @@ private fun ReadButton(
     modifier: Modifier,
     onRead: () -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
     Row(
         modifier = Modifier.clickable { onRead() }.then(modifier),
         verticalAlignment = Alignment.CenterVertically
@@ -92,7 +94,7 @@ private fun ReadButton(
             contentDescription = null,
         )
         Spacer(Modifier.width(10.dp))
-        Text("Read")
+        Text(commonStrings.read)
     }
 }
 
@@ -103,6 +105,7 @@ private fun IncognitoDropDown(
     onIncognitoRead: () -> Unit,
     onDropdownOpenChange: (Boolean) -> Unit = {}
 ) {
+    val commonStrings = LocalStrings.current.common
     var isExpanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(
         expanded = isExpanded,
@@ -130,7 +133,7 @@ private fun IncognitoDropDown(
             modifier = Modifier.width(150.dp)
         ) {
             DropdownMenuItem(
-                text = { Text("Read incognito") },
+                text = { Text(commonStrings.readIncognito) },
                 onClick = { onIncognitoRead() },
                 modifier = Modifier.cursorForHand()
             )

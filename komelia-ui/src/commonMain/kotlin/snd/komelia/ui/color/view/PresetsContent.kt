@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import snd.komelia.color.Preset
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.color.PresetsState
 import snd.komelia.ui.common.components.CheckboxWithLabel
 import snd.komelia.ui.common.components.DropdownChoiceMenu
@@ -38,6 +39,8 @@ fun <T : Preset> PresetsContent(
     state: PresetsState<T>,
     modifier: Modifier = Modifier
 ) {
+    val colorStrings = LocalStrings.current.screens.color
+    val validationStrings = LocalStrings.current.validation
     val selectedPreset = state.selectedPreset.collectAsState().value
     val availablePresets = state.presets.collectAsState().value
     var showNameDialog by remember { mutableStateOf(false) }
@@ -50,17 +53,17 @@ fun <T : Preset> PresetsContent(
             options = remember(availablePresets) { availablePresets.map { LabeledEntry(it, it.name) } },
             onOptionChange = { preset -> preset.value?.let { state.onPresetSelect(it) } },
             inputFieldModifier = Modifier.fillMaxWidth(),
-            label = { Text("Presets") },
+            label = { Text(colorStrings.presets) },
             modifier = Modifier.weight(1f, false).widthIn(max = 400.dp).fillMaxWidth(),
         )
         if (selectedPreset == null)
-            Tooltip("Save Preset") {
+            Tooltip(colorStrings.savePreset) {
                 IconButton(onClick = { showNameDialog = true }) {
                     Icon(Icons.Default.Add, null)
                 }
             }
         else {
-            Tooltip("Delete Preset") {
+            Tooltip(colorStrings.deletePreset) {
                 IconButton(
                     onClick = { state.onPresetDelete(selectedPreset) },
                 ) {
@@ -82,7 +85,7 @@ fun <T : Preset> PresetsContent(
             },
             header = {
                 Text(
-                    "Enter a name for the preset",
+                    colorStrings.enterPresetName,
                     modifier = Modifier.padding(20.dp)
                 )
             },
@@ -94,10 +97,10 @@ fun <T : Preset> PresetsContent(
                         value = newPresetName,
                         onValueChange = { newPresetName = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Saved Settings") },
+                        placeholder = { Text(colorStrings.savedSettings) },
                         supportingText = {
                             if (!isValidName) Text(
-                                "Preset with that name already exists",
+                                validationStrings.presetAlreadyExists,
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
@@ -107,7 +110,7 @@ fun <T : Preset> PresetsContent(
                         CheckboxWithLabel(
                             checked = confirmOverride,
                             onCheckedChange = { confirmOverride = it },
-                            label = { Text("Override existing preset") }
+                            label = { Text(colorStrings.overrideExistingPreset) }
                         )
                     }
 

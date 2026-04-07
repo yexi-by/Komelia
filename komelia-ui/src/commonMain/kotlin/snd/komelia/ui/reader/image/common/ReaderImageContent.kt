@@ -24,9 +24,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpSize
 import snd.komelia.image.ReaderImage
 import snd.komelia.image.ReaderImageResult
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun ReaderImageContent(imageResult: ReaderImageResult?) {
+    val readerStrings = LocalStrings.current.reader
     when (imageResult) {
         is ReaderImageResult.Success -> ImageContent(imageResult.image)
         is ReaderImageResult.Error -> Text(
@@ -37,18 +39,19 @@ fun ReaderImageContent(imageResult: ReaderImageResult?) {
         null -> Box(
             modifier = Modifier.fillMaxHeight().aspectRatio(0.7f).background(Color.White),
             contentAlignment = Alignment.Center,
-            content = {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    CircularProgressIndicator(color = Color.Black)
-                    Text("Downloading...", color = Color.Black)
+                content = {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator(color = Color.Black)
+                        Text(readerStrings.downloading, color = Color.Black)
+                    }
                 }
-            }
         )
     }
 }
 
 @Composable
 private fun ImageContent(image: ReaderImage) {
+    val readerStrings = LocalStrings.current.reader
     // reimplement collectAsState and call remember with image key,
     // this avoids unnecessary recomposition and flickering caused by attempt to render old value on image change
     // without remember key, old painter value is remembered until new value is collected from flow
@@ -88,7 +91,7 @@ private fun ImageContent(image: ReaderImage) {
             verticalArrangement = Arrangement.Center
         ) {
             CircularProgressIndicator(color = Color.Black)
-            Text("Processing...", color = Color.Black)
+            Text(readerStrings.processing, color = Color.Black)
         }
 
     } else {

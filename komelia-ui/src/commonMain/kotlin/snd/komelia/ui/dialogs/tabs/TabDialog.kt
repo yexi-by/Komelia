@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import snd.komelia.ui.LocalWindowWidth
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.dialogs.AppDialogLayout
 import snd.komelia.ui.dialogs.BasicAppDialog
 import snd.komelia.ui.dialogs.DialogConfirmCancelButtons
@@ -180,6 +181,7 @@ private fun TabColumnDialog(
     onTabChange: (DialogTab) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
     val scrollState = rememberScrollState()
     AppDialogLayout(
         header = {
@@ -213,7 +215,7 @@ private fun TabColumnDialog(
         controlButtons = {
             DialogConfirmCancelButtons(
                 confirmText = confirmationText,
-                cancelText = "Cancel",
+                cancelText = commonStrings.cancel,
                 onConfirm = onConfirm,
                 confirmEnabled = canConfirm,
                 showCancelButton = showCancelButton,
@@ -245,7 +247,8 @@ private fun TabNavigationItems(
 ) {
     tabs.forEachIndexed { index, tab ->
         val selected = index == currentIndex
-        val enabled = tab.options().enabled
+        val tabItem = tab.options()
+        val enabled = tabItem.enabled
         val color = when {
             !enabled -> MaterialTheme.colorScheme.surfaceVariant
             selected -> MaterialTheme.colorScheme.secondary
@@ -255,12 +258,12 @@ private fun TabNavigationItems(
         TabNavigationItem(
             label = {
                 Text(
-                    text = tab.options().title,
+                    text = tabItem.title,
                     color = color,
                     style = MaterialTheme.typography.labelLarge
                 )
             },
-            icon = { tab.options().icon?.let { Icon(it, contentDescription = null, tint = color) } },
+            icon = { tabItem.icon?.let { Icon(it, contentDescription = null, tint = color) } },
             selected = selected,
             enabled = enabled,
             onClick = { onTabChange(tab) }

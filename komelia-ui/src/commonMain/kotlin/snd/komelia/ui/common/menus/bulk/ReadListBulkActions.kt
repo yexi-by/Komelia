@@ -15,8 +15,10 @@ import snd.komelia.komga.api.KomgaReadListApi
 import snd.komelia.komga.api.model.KomeliaBook
 import snd.komelia.ui.LocalKomgaState
 import snd.komelia.ui.LocalOfflineMode
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.dialogs.ConfirmationDialog
+import snd.komelia.ui.strings.RuntimeAppStrings
 import snd.komga.client.common.PatchValue
 import snd.komga.client.readlist.KomgaReadList
 import snd.komga.client.readlist.KomgaReadListUpdateRequest
@@ -37,10 +39,11 @@ fun ReadListBulkActionsContent(
 
 @Composable
 fun ReadListBulkActionsDialogs(state: ReadListBulkActinsState) {
+    val bulkStrings = LocalStrings.current.menus.bulk
     val coroutineScope = rememberCoroutineScope()
     if (state.showDeleteDialog) {
         ConfirmationDialog(
-            body = "Remove selected books from this read list?",
+            body = bulkStrings.removeFromReadListBody,
             onDialogConfirm = {
                 coroutineScope.launch { state.actions.removeFromReadList(state.readList, state.books) }
                 state.showDeleteDialog = false
@@ -102,13 +105,14 @@ data class ReadListBulkActinsState(
     private val isOffline: Boolean,
     private val isAdmin: Boolean,
 ) {
+    private val bulkStrings = RuntimeAppStrings.strings.value.menus.bulk
     var showDeleteDialog by mutableStateOf(false)
 
     val buttons = buildList {
         if (!isOffline && isAdmin) {
             add(
                 BulkActionButtonData(
-                    description = "Remove from read list",
+                    description = bulkStrings.removeFromReadList,
                     icon = Icons.Default.LayersClear,
                     onClick = { showDeleteDialog = true }
                 )
@@ -116,3 +120,4 @@ data class ReadListBulkActinsState(
         }
     }
 }
+

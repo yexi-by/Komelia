@@ -41,6 +41,7 @@ import snd.komelia.ui.common.components.CheckboxWithLabel
 import snd.komelia.ui.dialogs.AppDialog
 import snd.komelia.ui.platform.cursorForHand
 import snd.komelia.updates.UpdateProgress
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun OrtInstallDialog(
@@ -49,6 +50,8 @@ fun OrtInstallDialog(
     onDismiss: () -> Unit,
 ) {
     if (!show) return
+    val commonStrings = LocalStrings.current.common
+    val imageStrings = LocalStrings.current.imageSettings
 
     val coroutineScope = rememberCoroutineScope()
     var provider by remember { mutableStateOf<OnnxRuntimeExecutionProvider?>(null) }
@@ -76,9 +79,9 @@ fun OrtInstallDialog(
             header = {
                 Column(modifier = Modifier.padding(10.dp)) {
                     if (updateProgress == null)
-                        Text("Choose ONNX Runtime version", style = MaterialTheme.typography.titleLarge)
+                        Text(imageStrings.chooseOnnxRuntimeVersion, style = MaterialTheme.typography.titleLarge)
                     else
-                        Text("Downloading ONNX Runtime", style = MaterialTheme.typography.titleLarge)
+                        Text(imageStrings.downloadingOnnxRuntime, style = MaterialTheme.typography.titleLarge)
                     HorizontalDivider(Modifier.padding(top = 10.dp))
                 }
             },
@@ -102,7 +105,7 @@ fun OrtInstallDialog(
                     TextButton(
                         onClick = onDismiss,
                         modifier = Modifier.cursorForHand(),
-                        content = { Text("Cancel") }
+                        content = { Text(LocalStrings.current.common.cancel) }
                     )
 
                     FilledTonalButton(
@@ -110,7 +113,7 @@ fun OrtInstallDialog(
                         onClick = { provider?.let { onInstall(it) } },
                         modifier = Modifier.cursorForHand(),
                     ) {
-                        Text("Install")
+                        Text(imageStrings.install)
                     }
                 }
             },
@@ -126,6 +129,7 @@ private fun OrtDownloadDialogContent(
     chosenProvider: OnnxRuntimeExecutionProvider?,
     onProviderChoice: (OnnxRuntimeExecutionProvider) -> Unit,
 ) {
+    val imageStrings = LocalStrings.current.imageSettings
     Column(
         modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp).fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -136,7 +140,7 @@ private fun OrtDownloadDialogContent(
                 .fillMaxWidth()
         ) {
             Text(
-                "ONNX Runtime support is experimental.\nMight cause crashes or other app instabilities",
+                imageStrings.onnxRuntimeExperimentalWarning,
                 color = MaterialTheme.colorScheme.tertiaryContainer
             )
         }
@@ -151,10 +155,10 @@ private fun OrtDownloadDialogContent(
                         labelAlignment = Alignment.Top,
                         label = {
                             Column {
-                                Text("Cuda (Nvidia GPUs, requires CUDA12 and cuDNN9 system install)")
+                                Text(imageStrings.providerCuda)
                                 Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                                     Text(
-                                        "download CUDA12",
+                                        imageStrings.downloadCuda12,
                                         color = MaterialTheme.colorScheme.secondary,
                                         textDecoration = Underline,
                                         modifier = Modifier
@@ -163,7 +167,7 @@ private fun OrtDownloadDialogContent(
                                             .padding(horizontal = 5.dp),
                                     )
                                     Text(
-                                        "download cuDNN9",
+                                        imageStrings.downloadCudnn9,
                                         color = MaterialTheme.colorScheme.secondary,
                                         textDecoration = Underline,
                                         modifier = Modifier
@@ -183,14 +187,14 @@ private fun OrtDownloadDialogContent(
                     labelAlignment = Alignment.Top,
                     label = {
                         Column {
-                            Text("TensorRT (Nvidia GPUs, requires CUDA12, cuDNN9 and TensorRT system install)")
+                            Text(imageStrings.providerTensorRt)
                             Text(
-                                "Uses TensorRT to create optimized graph engine. Takes a significant time on model first load. After initial load engine is cached for future use",
+                                imageStrings.providerTensorRtDescription,
                                 style = MaterialTheme.typography.labelLarge
                             )
                             Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                                 Text(
-                                    "download CUDA12",
+                                    imageStrings.downloadCuda12,
                                     color = MaterialTheme.colorScheme.secondary,
                                     textDecoration = Underline,
                                     modifier = Modifier
@@ -199,7 +203,7 @@ private fun OrtDownloadDialogContent(
                                         .padding(horizontal = 5.dp),
                                 )
                                 Text(
-                                    "download cuDNN9",
+                                    imageStrings.downloadCudnn9,
                                     color = MaterialTheme.colorScheme.secondary,
                                     textDecoration = Underline,
                                     modifier = Modifier
@@ -208,7 +212,7 @@ private fun OrtDownloadDialogContent(
                                         .padding(horizontal = 5.dp),
                                 )
                                 Text(
-                                    "download TensorRT",
+                                    imageStrings.downloadTensorRt,
                                     color = MaterialTheme.colorScheme.secondary,
                                     textDecoration = Underline,
                                     modifier = Modifier
@@ -225,7 +229,7 @@ private fun OrtDownloadDialogContent(
                 ROCm -> CheckboxWithLabel(
                     checked = chosenProvider == ROCm,
                     onCheckedChange = { onProviderChoice(ROCm) },
-                    label = { Text("ROCm (AMD GPUs, requires ROCm7 system install)") },
+                    label = { Text(imageStrings.providerRocm) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -235,9 +239,9 @@ private fun OrtDownloadDialogContent(
                     labelAlignment = Alignment.Top,
                     label = {
                         Column {
-                            Text("DirectML (any GPU)")
+                            Text(imageStrings.providerDirectMl)
                             Text(
-                                "High-performance, hardware-accelerated DirectX 12 library for machine learning",
+                                imageStrings.providerDirectMlDescription,
                                 style = MaterialTheme.typography.labelLarge
                             )
                         }
@@ -248,7 +252,7 @@ private fun OrtDownloadDialogContent(
                 CPU -> CheckboxWithLabel(
                     checked = chosenProvider == CPU,
                     onCheckedChange = { onProviderChoice(CPU) },
-                    label = { Text("CPU") },
+                    label = { Text(imageStrings.providerCpu) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -258,9 +262,9 @@ private fun OrtDownloadDialogContent(
                     labelAlignment = Alignment.Top,
                     label = {
                         Column {
-                            Text("WebGPU (Any GPU)")
+                            Text(imageStrings.providerWebGpu)
                             Text(
-                                " API for cross-platform efficient GPU access using system's underlying Vulkan, Metal, or Direct3D 12 technologies",
+                                imageStrings.providerWebGpuDescription,
                                 style = MaterialTheme.typography.labelLarge
                             )
                         }
@@ -277,14 +281,16 @@ fun RestartDialog(
     error: String?,
     onConfirm: () -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val imageStrings = LocalStrings.current.imageSettings
     AppDialog(
         modifier = Modifier.widthIn(max = 600.dp),
         content = {
             Box(Modifier.padding(30.dp)) {
                 if (error != null)
-                    Text("An error occurred during installation:\n$error")
+                    Text(imageStrings.installationError(error))
                 else
-                    Text("App restart is required for changes to take effect")
+                    Text(imageStrings.restartRequiredForChanges)
             }
         },
         controlButtons = {
@@ -293,7 +299,7 @@ fun RestartDialog(
                     onClick = onConfirm,
                     modifier = Modifier.cursorForHand(),
                 ) {
-                    Text("Confirm")
+                    Text(commonStrings.confirm)
                 }
             }
         },

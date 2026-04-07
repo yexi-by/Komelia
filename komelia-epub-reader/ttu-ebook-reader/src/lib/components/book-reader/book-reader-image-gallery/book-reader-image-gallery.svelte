@@ -6,6 +6,7 @@
     readerImageGalleryKeybindMap$,
     skipKeyDownListener$
   } from '$lib/data/store';
+  import {epubStrings$} from '$lib/i18n/strings';
   import { createEventDispatcher, onMount } from 'svelte';
   import { quintInOut } from 'svelte/easing';
   import Fa from 'svelte-fa';
@@ -137,7 +138,7 @@
       style:background-color={backgroundColor}
     >
       <button
-        title="Close Image Gallery"
+        title={$epubStrings$.reader.closeImageGallery}
         class="flex items-end md:items-center"
         on:click={closeReaderImageGallery}
       >
@@ -164,12 +165,12 @@
           />
           {#if showSpoiler}
             <button
-              title="Show Image"
+              title={$epubStrings$.reader.showImage}
               class="spoiler-label"
               aria-hidden="true"
               on:click={() => toggleGalleryPictureSpoiler(readerImageGalleryPicture.url)}
             >
-              ネタバレ
+              {$epubStrings$.reader.spoilerLabel}
             </button>
           {/if}
         </button>
@@ -185,7 +186,7 @@
       {@const showSpoiler = $hideSpoilerImage$ && !selectedImage.unspoilered}
       <div class="flex flex-1">
         <button
-          title="Previous Image"
+          title={$epubStrings$.reader.previousImage}
           class="mx-4 text-5xl hover:text-red-500"
           class:invisible={!selectedImageIndex}
           on:click={previousImage}
@@ -196,17 +197,17 @@
           <img class="max-h-[94vh]" src={selectedImage.url} alt="currentImage" />
           {#if showSpoiler}
             <button
-              title="Show Image"
+              title={$epubStrings$.reader.showImage}
               class="spoiler-label"
               aria-hidden="true"
               on:click={() => toggleGalleryPictureSpoiler(selectedImage.url)}
             >
-              ネタバレ
+              {$epubStrings$.reader.spoilerLabel}
             </button>
           {/if}
         </div>
         <button
-          title="Next Image"
+          title={$epubStrings$.reader.nextImage}
           class="mx-4 text-5xl hover:text-red-500"
           class:invisible={selectedImageIndex === $readerImageGalleryPictures$.length - 1}
           on:click={nextImage}

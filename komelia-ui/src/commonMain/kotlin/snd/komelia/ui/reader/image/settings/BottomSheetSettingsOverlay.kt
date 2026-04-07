@@ -118,6 +118,9 @@ fun BottomSheetSettingsOverlay(
 ) {
 
     val windowWidth = LocalWindowWidth.current
+    val readerStrings = LocalStrings.current.reader
+    val continuousReaderStrings = LocalStrings.current.continuousReader
+    val imageStrings = LocalStrings.current.imageSettings
     var showSettingsDialog by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
@@ -190,14 +193,14 @@ fun BottomSheetSettingsOverlay(
                         onClick = { selectedTab = 0 },
                         modifier = Modifier.heightIn(min = 40.dp).cursorForHand(),
                     ) {
-                        Text("Reading mode")
+                        Text(readerStrings.readingMode)
                     }
                     Tab(
                         selected = selectedTab == 1,
                         onClick = { selectedTab = 1 },
                         modifier = Modifier.heightIn(min = 40.dp).cursorForHand(),
                     ) {
-                        Text("Image settings")
+                        Text(readerStrings.imageSettings)
                     }
                 }
                 val focusManager = LocalFocusManager.current
@@ -272,24 +275,25 @@ private fun BottomSheetReadingModeSettings(
     continuousReaderState: ContinuousReaderState,
     panelsReaderState: PanelsReaderState?,
 ) {
+    val readerStrings = LocalStrings.current.reader
     Column {
-        Text("Reading mode")
+        Text(readerStrings.readingMode)
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             InputChip(
                 selected = readerType == PAGED,
                 onClick = { onReaderTypeChange(PAGED) },
-                label = { Text("Paged") }
+                label = { Text(readerStrings.forReaderType(PAGED)) }
             )
             InputChip(
                 selected = readerType == CONTINUOUS,
                 onClick = { onReaderTypeChange(CONTINUOUS) },
-                label = { Text("Continuous") }
+                label = { Text(readerStrings.forReaderType(CONTINUOUS)) }
             )
             if (panelsReaderState != null)
                 InputChip(
                     selected = readerType == PANELS,
                     onClick = { onReaderTypeChange(PANELS) },
-                    label = { Text("Panels") }
+                    label = { Text(readerStrings.forReaderType(PANELS)) }
                 )
         }
 
@@ -451,8 +455,8 @@ private fun ContinuousModeSettings(
             val sidePadding = state.sidePaddingFraction.collectAsState().value
             val paddingPercentage = remember(sidePadding) { (sidePadding * 200).roundToInt() }
             Column(Modifier.width(100.dp)) {
-                Text("Side padding", style = MaterialTheme.typography.labelLarge)
-                Text("$paddingPercentage%", style = MaterialTheme.typography.labelMedium)
+                Text(strings.sidePadding, style = MaterialTheme.typography.labelLarge)
+                Text(strings.sidePaddingValue(paddingPercentage), style = MaterialTheme.typography.labelMedium)
             }
             Slider(
                 value = sidePadding,
@@ -466,8 +470,8 @@ private fun ContinuousModeSettings(
         Row(verticalAlignment = Alignment.CenterVertically) {
             val spacing = state.pageSpacing.collectAsState(Dispatchers.Main.immediate).value
             Column(Modifier.width(100.dp)) {
-                Text("Page spacing", style = MaterialTheme.typography.labelLarge)
-                Text("$spacing", style = MaterialTheme.typography.labelMedium)
+                Text(strings.pageSpacing, style = MaterialTheme.typography.labelLarge)
+                Text(strings.pageSpacingValue(spacing), style = MaterialTheme.typography.labelMedium)
             }
             when (windowWidth) {
                 COMPACT -> Slider(
@@ -524,7 +528,7 @@ private fun BottomSheetImageSettings(
     flashDuration: Long,
     onFlashDurationChange: (Long) -> Unit,
 
-    ) {
+) {
     Column {
         SamplingModeSettings(
             availableUpsamplingModes = availableUpsamplingModes,
@@ -556,7 +560,7 @@ private fun BottomSheetImageSettings(
 
         val strings = LocalStrings.current.reader
         val zoomPercentage = remember(zoom) { (zoom * 100).roundToInt() }
-        Text("${strings.zoom}: $zoomPercentage%")
+        Text(strings.zoomLine(zoomPercentage))
         when (readerType) {
             PAGED ->
                 PagedReaderPagesInfo(
@@ -641,9 +645,9 @@ private fun SamplingModeSettings(
     SwitchWithLabel(
         checked = linearLightDownsampling,
         onCheckedChange = onLinearLightDownsamplingChange,
-        label = { Text("Linear light downsampling") },
+        label = { Text(strings.linearLightDownsampling) },
         supportingText = {
-            Text("slower but potentially more accurate", style = MaterialTheme.typography.labelMedium)
+            Text(strings.linearLightDownsamplingDescription, style = MaterialTheme.typography.labelMedium)
         },
         contentPadding = PaddingValues(horizontal = 10.dp)
     )

@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import snd.komelia.color.ColorCorrectionType
 import snd.komelia.ui.LocalWindowWidth
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.color.CurvesState
 import snd.komelia.ui.color.LevelsState
 import snd.komelia.ui.platform.VerticalScrollbar
@@ -46,6 +47,7 @@ fun ColorCorrectionContent(
     displayImage: ImageBitmap?,
     onImageMaxSizeChange: (IntSize) -> Unit
 ) {
+    val colorStrings = LocalStrings.current.screens.color
     val width = LocalWindowWidth.current
     when (width) {
         COMPACT, MEDIUM ->
@@ -141,6 +143,7 @@ private fun EditorContent(
     levelsState: LevelsState,
     modifier: Modifier
 ) {
+    val colorStrings = LocalStrings.current.screens.color
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -151,14 +154,14 @@ private fun EditorContent(
                 onClick = { onCurveTypeChange(ColorCorrectionType.entries[0]) },
                 modifier = Modifier.heightIn(min = 40.dp).pointerHoverIcon(PointerIcon.Hand),
             ) {
-                Text("Curves")
+                Text(colorStrings.curves)
             }
             Tab(
                 selected = currentCurveType.ordinal == 1,
                 onClick = { onCurveTypeChange(ColorCorrectionType.entries[1]) },
                 modifier = Modifier.heightIn(min = 40.dp).pointerHoverIcon(PointerIcon.Hand),
             ) {
-                Text("Levels")
+                Text(colorStrings.levels)
             }
         }
 

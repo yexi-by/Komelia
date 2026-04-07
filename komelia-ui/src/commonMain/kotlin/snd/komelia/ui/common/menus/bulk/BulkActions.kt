@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.platform.cursorForHand
 import kotlin.math.roundToInt
 
@@ -59,6 +60,8 @@ fun BulkActionsContainer(
     onSelectAll: () -> Unit,
     content: @Composable RowScope.() -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
+    val bulkStrings = LocalStrings.current.menus.bulk
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -80,9 +83,9 @@ fun BulkActionsContainer(
                 selected = allSelected,
                 onClick = { onSelectAll() }
             )
-            Text("Select All")
+            Text(commonStrings.selectAll)
         }
-        Text("$selectedCount selected", modifier = Modifier.width(110.dp).padding(start = 10.dp))
+        Text(bulkStrings.selectedCount(selectedCount), modifier = Modifier.width(110.dp).padding(start = 10.dp))
 
         content()
     }
@@ -210,6 +213,7 @@ fun BulkActionsButtonsLayout(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MoreActionsDropdown(actions: List<BulkActionButtonData>, compact: Boolean) {
+    val commonStrings = LocalStrings.current.common
     var showDropdown by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
@@ -217,7 +221,7 @@ private fun MoreActionsDropdown(actions: List<BulkActionButtonData>, compact: Bo
         onExpandedChange = { showDropdown = it },
     ) {
         BulkActionButton(
-            description = "More",
+            description = commonStrings.more,
             icon = if (compact) Icons.Default.MoreHoriz else Icons.Default.MoreVert,
             onClick = { showDropdown = true },
             compact = compact

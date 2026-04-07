@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import snd.komelia.ui.LocalKomgaState
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.images.ReadListThumbnail
 import snd.komelia.ui.common.menus.ReadListActionsMenu
 import snd.komga.client.readlist.KomgaReadList
@@ -108,6 +109,7 @@ private fun ReadListImageOverlay(
     readlist: KomgaReadList,
     content: @Composable () -> Unit
 ) {
+    val strings = LocalStrings.current.screens.readList
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -117,9 +119,7 @@ private fun ReadListImageOverlay(
         CardGradientOverlay()
         Column(Modifier.padding(10.dp)) {
             CardOutlinedText(readlist.name)
-            CardOutlinedText(
-                if (readlist.bookIds.size == 1) "1 book" else "${readlist.bookIds.size} books",
-            )
+            CardOutlinedText(strings.booksCount(readlist.bookIds.size))
         }
     }
 

@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import snd.komelia.offline.server.model.OfflineMediaServer
 import snd.komelia.offline.server.model.OfflineMediaServerId
 import snd.komelia.offline.user.model.OfflineUser
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.dialogs.ConfirmationDialog
 import snd.komga.client.user.KomgaUser
 import snd.komga.client.user.KomgaUserId
@@ -51,12 +52,17 @@ fun OfflineUserSettingsContent(
     onServerDelete: (OfflineMediaServerId) -> Unit,
     onUserDelete: (KomgaUserId) -> Unit
 ) {
+    val settingsStrings = LocalStrings.current.screens.settings
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
 
         Column {
-            Text("user: ${currentUser?.email ?: "none"}")
-            Text("status: ${if (isOffline) "offline" else "online"}")
-            Text("server: ${if (currentUser?.id == OfflineUser.ROOT || onlineServerUrl == null) "none" else onlineServerUrl}")
+            Text(settingsStrings.currentUser(currentUser?.email ?: settingsStrings.none))
+            Text(settingsStrings.currentStatus(if (isOffline) settingsStrings.offline else settingsStrings.online))
+            Text(
+                settingsStrings.currentServer(
+                    if (currentUser?.id == OfflineUser.ROOT || onlineServerUrl == null) settingsStrings.none else onlineServerUrl
+                )
+            )
         }
 
         Row(
@@ -71,9 +77,9 @@ fun OfflineUserSettingsContent(
             }
 
             if (isOffline) {
-                FilledTonalButton(onClick = { goOnline() }) { Text("Go online") }
+                FilledTonalButton(onClick = { goOnline() }) { Text(settingsStrings.goOnline) }
             } else if (canGoOffline) {
-                FilledTonalButton(onClick = { currentUser?.let { loginAs(it.id) } }) { Text("Go offline as current user") }
+                FilledTonalButton(onClick = { currentUser?.let { loginAs(it.id) } }) { Text(settingsStrings.goOfflineAsCurrentUser) }
             }
         }
 
@@ -104,6 +110,7 @@ fun ServerCard(
     onUserDelete: (KomgaUserId) -> Unit,
     expandByDefault: Boolean,
 ) {
+    val settingsStrings = LocalStrings.current.screens.settings
 
     var showUsers by remember { mutableStateOf(expandByDefault || users.size == 1) }
     var showDeleteConfirmation by remember { mutableStateOf(false) }
@@ -136,8 +143,8 @@ fun ServerCard(
 
                 if (showDeleteConfirmation) {
                     ConfirmationDialog(
-                        body = "Delete all server data?",
-                        confirmText = "Yes, delete all downloaded files and user data",
+                        body = settingsStrings.deleteAllServerData,
+                        confirmText = settingsStrings.deleteAllServerDataConfirm,
                         onDialogConfirm = { onServerDelete(server.id) },
                         onDialogDismiss = { showDeleteConfirmation = false }
                     )
@@ -166,6 +173,8 @@ private fun UserCard(
     goOffline: (KomgaUserId) -> Unit,
     onUserDelete: (KomgaUserId) -> Unit,
 ) {
+    val loginStrings = LocalStrings.current.screens.login
+    val settingsStrings = LocalStrings.current.screens.settings
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     Row(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -181,7 +190,7 @@ private fun UserCard(
         }
 
         FilledTonalButton(onClick = { goOffline(user.id) }) {
-            Text("login")
+            Text(loginStrings.login)
         }
 
         IconButton(
@@ -193,8 +202,8 @@ private fun UserCard(
 
     if (showDeleteConfirmation) {
         ConfirmationDialog(
-            body = "Delete user data?",
-            confirmText = "Yes, delete user data and associated read progress",
+            body = settingsStrings.deleteUserData,
+            confirmText = settingsStrings.deleteUserDataConfirm,
             onDialogConfirm = { onUserDelete(user.id) },
             onDialogDismiss = { showDeleteConfirmation = false }
         )
@@ -203,6 +212,8 @@ private fun UserCard(
 
 @Composable
 fun RootUserCard(goOffline: () -> Unit) {
+    val loginStrings = LocalStrings.current.screens.login
+    val settingsStrings = LocalStrings.current.screens.settings
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -222,16 +233,16 @@ fun RootUserCard(goOffline: () -> Unit) {
                     null,
                     tint = MaterialTheme.colorScheme.tertiaryContainer
                 )
-                Text("root")
+                Text(settingsStrings.rootUser)
             }
 
-            Text("Special user that has access to all downloaded books")
-            Text("Read progress will not be synced")
+            Text(settingsStrings.rootDescription)
+            Text(settingsStrings.rootReadProgressWillNotSync)
         }
 
 
         FilledTonalButton(onClick = { goOffline() }) {
-            Text("login")
+            Text(loginStrings.login)
         }
     }
 }

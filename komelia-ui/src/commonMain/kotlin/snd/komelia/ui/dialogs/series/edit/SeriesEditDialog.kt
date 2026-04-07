@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.dialogs.oneshot.OneshotEditDialog
 import snd.komelia.ui.dialogs.tabs.TabDialog
@@ -20,14 +21,15 @@ fun SeriesEditDialog(
     LaunchedEffect(series) { vm.initialize() }
 
     val coroutineScope = rememberCoroutineScope()
+    val commonStrings = LocalStrings.current.common
     if (series.oneshot) {
         OneshotEditDialog(series.id, series, null, onDismissRequest)
     } else {
         TabDialog(
-            title = "Edit ${series.metadata.title}",
+            title = commonStrings.editItem(series.metadata.title),
             currentTab = vm.currentTab,
             tabs = vm.tabs,
-            confirmationText = "Save",
+            confirmationText = commonStrings.save,
             onConfirm = { coroutineScope.launch { vm.saveChanges() } },
             onTabChange = { vm.currentTab = it },
             onDismissRequest = { onDismissRequest() }

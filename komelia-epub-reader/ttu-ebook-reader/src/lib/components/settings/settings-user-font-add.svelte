@@ -2,6 +2,7 @@
   import {inputClasses} from '$lib/css-classes';
   import {userFonts$} from '$lib/data/store';
   import {dummyFn} from '$lib/functions/utils';
+  import {epubStrings$} from '$lib/i18n/strings';
   import {faFloppyDisk} from '@fortawesome/free-solid-svg-icons';
   import Fa from 'svelte-fa';
   import {externalFunctions} from "$lib/external";
@@ -43,7 +44,7 @@
 </script>
 
 <div class="flex flex-col min-w-[15rem] md:min-w-[20rem]">
-  <span>Font Name</span>
+  <span>{$epubStrings$.settings.fontName}</span>
   <input
       class="mt-2"
       type="text"
@@ -54,7 +55,7 @@
       if (
         $userFonts$.find((userFont) => userFont.displayName === fontName)
       ) {
-        currentError = 'a font file with this name is already stored';
+        currentError = $epubStrings$.settings.fontAlreadyStored;
       }
     }}
   />
@@ -67,12 +68,12 @@
         onclick={() => openFileDialog()}
         onkeyup={dummyFn}
     >
-      Choose File (and click Save)
+      {$epubStrings$.settings.chooseFileAndSave}
     </div>
     <div
         tabindex="0"
         role="button"
-        title={canSave ? 'Save' : 'Select a File and Font name to save'}
+        title={canSave ? $epubStrings$.settings.save : $epubStrings$.settings.saveFontTooltip}
         class:text-gray-500={!canSave}
         class:cursor-not-allowed={!canSave}
         onclick={() => {

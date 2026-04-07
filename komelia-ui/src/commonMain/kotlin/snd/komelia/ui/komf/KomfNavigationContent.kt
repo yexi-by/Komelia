@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.login.LoginScreen
 import snd.komelia.ui.settings.komf.general.KomfSettingsScreen
 import snd.komelia.ui.settings.komf.jobs.KomfJobsScreen
@@ -29,50 +30,53 @@ fun KomfNavigationContent(
     contentColor: Color,
     modifier: Modifier = Modifier
 ) {
+    val commonStrings = LocalStrings.current.common
+    val komfStrings = LocalStrings.current.komf
+    val settingsStrings = LocalStrings.current.screens.settings
     Column(
         modifier = modifier.verticalScroll(rememberScrollState())
     ) {
         NavigationButton(
-            label = "Komga webui",
+            label = komfStrings.navigation.komgaWebui,
             onClick = { onNavigation(LoginScreen()) },
             isSelected = currentScreen is LoginScreen,
             color = contentColor,
         )
 
         HorizontalDivider(Modifier.padding(vertical = 10.dp))
-        Text("Komf Settings", style = MaterialTheme.typography.titleSmall)
+        Text(settingsStrings.komfSettings, style = MaterialTheme.typography.titleSmall)
         NavigationButton(
-            label = "Connection",
+            label = commonStrings.connection,
             onClick = { onNavigation(KomfSettingsScreen(integrationToggleEnabled = false, showKavitaSettings = true)) },
             isSelected = currentScreen is KomfSettingsScreen,
             color = contentColor,
         )
         NavigationButton(
-            label = "Komga Processing",
+            label = komfStrings.navigation.komgaProcessing,
             onClick = { onNavigation(KomfProcessingSettingsScreen(KOMGA)) },
             isSelected = currentScreen is KomfProcessingSettingsScreen && currentScreen.serverType == KOMGA,
             color = contentColor,
         )
         NavigationButton(
-            label = "Kavita Processing",
+            label = komfStrings.navigation.kavitaProcessing,
             onClick = { onNavigation(KomfProcessingSettingsScreen(KAVITA)) },
             isSelected = currentScreen is KomfProcessingSettingsScreen && currentScreen.serverType == KAVITA,
             color = contentColor,
         )
         NavigationButton(
-            label = "Providers",
+            label = commonStrings.providers,
             onClick = { onNavigation(KomfProvidersSettingsScreen()) },
             isSelected = currentScreen is KomfProvidersSettingsScreen,
             color = contentColor,
         )
         NavigationButton(
-            label = "Notifications",
+            label = commonStrings.notifications,
             onClick = { onNavigation(KomfNotificationSettingsScreen()) },
             isSelected = currentScreen is KomfNotificationSettingsScreen,
             color = contentColor,
         )
         NavigationButton(
-            label = "Job History",
+            label = settingsStrings.jobHistory,
             onClick = { onNavigation(KomfJobsScreen(false)) },
             isSelected = currentScreen is KomfJobsScreen,
             color = contentColor,

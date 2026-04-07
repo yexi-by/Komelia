@@ -17,6 +17,7 @@
     translateXHeaderFa
   } from '$lib/css-classes';
   import {customReadingPointEnabled$, viewMode$} from '$lib/data/store';
+  import {epubStrings$} from '$lib/i18n/strings';
   import {ViewMode} from '$lib/data/view-mode';
   import {dummyFn, isMobile$} from '$lib/functions/utils';
   import Fa from 'svelte-fa';
@@ -66,9 +67,9 @@
     label: string;
     action: any;
   }[] = [
-    ...(hasCustomReadingPoint ? [{label: 'Show Point', action: showCustomReadingPoint}] : []),
-    {label: 'Set Point', action: setCustomReadingPoint},
-    ...(hasCustomReadingPoint ? [{label: 'Reset Point', action: resetCustomReadingPoint}] : [])
+    ...(hasCustomReadingPoint ? [{label: $epubStrings$.reader.showPoint, action: showCustomReadingPoint}] : []),
+    {label: $epubStrings$.reader.setPoint, action: setCustomReadingPoint},
+    ...(hasCustomReadingPoint ? [{label: $epubStrings$.reader.identifyPointReset, action: resetCustomReadingPoint}] : [])
   ];
 
   let customReadingPointMenuElm: Popover | undefined = $state();
@@ -88,7 +89,7 @@
       <div
           tabindex="0"
           role="button"
-          title="Open Table of Contents"
+          title={$epubStrings$.reader.openTableOfContents}
           class={baseIconClasses}
           onclick={tocClick}
           onkeyup={dummyFn}
@@ -99,7 +100,7 @@
     <div
         tabindex="0"
         role="button"
-        title="Create Bookmark"
+        title={$epubStrings$.reader.createBookmark}
         class={baseIconClasses}
         onclick={bookmarkClick}
         onkeyup={dummyFn}
@@ -110,7 +111,7 @@
       <div
           tabindex="0"
           role="button"
-          title="Return to Bookmark"
+          title={$epubStrings$.reader.returnToBookmark}
           class={baseIconClasses}
           onclick={scrollToBookmarkClick}
           onkeyup={dummyFn}
@@ -121,7 +122,7 @@
     {#if $viewMode$ === ViewMode.Continuous && !$isMobile$}
       <div
           class="flex items-center px-4 text-xl xl:px-3 xl:text-lg"
-          title="Current Autoscroll Speed"
+          title={$epubStrings$.reader.currentAutoscrollSpeed}
       >
         {autoScrollMultiplier}x
       </div>
@@ -132,7 +133,7 @@
     <div
         tabindex="0"
         role="button"
-        title="Complete Book"
+        title={$epubStrings$.reader.completeBook}
         class={baseIconClasses}
         onclick={completeBook}
         onkeyup={dummyFn}
@@ -147,7 +148,7 @@
             yOffset={0}
             bind:this={customReadingPointMenuElm}
         >
-          <div slot="icon" title="Open Custom Point Actions" class={baseIconClasses}>
+          <div slot="icon" title={$epubStrings$.reader.openCustomPointActions} class={baseIconClasses}>
             <Fa icon={faCrosshairs}/>
           </div>
           <div class="w-40 bg-gray-700 md:w-32" slot="content">
@@ -170,7 +171,7 @@
       <div
           tabindex="0"
           role="button"
-          title="Toggle Fullscreen"
+          title={$epubStrings$.reader.toggleFullscreen}
           class={baseIconClasses}
           onclick={fullscreenClick}
           onkeyup={dummyFn}
@@ -181,7 +182,7 @@
     <div
         tabindex="0"
         role="button"
-        title="Images"
+        title={$epubStrings$.reader.images}
         class={baseIconClasses}
         onclick={readerImageGalleryClick}
         onkeyup={dummyFn}
@@ -191,7 +192,7 @@
     <div
         tabindex="0"
         role="button"
-        title="Settings"
+        title={$epubStrings$.reader.settings}
         class={baseIconClasses}
         onclick={settingsClick}
         onkeyup={dummyFn}
@@ -202,7 +203,7 @@
     <div
         tabindex="0"
         role="button"
-        title="Close Book"
+        title={$epubStrings$.reader.closeBook}
         class={baseIconClasses}
         onclick={closeBook}
         onkeyup={dummyFn}

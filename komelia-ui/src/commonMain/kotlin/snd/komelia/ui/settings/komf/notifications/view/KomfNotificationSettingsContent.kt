@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import snd.komelia.ui.StateHolder
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.platform.cursorForHand
 import snd.komelia.ui.settings.komf.notifications.AppriseState
 import snd.komelia.ui.settings.komf.notifications.DiscordState
@@ -24,22 +25,23 @@ fun KomfSettingsContent(
     discordState: DiscordState,
     appriseState: AppriseState,
 ) {
+    val commonStrings = LocalStrings.current.common
     Column {
         var selectedTab by remember { mutableStateOf(0) }
         SecondaryTabRow(selectedTabIndex = selectedTab) {
             Tab(
                 selected = selectedTab == 0,
-                onClick = { selectedTab = 0 },
-                modifier = Modifier.heightIn(min = 40.dp).cursorForHand(),
-            ) {
-                Text("Discord")
+            onClick = { selectedTab = 0 },
+            modifier = Modifier.heightIn(min = 40.dp).cursorForHand(),
+        ) {
+                Text(commonStrings.discord)
             }
             Tab(
                 selected = selectedTab == 1,
                 onClick = { selectedTab = 1 },
                 modifier = Modifier.heightIn(min = 40.dp).cursorForHand(),
             ) {
-                Text("Apprise")
+                Text(commonStrings.apprise)
             }
         }
         Spacer(Modifier.height(30.dp))

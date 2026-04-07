@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import snd.komelia.komga.api.model.KomeliaBook
 import snd.komelia.ui.LocalKomgaState
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalWindowWidth
 import snd.komelia.ui.book.BookInfoColumn
 import snd.komelia.ui.book.BookInfoRow
@@ -86,6 +87,7 @@ fun OneshotScreenContent(
     onBookDownloadDelete: () -> Unit,
     cardWidth: Dp
 ) {
+    val bookStrings = LocalStrings.current.screens.book
     val scrollState: ScrollState = rememberScrollState()
     Column(modifier = Modifier.fillMaxSize()) {
         OneshotToolBar(
@@ -224,6 +226,7 @@ private fun FlowRowScope.OneshotMainInfo(
     onDownload: () -> Unit,
     onDownloadDelete: () -> Unit
 ) {
+    val bookStrings = LocalStrings.current.screens.book
     val isDeleted = remember(series, library) { series.deleted || library.unavailable }
     Column(
         modifier = Modifier.weight(1f, false).widthIn(min = 450.dp, max = 1200.dp),
@@ -266,7 +269,7 @@ private fun FlowRowScope.OneshotMainInfo(
                     onClick = onDownloadDelete,
                     border = BorderStroke(2.dp, MaterialTheme.colorScheme.errorContainer)
                 ) {
-                    Text("Delete downloaded")
+                    Text(bookStrings.deleteDownloaded)
                 }
             }
         }

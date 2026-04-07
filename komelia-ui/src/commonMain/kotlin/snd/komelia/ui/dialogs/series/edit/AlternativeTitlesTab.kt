@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import snd.komelia.ui.StateHolder
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.components.LockIcon
 import snd.komelia.ui.common.components.withTextFieldNavigation
 import snd.komelia.ui.dialogs.tabs.DialogTab
@@ -30,8 +31,9 @@ internal class AlternativeTitlesTab(
     private val vm: SeriesEditMetadataState,
 ) : DialogTab {
 
+    @Composable
     override fun options() = TabItem(
-        title = "ALTERNATE TITLES",
+        title = LocalStrings.current.common.alternateTitles,
         icon = Icons.Default.Title
     )
 
@@ -55,6 +57,8 @@ private fun AlternativeTitlesTabContent(
     onTitleRemove: (index: Int) -> Unit,
     alternativeTitlesLock: StateHolder<Boolean>,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val dialogStrings = LocalStrings.current.dialogs.links
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier = Modifier
@@ -68,7 +72,7 @@ private fun AlternativeTitlesTabContent(
                 TextField(
                     value = altTitle.label,
                     onValueChange = { onTitleChange(index, altTitle.copy(label = it)) },
-                    label = { Text("Label") },
+                    label = { Text(dialogStrings.label) },
                     maxLines = 1,
                     modifier = Modifier.weight(.3f).withTextFieldNavigation(onTitleAdd)
                 )
@@ -78,7 +82,7 @@ private fun AlternativeTitlesTabContent(
                 TextField(
                     value = altTitle.title,
                     onValueChange = { onTitleChange(index, altTitle.copy(title = it)) },
-                    label = { Text("Alternate title") },
+                    label = { Text(commonStrings.alternateTitle) },
                     maxLines = 1,
                     modifier = Modifier.weight(.7f).withTextFieldNavigation()
                 )
@@ -95,4 +99,7 @@ private fun AlternativeTitlesTabContent(
     }
 
 }
+
+
+
 

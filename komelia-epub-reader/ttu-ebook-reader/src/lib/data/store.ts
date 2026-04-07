@@ -19,6 +19,7 @@ import type {WritingMode} from './writing-mode';
 import {externalFunctions} from '$lib/external';
 import {BookReaderAvailableKeybind, type BookReaderKeybindMap} from './book-reader-keybind';
 import {subjectToSvelteWritable} from '$lib/functions/rxjs/subject-to-writable';
+import {initializeEpubStrings} from '$lib/i18n/strings';
 
 export const bookId$ = subjectToSvelteWritable(new ReplaySubject<string>(1));
 
@@ -141,6 +142,7 @@ let externalSettingsState: ReaderSettings;
 export async function loadExternalSettings() {
   if (externalSettingsState != undefined) return;
 
+  await initializeEpubStrings();
   bookId$.next(await externalFunctions.getCurrentBookId());
   availableSystemFonts$.next(await externalFunctions.getAvailableSystemFonts());
   let userfonts = await externalFunctions.getStoredFonts()

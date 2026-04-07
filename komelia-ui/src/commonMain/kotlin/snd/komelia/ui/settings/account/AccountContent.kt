@@ -20,6 +20,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.dialogs.user.PasswordChangeDialog
 import snd.komga.client.user.KomgaUser
 
@@ -36,19 +37,21 @@ fun AccountSettingsContent(user: KomgaUser) {
 
 @Composable
 private fun EmailDetails(user: KomgaUser) {
+    val commonStrings = LocalStrings.current.common
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text("Email:  ${user.email}", fontWeight = FontWeight.Bold)
+        Text(commonStrings.labeledValue(commonStrings.email, user.email), fontWeight = FontWeight.Bold)
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun RolesDetails(user: KomgaUser) {
+    val commonStrings = LocalStrings.current.common
     Row(
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Text("Roles:", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 10.dp))
+        Text(commonStrings.labelWithColon(commonStrings.roles), fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 10.dp))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
             user.roles.forEach { role ->
                 SuggestionChip(
@@ -68,7 +71,7 @@ private fun PasswordDetails(user: KomgaUser) {
         onClick = { showPasswordDialog = true },
         modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
     ) {
-        Text("Change Password")
+        Text(LocalStrings.current.common.changePassword)
     }
     if (showPasswordDialog) {
         PasswordChangeDialog(user = user, onDismiss = { showPasswordDialog = false })

@@ -69,6 +69,8 @@ Then choose your packaging option:
 
 ## Android App Build
 
+Detailed Android build notes and troubleshooting are documented in [`docs/android-apk-build-playbook.md`](docs/android-apk-build-playbook.md).
+
 To build with docker container, replace <*arch*> placeholder with your target architecture\
 Available architectures include:  `aarch64`, `armv7a`, `x86_64`, `x86`
 

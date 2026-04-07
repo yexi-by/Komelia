@@ -27,6 +27,7 @@ import snd.komelia.ui.common.components.CheckboxWithLabel
 import snd.komelia.ui.common.components.PasswordTextField
 import snd.komelia.ui.common.components.withTextFieldNavigation
 import snd.komelia.ui.dialogs.AppDialog
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun UserAddDialog(
@@ -86,13 +87,15 @@ fun UserAddDialog(
         onDismissRequest = onDismissRequest,
         modifier = Modifier.widthIn(max = 600.dp),
         header = {
+            val commonStrings = LocalStrings.current.common
             Text(
-                text = "Add User",
+                text = commonStrings.addUser,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(horizontal = 15.dp, vertical = 10.dp)
             )
         },
         content = {
+            val commonStrings = LocalStrings.current.common
             Column(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 horizontalAlignment = Alignment.Start,
@@ -102,7 +105,7 @@ fun UserAddDialog(
                 TextField(
                     value = email,
                     onValueChange = onEmailChange,
-                    label = { Text("Email") },
+                    label = { Text(commonStrings.email) },
                     supportingText = {
                         if (emailValidation != null)
                             Text(text = emailValidation, color = MaterialTheme.colorScheme.error)
@@ -113,31 +116,31 @@ fun UserAddDialog(
                 PasswordTextField(
                     value = password,
                     onValueChange = onPasswordChange,
-                    label = { Text("Password") },
+                    label = { Text(LocalStrings.current.common.password) },
                     isError = passwordValidation != null,
                     supportingText = { passwordValidation?.let { Text(it) } },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 Column {
-                    Text("Roles")
+                    Text(commonStrings.roles)
 
                     CheckboxWithLabel(
                         checked = administratorRole,
                         onCheckedChange = onAdministratorRoleChange,
-                        label = { Text("Administrator") }
+                        label = { Text(LocalStrings.current.dialogs.user.administrator) }
                     )
 
                     CheckboxWithLabel(
                         checked = pageStreamingRole,
                         onCheckedChange = onPageStreamingRoleChange,
-                        label = { Text("Page Streaming") }
+                        label = { Text(commonStrings.pageStreaming) }
                     )
 
                     CheckboxWithLabel(
                         checked = fileDownloadRole,
                         onCheckedChange = onFileDownloadRoleChange,
-                        label = { Text("File Download") }
+                        label = { Text(commonStrings.fileDownload) }
                     )
                 }
             }
@@ -153,7 +156,7 @@ fun UserAddDialog(
                     onClick = onDismissRequest,
                     modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
                 ) {
-                    Text("Cancel")
+                    Text(LocalStrings.current.common.cancel)
                 }
 
                 FilledTonalButton(
@@ -166,7 +169,7 @@ fun UserAddDialog(
                     enabled = isValid,
                     modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
                 ) {
-                    Text("Add")
+                    Text(LocalStrings.current.common.add)
                 }
             }
         }

@@ -9,6 +9,7 @@ import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.asList
 import snd.komelia.KomfActiveDialog
+import snd.komelia.strings.RuntimeExtensionStrings
 import snd.komf.api.KomfServerLibraryId
 
 class KomgaLibraryActions(
@@ -18,8 +19,8 @@ class KomgaLibraryActions(
     val element: HTMLButtonElement = document.createElement("button") as HTMLButtonElement
     private val dropdown = KomgaDropdown(
         listOf(
-            KomgaDropdown.DropdownItem("Auto-Identify", this::onIdentifyClick),
-            KomgaDropdown.DropdownItem("Reset Metadata", this::onResetClick),
+            KomgaDropdown.DropdownItem(RuntimeExtensionStrings.strings.value.content.autoIdentifyTitle, this::onIdentifyClick),
+            KomgaDropdown.DropdownItem(RuntimeExtensionStrings.strings.value.content.resetMetadataTitle, this::onResetClick),
         )
     )
 
@@ -54,13 +55,17 @@ class KomgaLibraryActions(
 
     private fun onIdentifyClick() {
         val libraryId = getLibraryId()
-        if (libraryId == null) currentDialog.value = KomfActiveDialog.ErrorDialog("Failed to fine libraryId")
+        if (libraryId == null) currentDialog.value = KomfActiveDialog.ErrorDialog(
+            RuntimeExtensionStrings.strings.value.content.libraryIdNotFound
+        )
         else currentDialog.value = KomfActiveDialog.LibraryIdentify(libraryId)
     }
 
     private fun onResetClick() {
         val libraryId = getLibraryId()
-        if (libraryId == null) currentDialog.value = KomfActiveDialog.ErrorDialog("Failed to fine libraryId")
+        if (libraryId == null) currentDialog.value = KomfActiveDialog.ErrorDialog(
+            RuntimeExtensionStrings.strings.value.content.libraryIdNotFound
+        )
         else currentDialog.value = KomfActiveDialog.LibraryReset(libraryId)
     }
 

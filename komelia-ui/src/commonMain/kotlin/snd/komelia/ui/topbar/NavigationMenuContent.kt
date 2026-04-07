@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import snd.komelia.ui.LocalKomgaState
 import snd.komelia.ui.LocalOfflineMode
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.menus.LibraryActionsMenu
 import snd.komelia.ui.common.menus.LibraryMenuActions
 import snd.komelia.ui.dialogs.libraryedit.LibraryEditDialogs
@@ -130,6 +131,7 @@ fun ColumnScope.LibrariesNavBarContent(
     onLibrariesClick: () -> Unit,
     onLibraryClick: (KomgaLibraryId) -> Unit,
 ) {
+    val topBarStrings = LocalStrings.current.screens.topBar
     var showLibraryAddDialog by remember { mutableStateOf(false) }
     if (showLibraryAddDialog) {
         LibraryEditDialogs(
@@ -143,7 +145,7 @@ fun ColumnScope.LibrariesNavBarContent(
     NavButton(
         onClick = { onLibrariesClick() },
         icon = Icons.AutoMirrored.Filled.LibraryBooks,
-        label = "Libraries",
+        label = topBarStrings.libraries,
         isSelected = false,
         actionButton = if (!isAdmin || isOffline) null else {
             {
@@ -162,7 +164,7 @@ fun ColumnScope.LibrariesNavBarContent(
             onClick = { onLibraryClick(library.id) },
             icon = null,
             label = library.name,
-            errorLabel = if (library.unavailable) "Unavailable" else null,
+            errorLabel = if (library.unavailable) topBarStrings.unavailable else null,
             isSelected = currentScreen is LibraryScreen && currentScreen.libraryId == library.id,
             actionButton = if (!isAdmin && !isOffline) null else {
                 {
@@ -198,6 +200,7 @@ private fun NavMenu(
     onLibraryClick: (KomgaLibraryId) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
+    val topBarStrings = LocalStrings.current.screens.topBar
     val scrollState: ScrollState = rememberScrollState()
     val navBarInteractionSource = remember { MutableInteractionSource() }
     val isHovered = navBarInteractionSource.collectIsHoveredAsState()
@@ -220,7 +223,7 @@ private fun NavMenu(
             NavButton(
                 onClick = { onHomeClick() },
                 icon = Icons.Default.Home,
-                label = "Home",
+                label = topBarStrings.home,
                 isSelected = currentScreen is HomeScreen
             )
             LibrariesNavBarContent(
@@ -235,7 +238,7 @@ private fun NavMenu(
             NavButton(
                 onClick = onSettingsClick,
                 icon = Icons.Default.Settings,
-                label = "Settings",
+                label = topBarStrings.settings,
                 isSelected = false
             )
 
@@ -303,18 +306,19 @@ private fun NavButton(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun TaskQueueIndicator(queueStatus: TaskQueueStatus) {
+    val topBarStrings = LocalStrings.current.screens.topBar
     BasicTooltipBox(
         positionProvider = rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
         tooltip = {
             Surface(color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .9f)) {
                 Column(Modifier.padding(10.dp)) {
                     when (queueStatus.count) {
-                        1 -> Text("1 pending task")
-                        else -> Text("${queueStatus.count} pending tasks")
+                        1 -> Text(topBarStrings.pendingTaskSingular)
+                        else -> Text(topBarStrings.pendingTasks(queueStatus.count))
                     }
                     Spacer(Modifier.height(10.dp))
                     queueStatus.countByType.forEach { (task, count) ->
-                        Text("$task: $count")
+                        Text(topBarStrings.taskQueueItem(task, count))
                     }
                 }
             }

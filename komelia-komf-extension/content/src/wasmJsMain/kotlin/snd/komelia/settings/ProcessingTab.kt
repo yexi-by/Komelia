@@ -14,12 +14,14 @@ import io.github.snd_r.komelia.ui.dialogs.tabs.TabItem
 import io.github.snd_r.komelia.ui.error.formatExceptionMessage
 import io.github.snd_r.komelia.ui.settings.komf.processing.KomfProcessingSettingsContent
 import snd.komelia.LocalKomfViewModelFactory
+import snd.komelia.strings.LocalExtensionStrings
 import snd.komf.api.MediaServer
 
 class ProcessingTab(private val mediaServer: MediaServer) : DialogTab {
 
+    @Composable
     override fun options() = TabItem(
-        title = "Processing",
+        title = LocalExtensionStrings.current.content.processingTab,
         icon = Icons.Default.Memory
     )
 
@@ -51,3 +53,6 @@ class ProcessingTab(private val mediaServer: MediaServer) : DialogTab {
 
     }
 }
+
+
+

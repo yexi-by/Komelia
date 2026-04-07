@@ -69,6 +69,7 @@ import snd.komga.client.series.KomgaSeries
 import snd.komga.client.series.KomgaSeriesId
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun KomfJobsContent(
@@ -83,6 +84,8 @@ fun KomfJobsContent(
     onDeleteAll: () -> Unit,
     isLoading: Boolean,
 ) {
+    val komfStrings = LocalStrings.current.komf.jobs
+    val settingsStrings = LocalStrings.current.screens.settings
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Column {
             StatusFilters(
@@ -106,7 +109,7 @@ fun KomfJobsContent(
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 if (loading) CircularProgressIndicator()
                 else if (jobs.isEmpty()) {
-                    Text("Nothing to show")
+                    Text(settingsStrings.nothingToShow)
                 } else {
                     key(currentPage, selectedStatus) {
                         jobs.forEach {
@@ -140,6 +143,7 @@ private fun JobCard(
     getSeries: (suspend (KomgaSeriesId) -> KomgaSeries?)?,
     onSeriesClick: (KomgaSeries) -> Unit,
 ) {
+    val komfStrings = LocalStrings.current.komf.jobs
     var loading by remember { mutableStateOf(true) }
     var series by remember { mutableStateOf<KomgaSeries?>(null) }
     var seriesTitle by remember { mutableStateOf("") }
@@ -209,7 +213,7 @@ private fun JobCard(
         }
         job.finishedAt?.let {
             val duration: Duration = it.minus(job.startedAt)
-            Text("duration: ${duration.toString(DurationUnit.SECONDS, 2)}")
+            Text(komfStrings.duration(duration.toString(DurationUnit.SECONDS, 2)))
         }
 
         Spacer(Modifier.weight(1f))
@@ -257,13 +261,15 @@ private fun StatusFilters(
     onStatusSelect: (KomfMetadataJobStatus?) -> Unit,
     onDeleteAll: () -> Unit
 ) {
+    val komfStrings = LocalStrings.current.komf.jobs
+    val settingsStrings = LocalStrings.current.screens.settings
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(5.dp),
     ) {
         FilterChip(
             selected = selectedStatus == null,
             onClick = { onStatusSelect(null) },
-            label = { Text("All") },
+            label = { Text(LocalStrings.current.common.all) },
             colors = AppFilterChipDefaults.filterChipColors(),
             border = null
         )
@@ -271,21 +277,21 @@ private fun StatusFilters(
         FilterChip(
             selected = selectedStatus == RUNNING,
             onClick = { onStatusSelect(RUNNING) },
-            label = { Text("Running") },
+            label = { Text(LocalStrings.current.common.running) },
             colors = AppFilterChipDefaults.filterChipColors(),
             border = null
         )
         FilterChip(
             selected = selectedStatus == COMPLETED,
             onClick = { onStatusSelect(COMPLETED) },
-            label = { Text("Completed") },
+            label = { Text(LocalStrings.current.common.completed) },
             colors = AppFilterChipDefaults.filterChipColors(),
             border = null
         )
         FilterChip(
             selected = selectedStatus == FAILED,
             onClick = { onStatusSelect(FAILED) },
-            label = { Text("Failed") },
+            label = { Text(LocalStrings.current.common.failed) },
             colors = AppFilterChipDefaults.filterChipColors(),
             border = null
         )
@@ -297,11 +303,11 @@ private fun StatusFilters(
             colors = ButtonDefaults.filledTonalButtonColors(containerColor = MaterialTheme.colorScheme.errorContainer),
             modifier = Modifier.cursorForHand()
         ) {
-            Text("Delete all")
+            Text(settingsStrings.deleteAll)
         }
         if (showConfirmationDialog) {
             ConfirmationDialog(
-                body = "Delete job history?",
+                body = komfStrings.deleteHistoryBody,
                 buttonConfirmColor = MaterialTheme.colorScheme.errorContainer,
                 onDialogConfirm = onDeleteAll,
                 onDialogDismiss = { showConfirmationDialog = false }
@@ -315,6 +321,7 @@ private fun SeriesTooltip(
     series: KomgaSeries?,
     loading: Boolean
 ) {
+    val komfStrings = LocalStrings.current.komf.jobs
     if (series == null)
         Card(
             Modifier
@@ -326,7 +333,7 @@ private fun SeriesTooltip(
             if (loading) CircularProgressIndicator()
             else {
                 Spacer(Modifier.weight(1f))
-                Text("Unknown series")
+                Text(komfStrings.unknownSeries)
             }
         }
     else SeriesImageCard(

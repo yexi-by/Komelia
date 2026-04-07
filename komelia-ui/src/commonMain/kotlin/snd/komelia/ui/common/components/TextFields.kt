@@ -71,6 +71,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import snd.komelia.formatDecimal
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun PasswordTextField(
@@ -83,6 +84,7 @@ fun PasswordTextField(
     modifier: Modifier = Modifier
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
+    val commonStrings = LocalStrings.current.common
 
     TextField(
         value = value,
@@ -99,7 +101,7 @@ fun PasswordTextField(
                 Icons.Default.Visibility
             else Icons.Default.VisibilityOff
 
-            val description = if (passwordVisible) "Hide password" else "Show password"
+            val description = if (passwordVisible) commonStrings.hidePassword else commonStrings.showPassword
 
             IconButton(
                 onClick = { passwordVisible = !passwordVisible },

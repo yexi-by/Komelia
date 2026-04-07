@@ -25,8 +25,9 @@ internal class GeneralTab(
     private val vm: SeriesBulkEditDialogViewModel,
 ) : DialogTab {
 
+    @Composable
     override fun options() = TabItem(
-        title = "GENERAL",
+        title = LocalStrings.current.common.general,
         icon = Icons.Default.FormatAlignCenter
     )
 
@@ -126,3 +127,8 @@ private fun GeneralTabContent(
         )
     }
 }
+
+
+
+
+

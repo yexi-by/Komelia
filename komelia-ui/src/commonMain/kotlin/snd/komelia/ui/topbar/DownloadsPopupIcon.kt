@@ -45,6 +45,7 @@ import androidx.compose.ui.window.Popup
 import kotlinx.datetime.format
 import snd.komelia.DefaultDateTimeFormats.localTimeFormat
 import snd.komelia.formatDecimal
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.platform.VerticalScrollbar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,6 +54,7 @@ fun DownloadsPopupIcon(
     state: NotificationsState,
     modifier: Modifier
 ) {
+    val topBarStrings = LocalStrings.current.screens.topBar
     val notifications = state.notifications.collectAsState(emptyList()).value
     if (notifications.isEmpty()) return
 
@@ -77,7 +79,7 @@ fun DownloadsPopupIcon(
                         contentColor = Color.White,
                         modifier = Modifier.align(Alignment.BottomEnd)
                     ) {
-                        Text("$unreadNotifications")
+                        Text(unreadNotifications.toString())
                     }
                 }
             },
@@ -96,7 +98,8 @@ fun DownloadsPopupIcon(
                 ) {
                     NotificationsContent(
                         notifications = notifications,
-                        onNotificationsClear = state::onNotificationsClear
+                        onNotificationsClear = state::onNotificationsClear,
+                        topBarStrings = topBarStrings,
                     )
                 }
             }
@@ -109,6 +112,7 @@ fun DownloadsPopupIcon(
 private fun NotificationsContent(
     notifications: Collection<Notification>,
     onNotificationsClear: () -> Unit,
+    topBarStrings: snd.komelia.ui.strings.TopBarStrings,
 ) {
     val scrollState = rememberScrollState()
     Surface(
@@ -121,10 +125,10 @@ private fun NotificationsContent(
                 modifier = Modifier.padding(5.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Recent downloads", modifier = Modifier.padding(start = 5.dp))
+                Text(topBarStrings.recentDownloads, modifier = Modifier.padding(start = 5.dp))
                 Spacer(Modifier.weight(1f))
                 ElevatedButton(onClick = onNotificationsClear) {
-                    Text("Clear all")
+                    Text(topBarStrings.clearAll)
                     Icon(Icons.Default.Clear, null)
                 }
             }
@@ -168,6 +172,7 @@ private fun BookNotification(notification: BookNotification) {
 
 @Composable
 private fun BookNotificationProgress(event: BookNotification.BookDownloadProgress) {
+    val topBarStrings = LocalStrings.current.screens.topBar
     if (event.totalProgress == 0L)
         LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
     else {
@@ -182,7 +187,7 @@ private fun BookNotificationProgress(event: BookNotification.BookDownloadProgres
         val completedMiB = remember(event.completedProgress) {
             (event.completedProgress.toFloat() / 1024 / 1024).formatDecimal(2)
         }
-        Text("${completedMiB}MiB / ${totalMiB}MiB", style = MaterialTheme.typography.bodyMedium)
+        Text(topBarStrings.downloadProgress(completedMiB, totalMiB), style = MaterialTheme.typography.bodyMedium)
     }
 }
 

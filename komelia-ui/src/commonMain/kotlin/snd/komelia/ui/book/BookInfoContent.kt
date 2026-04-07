@@ -30,6 +30,7 @@ import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import snd.komelia.DefaultDateTimeFormats.localDateTimeFormat
 import snd.komelia.komga.api.model.KomeliaBook
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.TagList
 import snd.komelia.ui.common.components.DescriptionChips
 import snd.komelia.ui.common.components.LabeledEntry
@@ -71,10 +72,11 @@ fun BookInfoColumn(
     fileUrl: String,
     onFilterClick: (SeriesScreenFilter) -> Unit,
 ) {
+    val bookStrings = LocalStrings.current.screens.book
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         if (!publisher.isNullOrBlank()) {
             DescriptionChips(
-                label = "Publisher",
+                label = bookStrings.publisher,
                 chipValue = stringEntry(publisher),
                 onClick = { onFilterClick(SeriesScreenFilter(publisher = listOf(it))) },
             )
@@ -83,7 +85,7 @@ fun BookInfoColumn(
         val genreEntries = remember(genres) { genres?.map { stringEntry(it) } }
         if (genreEntries != null) {
             DescriptionChips(
-                label = "Genres",
+                label = bookStrings.genres,
                 chipValues = genreEntries,
                 onChipClick = { onFilterClick(SeriesScreenFilter(genres = listOf(it))) },
             )
@@ -98,7 +100,7 @@ fun BookInfoColumn(
         val uriHandler = LocalUriHandler.current
         val linkEntries = remember(links) { links.map { LabeledEntry(it, it.label) } }
         DescriptionChips(
-            label = "Links",
+            label = bookStrings.links,
             chipValues = linkEntries,
             onChipClick = { entry -> uriHandler.openUri(entry.url) },
             icon = Icons.Default.Link,
@@ -124,7 +126,7 @@ fun BookInfoColumn(
         Spacer(Modifier.size(0.dp))
         Row {
             Text(
-                "Size",
+                bookStrings.size,
                 style = MaterialTheme.typography.labelLarge,
                 modifier = Modifier.width(120.dp)
             )
@@ -133,7 +135,7 @@ fun BookInfoColumn(
 
         Row {
             Text(
-                "Format",
+                bookStrings.format,
                 style = MaterialTheme.typography.labelLarge,
                 modifier = Modifier.width(120.dp)
             )
@@ -145,7 +147,7 @@ fun BookInfoColumn(
         isbn.ifBlank { null }?.let { isbn ->
             Row {
                 Text(
-                    "ISBN",
+                    bookStrings.isbn,
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.width(120.dp)
                 )
@@ -155,7 +157,7 @@ fun BookInfoColumn(
 
         Row {
             Text(
-                "File",
+                bookStrings.file,
                 style = MaterialTheme.typography.labelLarge,
                 modifier = Modifier.width(120.dp)
             )
@@ -170,6 +172,7 @@ fun BookInfoRow(
     book: KomeliaBook,
     onSeriesButtonClick: (() -> Unit)? = null,
 ) {
+    val bookStrings = LocalStrings.current.screens.book
 
     Column(
         modifier = modifier,
@@ -188,7 +191,7 @@ fun BookInfoRow(
             if (book.deleted) {
                 SuggestionChip(
                     onClick = {},
-                    label = { Text("Unavailable") },
+                    label = { Text(bookStrings.unavailable) },
                     border = null,
                     colors = SuggestionChipDefaults.suggestionChipColors(
                         containerColor = MaterialTheme.colorScheme.errorContainer
@@ -198,7 +201,7 @@ fun BookInfoRow(
             if (book.remoteFileUnavailable) {
                 SuggestionChip(
                     onClick = {},
-                    label = { Text("Remote Unavailable") },
+                    label = { Text(bookStrings.remoteUnavailable) },
                     border = null,
                     colors = SuggestionChipDefaults.suggestionChipColors(
                         containerColor = MaterialTheme.colorScheme.errorContainer
@@ -209,7 +212,7 @@ fun BookInfoRow(
             if (book.isLocalFileOutdated) {
                 SuggestionChip(
                     onClick = {},
-                    label = { Text("Local download outdated") },
+                    label = { Text(bookStrings.localDownloadOutdated) },
                     border = null,
                     colors = SuggestionChipDefaults.suggestionChipColors(
                         containerColor = MaterialTheme.colorScheme.errorContainer
@@ -219,7 +222,7 @@ fun BookInfoRow(
         }
 
         SelectionContainer {
-            Text(text = "Book #${book.metadata.number} · ${book.media.pagesCount} pages")
+            Text(text = bookStrings.bookPages(book.metadata.number, book.media.pagesCount))
         }
 
         Spacer(Modifier.heightIn(5.dp))
@@ -228,7 +231,7 @@ fun BookInfoRow(
                 book.metadata.releaseDate?.let {
                     Row {
                         Text(
-                            text = "Release date:",
+                            text = bookStrings.releaseDate,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.width(120.dp)
                         )
@@ -245,22 +248,16 @@ fun BookInfoRow(
                 if (readProgress != null) {
                     if (!readProgress.completed) {
                         val readProgressText = remember(pagesCount, readProgress) {
-                            buildString {
-                                val pagesLeft = pagesCount - readProgress.page
-                                val percentage =
-                                    (readProgress.page.toFloat() / pagesCount * 100)
-                                        .roundToInt()
-                                append(percentage)
-                                append("%, ")
-                                append(pagesLeft)
-                                if (pagesLeft == 1) append(" page left")
-                                else append(" pages left")
-                            }
+                            val pagesLeft = pagesCount - readProgress.page
+                            val percentage =
+                                (readProgress.page.toFloat() / pagesCount * 100)
+                                    .roundToInt()
+                            bookStrings.readProgressStatus(percentage, pagesLeft)
                         }
 
                         Row {
                             Text(
-                                "Read progress:",
+                                bookStrings.readProgress,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.width(120.dp)
                             )
@@ -275,7 +272,7 @@ fun BookInfoRow(
                                 .format(localDateTimeFormat)
                         }
                         Text(
-                            "Last read:",
+                            bookStrings.lastRead,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.width(120.dp)
                         )

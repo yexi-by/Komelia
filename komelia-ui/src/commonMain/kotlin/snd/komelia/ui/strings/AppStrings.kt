@@ -3,6 +3,7 @@ package snd.komelia.ui.strings
 import snd.komelia.image.ReduceKernel
 import snd.komelia.image.UpsamplingMode
 import snd.komelia.image.UpscaleMode
+import snd.komelia.settings.model.AppLanguageMode
 import snd.komelia.settings.model.AppTheme
 import snd.komelia.settings.model.ContinuousReadingDirection
 import snd.komelia.settings.model.EpubReaderType
@@ -53,10 +54,13 @@ import snd.komga.client.settings.KomgaThumbnailSize.MEDIUM
 import snd.komga.client.settings.KomgaThumbnailSize.XLARGE
 
 data class AppStrings(
+    val common: CommonStrings,
+    val dialogs: DialogStrings,
     val seriesView: SeriesViewStrings,
     val filters: FilterStrings,
     val seriesFilter: SeriesFilterStrings,
     val booksFilter: BookFilterStrings,
+    val menus: MenuStrings,
     val seriesEdit: SeriesEditStrings,
     val bookEdit: BookEditStrings,
     val libraryEdit: LibraryEditStrings,
@@ -64,15 +68,192 @@ data class AppStrings(
     val reader: ReaderStrings,
     val pagedReader: PagedReaderStrings,
     val continuousReader: ContinuousReaderStrings,
+    val screens: ScreenStrings,
     val settings: SettingsStrings,
     val imageSettings: ImageSettingsStrings,
     val errorCodes: ErrorCodes,
-    val komf: KomfStrings
+    val komf: KomfStrings,
+    val toasts: ToastStrings,
+    val validation: ValidationStrings,
 )
 
 data class KomfStrings(
-    val providerSettings: KomfProviderSettingsStrings
+    val navigation: KomfNavigationStrings,
+    val general: KomfGeneralStrings,
+    val jobs: KomfJobsStrings,
+    val notifications: KomfNotificationStrings,
+    val processing: KomfProcessingStrings,
+    val providerSettings: KomfProviderSettingsStrings,
+    val providers: KomfProvidersUiStrings,
 )
+
+data class KomfNavigationStrings(
+    val komgaWebui: String,
+    val komgaProcessing: String,
+    val kavitaProcessing: String,
+)
+
+data class KomfGeneralStrings(
+    val enableIntegration: String,
+    val integrationDescription: String,
+    val projectLink: String,
+    val komgaTab: String,
+    val kavitaTab: String,
+    val komfUrl: String,
+    val connect: String,
+    val komgaUrl: String,
+    val komgaUsername: String,
+    val komgaPassword: String,
+    val kavitaUrl: String,
+    val kavitaApiKey: String,
+    val eventListener: String,
+    val eventListenerDescription: String,
+    val connectionError: String,
+    val connectionErrorWithMessageTemplate: String,
+    val enableMetadataJobsForLibraries: String,
+    val enableNotificationJobsForLibraries: String,
+    val unknownLibraryTemplate: String,
+) {
+    fun formatConnectionError(message: String?): String =
+        message?.let { connectionErrorWithMessageTemplate.format(it) } ?: connectionError
+
+    fun unknownLibrary(libraryId: String): String = unknownLibraryTemplate.format(libraryId)
+}
+
+data class KomfJobsStrings(
+    val deleteHistoryBody: String,
+    val durationTemplate: String,
+    val unknownSeries: String,
+) {
+    fun duration(duration: String): String = durationTemplate.format(duration)
+}
+
+data class KomfNotificationStrings(
+    val noConfiguredAppriseUrls: String,
+    val noConfiguredDiscordWebhooks: String,
+    val uploadSeriesCover: String,
+    val notificationTemplate: String,
+    val notificationContext: String,
+    val testSend: String,
+    val templatesSaved: String,
+    val velocityTemplateLanguageSyntaxReference: String,
+    val apprise: KomfAppriseStrings,
+    val context: KomfNotificationContextStrings,
+    val discord: KomfDiscordStrings,
+)
+
+data class KomfAppriseStrings(
+    val urls: String,
+    val addUrl: String,
+    val addUrlDialogTitle: String,
+    val applyAnyway: String,
+    val usesAppriseDescription: String,
+    val appriseGithubPage: String,
+)
+
+data class KomfNotificationContextStrings(
+    val previewContext: String,
+    val pathLabelTemplate: String,
+    val metadataNumber: String,
+    val metadataNumberSort: String,
+    val metadataTitle: String,
+    val metadataTitleSort: String,
+    val alternativePublishers: String,
+    val bookItemTemplate: String,
+    val valueItemTemplate: String,
+    val addValueTemplate: String,
+) {
+    fun pathLabel(name: String, path: String): String = pathLabelTemplate.format(name, path)
+    fun book(index: Int): String = bookItemTemplate.format(index)
+    fun valueItem(name: String, index: Int): String = valueItemTemplate.format(name, index)
+    fun addValue(name: String): String = addValueTemplate.format(name)
+}
+
+data class KomfDiscordStrings(
+    val webhooks: String,
+    val addWebhook: String,
+    val addWebhookDialogTitle: String,
+    val webhookUrl: String,
+    val webhookUrlPlaceholder: String,
+    val usesMarkdownDescription: String,
+    val discordMarkdownText101: String,
+    val titleMax256: String,
+    val titleUrl: String,
+    val descriptionMax4096: String,
+    val footerMax2048: String,
+    val fieldItemTemplate: String,
+    val addField: String,
+    val fieldNameMax256: String,
+    val inline: String,
+    val fieldValueMax1024: String,
+) {
+    fun field(index: Int): String = fieldItemTemplate.format(index)
+}
+
+data class KomfProcessingStrings(
+    val updateModes: String,
+    val libraryTypeDescription: String,
+    val orderBooks: String,
+    val orderBooksDescription: String,
+    val aggregationSettings: String,
+    val aggregate: String,
+    val aggregateDescription: String,
+    val mergeGenres: String,
+    val mergeGenresDescription: String,
+    val mergeTags: String,
+    val mergeTagsDescription: String,
+    val coverSettings: String,
+    val seriesCovers: String,
+    val seriesCoversDescription: String,
+    val bookCovers: String,
+    val bookCoversDescription: String,
+    val overrideExistingCovers: String,
+    val overrideExistingCoversDescription: String,
+    val titleSettings: String,
+    val seriesTitle: String,
+    val seriesTitleDescription: String,
+    val alternativeSeriesTitles: String,
+    val alternativeSeriesTitlesDescription: String,
+    val alternativeTitleFallback: String,
+    val alternativeTitleFallbackDescription: String,
+    val seriesTitleLanguageIso639: String,
+    val alternativeTitleLanguagesIso639: String,
+    val defaultValues: String,
+    val defaultSeriesReadingDirection: String,
+    val defaultSeriesLanguage: String,
+)
+
+data class KomfProvidersUiStrings(
+    val settingsTitle: String,
+    val addProvider: String,
+    val nameMatchingMode: String,
+    val comicVineClientId: String,
+    val myAnimeListClientId: String,
+    val mangaBakaOfflineDatabase: String,
+    val downloadDateTemplate: String,
+    val checksumTemplate: String,
+    val updateMangaBakaDatabase: String,
+    val downloadMangaBakaDatabase: String,
+    val downloadingMangaBakaDatabase: String,
+    val editProviderTemplate: String,
+    val seriesMetadataTab: String,
+    val bookMetadataTab: String,
+    val providerSettingsTab: String,
+    val useOriginalPublisher: String,
+    val useOriginalPublisherDescription: String,
+    val mediaType: String,
+    val authorRoles: String,
+    val artistRoles: String,
+    val tagScoreThreshold: String,
+    val tagSizeLimit: String,
+    val alternativeTitleLanguagesIso639: String,
+    val includeLinks: String,
+    val datasourceType: String,
+) {
+    fun downloadDate(date: String): String = downloadDateTemplate.format(date)
+    fun checksum(checksum: String): String = checksumTemplate.format(checksum)
+    fun editProvider(providerName: String): String = editProviderTemplate.format(providerName)
+}
 
 data class KomfProviderSettingsStrings(
     val providerAniList: String,
@@ -149,6 +330,11 @@ data class SeriesEditStrings(
     val sortTitle: String,
     val summary: String,
     val language: String,
+    val linksTab: String,
+    val sharingTab: String,
+    val labels: String,
+    val bulkTagsWarning: String,
+    val bulkSharingWarning: String,
 
     val status: String,
     val statusEnded: String,
@@ -193,6 +379,9 @@ data class BookEditStrings(
     val summary: String,
     val releaseDate: String,
     val isbn: String,
+    val addCustomRole: String,
+    val bulkAuthorsWarning: String,
+    val bulkTagsWarning: String,
 )
 
 data class LibraryEditStrings(
@@ -264,7 +453,22 @@ data class UserEditStrings(
 }
 
 data class ReaderStrings(
+    val atBeginningOfBook: String,
+    val closeBook: String,
+    val current: String,
+    val downloading: String,
+    val finished: String,
+    val imageSettings: String,
+    val next: String,
+    val noNextBook: String,
+    val noPreviousBook: String,
+    val previous: String,
+    val processing: String,
+    val reachedEndOfSeries: String,
+    val reachedStartOfSeries: String,
+    val readingMode: String,
     val zoom: String,
+    val zoomTemplate: String,
     val readerPaged: String,
     val readerPanels: String,
     val readerType: String,
@@ -273,9 +477,34 @@ data class ReaderStrings(
     val decoder: String,
     val pagesInfo: String,
     val pageNumber: String,
+    val pageNumberTemplate: String,
     val memoryUsage: String,
     val pageDisplaySize: String,
+    val pageDisplaySizeTemplate: String,
     val pageOriginalSize: String,
+    val pageOriginalSizeTemplate: String,
+    val modeWithDirectionTemplate: String,
+    val helpCyclePageLayout: String,
+    val helpCycleScale: String,
+    val helpDisableColorCorrection: String,
+    val helpEnterExitFullScreen: String,
+    val helpFirstPage: String,
+    val helpKeyHeader: String,
+    val helpLastPage: String,
+    val helpMenusTitle: String,
+    val helpNextPage: String,
+    val helpPreviousPage: String,
+    val helpReaderNavigationTitle: String,
+    val helpReturnToSeriesScreen: String,
+    val helpScrollDown: String,
+    val helpScrollLeft: String,
+    val helpScrollRight: String,
+    val helpScrollUp: String,
+    val helpSettingsTitle: String,
+    val helpShowHideHelp: String,
+    val helpShowHideMenu: String,
+    val helpToggleDoublePageOffset: String,
+    val helpToggleImageStretchToFit: String,
 ) {
     fun forReaderType(type: ReaderType): String {
         return when (type) {
@@ -284,6 +513,12 @@ data class ReaderStrings(
             ReaderType.CONTINUOUS -> readerContinuous
         }
     }
+
+    fun zoomLine(zoomPercentage: Int): String = zoomTemplate.format(zoomPercentage)
+    fun pageNumberLine(pageNumber: Int): String = pageNumberTemplate.format(pageNumber)
+    fun pageDisplaySizeLine(width: Int, height: Int): String = pageDisplaySizeTemplate.format(width, height)
+    fun pageOriginalSizeLine(width: Int, height: Int): String = pageOriginalSizeTemplate.format(width, height)
+    fun modeWithDirection(mode: String, direction: String): String = modeWithDirectionTemplate.format(mode, direction)
 
 }
 
@@ -331,7 +566,9 @@ data class PagedReaderStrings(
 
 data class ContinuousReaderStrings(
     val sidePadding: String,
+    val sidePaddingValueTemplate: String,
     val pageSpacing: String,
+    val pageSpacingValueTemplate: String,
 
     val readingDirection: String,
     val readingDirectionTopToBottom: String,
@@ -346,6 +583,9 @@ data class ContinuousReaderStrings(
             ContinuousReadingDirection.RIGHT_TO_LEFT -> readingDirectionRightToLeft
         }
     }
+
+    fun sidePaddingValue(percentage: Int): String = sidePaddingValueTemplate.format(percentage)
+    fun pageSpacingValue(spacing: Int): String = pageSpacingValueTemplate.format(spacing)
 }
 
 data class SettingsStrings(
@@ -378,8 +618,18 @@ data class SettingsStrings(
     val appThemeDark: String,
     val appThemeLight: String,
     val appThemeOled: String,
+    val appLanguage: String,
+    val appLanguageSystem: String,
+    val appLanguageEnglish: String,
+    val appLanguageSimplifiedChinese: String,
     val imageCardSize: String,
     val decoder: String,
+
+    val epubReaderTypeLabel: String,
+    val projectOnGithub: String,
+    val epubReaderTtsuDescription: String,
+    val epubReaderKomgaDescription: String,
+    val mediaAnalysisMediaTemplate: String,
 
     val epubReaderTypeKomga: String,
     val epubReaderTypeTtsu: String,
@@ -401,17 +651,33 @@ data class SettingsStrings(
         }
     }
 
+    fun forAppLanguageMode(mode: AppLanguageMode): String {
+        return when (mode) {
+            AppLanguageMode.SYSTEM -> appLanguageSystem
+            AppLanguageMode.ENGLISH -> appLanguageEnglish
+            AppLanguageMode.SIMPLIFIED_CHINESE -> appLanguageSimplifiedChinese
+        }
+    }
+
     fun forEpubReaderType(readerType: EpubReaderType): String {
         return when (readerType) {
             EpubReaderType.KOMGA_EPUB -> epubReaderTypeKomga
             EpubReaderType.TTSU_EPUB -> epubReaderTypeTtsu
         }
     }
+
+    fun mediaAnalysisMedia(mediaType: String, size: String): String = mediaAnalysisMediaTemplate.format(mediaType, size)
 }
 
 data class FilterStrings(
     val anyValue: String,
+    val excludeSummaryTemplate: String,
+    val includeAndExcludeSummaryTemplate: String,
+    val includeSummaryTemplate: String,
 
+    val filterTagsExclusionModeLabel: String,
+    val filterTagsInclusionModeLabel: String,
+    val filterTagsOtherOptions: String,
     val filterTagsSearch: String,
     val filterTagsReset: String,
     val filterTagsGenreLabel: String,
@@ -424,6 +690,18 @@ data class FilterStrings(
     val excludeIfAllMatch: String,
     val excludeIfAnyMatch: String,
 ) {
+    fun summary(include: List<String>, exclude: List<String>, fallback: String = anyValue): String {
+        return when {
+            include.isNotEmpty() && exclude.isNotEmpty() -> includeAndExcludeSummaryTemplate.format(
+                include.joinToString(),
+                exclude.joinToString()
+            )
+
+            include.isNotEmpty() -> includeSummaryTemplate.format(include.joinToString())
+            exclude.isNotEmpty() -> excludeSummaryTemplate.format(exclude.joinToString())
+            else -> fallback
+        }
+    }
 
     fun forInclusionMode(mode: SeriesFilterState.TagInclusionMode) = when (mode) {
         SeriesFilterState.TagInclusionMode.INCLUDE_IF_ALL_MATCH -> includeIfAllMatch
@@ -632,11 +910,69 @@ data class ErrorCodes(
 }
 
 data class ImageSettingsStrings(
+    val active: String,
+    val browse: String,
+    val chooseOnnxRuntimeVersion: String,
+    val colorCorrection: String,
+    val cropBorders: String,
+    val downloadOnnxRuntime: String,
+    val downloadCuda12: String,
+    val downloadCudnn9: String,
+    val downloadTensorRt: String,
+    val downloadModel: String,
+    val downloadMangaJaNaiPreset: String,
+    val downloadingMangaJaNaiModels: String,
+    val downloadingOnnxRuntime: String,
+    val downloadingPanelDetectionModel: String,
+    val flashColorBlack: String,
+    val flashColorWhite: String,
+    val flashColorWhiteAndBlack: String,
+    val flashDuration: String,
+    val flashDurationValueTemplate: String,
+    val flashEvery: String,
+    val flashEveryPageSingularTemplate: String,
+    val flashEveryPagePluralTemplate: String,
+    val flashOnPageChange: String,
+    val flashOnPageChangeDescription: String,
+    val flashWith: String,
     val upsamplingMode: String,
     val upsamplingModeNearest: String,
     val upsamplingModeBilinear: String,
     val upsamplingModeMitchell: String,
     val upsamplingModeCatmullRom: String,
+    val linearLightDownsampling: String,
+    val linearLightDownsamplingDescription: String,
+    val loadThumbnailPreviewsWhileDragging: String,
+    val loadThumbnailPreviewsWhileDraggingDescription: String,
+    val onnxModelPath: String,
+    val onnxRuntime: String,
+    val onnxRuntimeLoadErrorTemplate: String,
+    val onnxRuntimeProviderTemplate: String,
+    val panelDetection: String,
+    val tileSize: String,
+    val updateOnnxRuntime: String,
+    val updateOnnxRuntimeDescription: String,
+    val upscalerSettings: String,
+    val gpu: String,
+    val install: String,
+    val installed: String,
+    val installationErrorTemplate: String,
+    val mangaJaNaiDescription: String,
+    val mangaJaNaiPresetTitle: String,
+    val onnxRuntimeExperimentalWarning: String,
+    val panelDetectionDescription: String,
+    val providerCpu: String,
+    val providerCuda: String,
+    val providerDirectMl: String,
+    val providerDirectMlDescription: String,
+    val providerRocm: String,
+    val providerTensorRt: String,
+    val providerTensorRtDescription: String,
+    val providerWebGpu: String,
+    val providerWebGpuDescription: String,
+    val redownloadMangaJaNaiPreset: String,
+    val redownloadModel: String,
+    val restartRequiredForChanges: String,
 
     val downsamplingKernel: String,
     val downsamplingKernelNearest: String,
@@ -650,6 +986,8 @@ data class ImageSettingsStrings(
     val downsamplingKernelDefault: String,
 
     val onnxRuntimeExecutionProvider: String,
+    val deviceLabelTemplate: String,
+    val tileSizeHelpText: String,
     val onnxRuntimeUpscaleMode: String,
     val onnxRuntimeUpscaleModeNone: String,
     val onnxRuntimeUpscaleModeUserModel: String,
@@ -685,4 +1023,16 @@ data class ImageSettingsStrings(
             UpscaleMode.NONE -> onnxRuntimeUpscaleModeNone
         }
     }
+
+    fun flashDurationValue(durationMs: Long): String = flashDurationValueTemplate.format(durationMs)
+    fun flashEveryValue(pages: Int): String = if (pages == 1) {
+        flashEveryPageSingularTemplate.format(pages)
+    } else {
+        flashEveryPagePluralTemplate.format(pages)
+    }
+
+    fun installationError(error: String): String = installationErrorTemplate.format(error)
+    fun onnxRuntimeLoadError(error: String): String = onnxRuntimeLoadErrorTemplate.format(error)
+    fun onnxRuntimeProvider(provider: String): String = onnxRuntimeProviderTemplate.format(provider)
+    fun deviceLabel(name: String, memoryGb: String): String = deviceLabelTemplate.format(name, memoryGb)
 }

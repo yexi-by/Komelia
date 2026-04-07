@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalWindowWidth
 import snd.komelia.ui.common.components.PageSizeSelectionDropdown
 import snd.komelia.ui.common.itemlist.SeriesLazyCardGrid
@@ -117,6 +118,7 @@ private fun BulkActionsToolbar(
     selectedSeries: List<KomgaSeries>,
     onSeriesSelect: (KomgaSeries) -> Unit,
 ) {
+    val seriesStrings = LocalStrings.current.screens.series
     BulkActionsContainer(
         onCancel = onCancel,
         selectedCount = selectedSeries.size,
@@ -129,7 +131,7 @@ private fun BulkActionsToolbar(
         when (LocalWindowWidth.current) {
             FULL, EXPANDED -> {
                 if (selectedSeries.isEmpty()) {
-                    Text("Click on items to select or deselect them")
+                    Text(seriesStrings.selectionHint)
                 } else {
                     Spacer(Modifier.weight(1f))
                     SeriesBulkActionsContent(selectedSeries, false)
@@ -149,6 +151,7 @@ private fun ToolBar(
     isLoading: Boolean,
     filterState: SeriesFilterState?,
 ) {
+    val libraryStrings = LocalStrings.current.screens.library
     Box {
         if (isLoading) {
             LinearProgressIndicator(
@@ -178,7 +181,7 @@ private fun ToolBar(
                 if (seriesTotalCount != 0) {
                     SuggestionChip(
                         onClick = {},
-                        label = { Text("$seriesTotalCount series") },
+                        label = { Text(libraryStrings.seriesCount(seriesTotalCount)) },
                     )
 
                     Spacer(Modifier.weight(1f))

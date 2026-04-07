@@ -4,11 +4,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import snd.komelia.ui.LoadState
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.common.components.LoadingMaxSizeIndicator
 import snd.komelia.ui.error.formatExceptionMessage
@@ -27,13 +27,9 @@ class KomfProcessingSettingsScreen(val serverType: MediaServer) : Screen {
         val vmState = vm.state.collectAsState().value
         val komfConfigLoadError = vm.komfSharedState.configError.collectAsState().value
         LaunchedEffect(Unit) { vm.initialize() }
-        val title = remember(serverType.name) {
-            val serverName = when (serverType) {
-                KOMGA -> "Komga"
-                KAVITA -> "Kavita"
-            }
-
-            "$serverName Metadata Processing Settings"
+        val title = when (serverType) {
+            KOMGA -> LocalStrings.current.komf.navigation.komgaProcessing
+            KAVITA -> LocalStrings.current.komf.navigation.kavitaProcessing
         }
         SettingsScreenContainer(title = title) {
 

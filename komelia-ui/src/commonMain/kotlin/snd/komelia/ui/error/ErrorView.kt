@@ -35,6 +35,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.Theme
 import snd.komelia.ui.platform.HorizontalScrollbar
 import snd.komelia.ui.platform.VerticalScrollbar
@@ -46,10 +47,13 @@ fun ErrorView(
     onExit: () -> Unit
 ) {
     val stacktrace = exception.stackTraceToString().replace("\t", "    ")
-    val errorText = remember {
+    val strings = LocalStrings.current.screens.error
+    val errorText = remember(strings, exception) {
         buildString {
-            append("Encountered Unrecoverable Error: ")
-            append("\"${exception::class.simpleName} ${exception.message}\"")
+            append(strings.unrecoverableError(exception::class.simpleName ?: "Unknown"))
+            if (!exception.message.isNullOrBlank()) {
+                append(" \"${exception.message}\"")
+            }
         }
     }
     ErrorView(
@@ -71,6 +75,7 @@ fun ErrorView(
     onExit: () -> Unit
 ) {
     MaterialTheme(colorScheme = Theme.DARK.colorScheme) {
+        val strings = LocalStrings.current.screens.error
         val clipboardManager = LocalClipboardManager.current
         Surface {
             Column(
@@ -90,7 +95,7 @@ fun ErrorView(
                 ) {
                     TooltipBox(
                         positionProvider = rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
-                        tooltip = { Text("Copied to clipboard") },
+                        tooltip = { Text(strings.copiedToClipboard) },
                         state = tooltipState,
                         enableUserInput = false
                     ) {
@@ -100,21 +105,21 @@ fun ErrorView(
                                 scope.launch { tooltipState.show() }
                             },
                         ) {
-                            Text("Copy stacktrace to clipboard")
+                            Text(strings.copyStacktrace)
                         }
                     }
                     if (isRestartable) {
                         Button(
                             onClick = onRestart,
                         ) {
-                            Text("Restart")
+                            Text(strings.restart)
                         }
 
                     }
                     Button(
                         onClick = onExit,
                     ) {
-                        Text("Exit")
+                        Text(strings.exit)
                     }
                 }
             }

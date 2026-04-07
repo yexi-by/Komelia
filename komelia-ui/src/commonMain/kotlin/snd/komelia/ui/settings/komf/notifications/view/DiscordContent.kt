@@ -66,6 +66,7 @@ import snd.komelia.ui.settings.komf.notifications.DiscordState.EmbedFieldState
 import snd.komelia.ui.settings.komf.notifications.NotificationContextState
 import snd.komf.api.notifications.EmbedField
 import kotlin.math.max
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun DiscordNotificationsContent(
@@ -93,11 +94,13 @@ fun DiscordNotificationsContent(
     onTemplateSend: () -> Unit,
     onTemplateSave: () -> Unit,
 ) {
+    val notificationStrings = LocalStrings.current.komf.notifications
+    val discordStrings = notificationStrings.discord
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
 
-        Text("Webhooks")
+        Text(discordStrings.webhooks)
         discordWebhooks.forEach { webhook ->
             Row {
                 TextField(
@@ -119,13 +122,13 @@ fun DiscordNotificationsContent(
             onClick = { showAddWebhookDialog = true },
             modifier = Modifier.cursorForHand()
         ) {
-            Text("Add Webhook")
+            Text(discordStrings.addWebhook)
         }
 
         SwitchWithLabel(
             checked = discordUploadSeriesCover.value,
             onCheckedChange = { discordUploadSeriesCover.setValue(it) },
-            label = { Text("Upload series cover") }
+            label = { Text(notificationStrings.uploadSeriesCover) }
         )
 
         if (showAddWebhookDialog) {
@@ -167,6 +170,9 @@ private fun AddDiscordWebhookDialog(
     onDismissRequest: () -> Unit,
     onWebhookAdd: (String) -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val discordStrings = LocalStrings.current.komf.notifications.discord
+    val validationStrings = LocalStrings.current.validation
     var newWebhook by remember { mutableStateOf("") }
 
     val interactionSource = remember { MutableInteractionSource() }
@@ -184,7 +190,7 @@ private fun AddDiscordWebhookDialog(
                 modifier = Modifier.padding(10.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Text("Add New Discord Webhook", style = MaterialTheme.typography.headlineSmall)
+                Text(discordStrings.addWebhookDialogTitle, style = MaterialTheme.typography.headlineSmall)
                 HorizontalDivider()
             }
         },
@@ -196,12 +202,12 @@ private fun AddDiscordWebhookDialog(
                 TextField(
                     value = newWebhook,
                     onValueChange = { newWebhook = it },
-                    label = { Text("Webhook URL") },
-                    placeholder = { Text("https://discord.com/api/webhooks/...") },
+                    label = { Text(discordStrings.webhookUrl) },
+                    placeholder = { Text(discordStrings.webhookUrlPlaceholder) },
                     modifier = Modifier.fillMaxWidth(),
                     isError = isError.value,
                     interactionSource = interactionSource,
-                    supportingText = { if (isError.value) Text("Invalid webhook URL") },
+                    supportingText = { if (isError.value) Text(validationStrings.invalidWebhookUrl) },
                     visualTransformation = if (isFocused) VisualTransformation.None else PasswordVisualTransformation(),
                 )
             }
@@ -215,7 +221,7 @@ private fun AddDiscordWebhookDialog(
                 TextButton(
                     onClick = onDismissRequest,
                     modifier = Modifier.cursorForHand(),
-                    content = { Text("Cancel") }
+                    content = { Text(LocalStrings.current.common.cancel) }
                 )
 
                 FilledTonalButton(
@@ -226,7 +232,7 @@ private fun AddDiscordWebhookDialog(
                     modifier = Modifier.cursorForHand(),
                     enabled = isValidUrl.value
                 ) {
-                    Text("Confirm")
+                    Text(commonStrings.confirm)
                 }
             }
         }
@@ -255,14 +261,16 @@ private fun TemplatesContent(
     onTemplateSave: () -> Unit,
     onTemplateRender: () -> Unit,
 ) {
+    val notificationStrings = LocalStrings.current.komf.notifications
+    val discordStrings = notificationStrings.discord
     var showNotificationContextDialog by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text("Notification Template", style = MaterialTheme.typography.titleLarge)
+        Text(notificationStrings.notificationTemplate, style = MaterialTheme.typography.titleLarge)
         Column {
-            Text("Uses markdown syntax. Templates are rendered using Apache Velocity")
+            Text(discordStrings.usesMarkdownDescription)
             Text(
-                "Discord Markdown Text 101",
+                discordStrings.discordMarkdownText101,
                 color = MaterialTheme.colorScheme.secondary,
                 textDecoration = TextDecoration.Underline,
                 modifier = Modifier.clickable {
@@ -270,7 +278,7 @@ private fun TemplatesContent(
                 }.padding(2.dp).cursorForHand()
             )
             Text(
-                "Velocity Template Language syntax reference",
+                notificationStrings.velocityTemplateLanguageSyntaxReference,
                 color = MaterialTheme.colorScheme.secondary,
                 textDecoration = TextDecoration.Underline,
                 modifier = Modifier.clickable {
@@ -286,7 +294,7 @@ private fun TemplatesContent(
                 onClick = { selectedTab = 0 },
                 modifier = Modifier.heightIn(min = 40.dp).cursorForHand(),
             ) {
-                Text("Write")
+                Text(LocalStrings.current.common.write)
             }
             Tab(
                 selected = selectedTab == 1,
@@ -296,7 +304,7 @@ private fun TemplatesContent(
                 },
                 modifier = Modifier.heightIn(min = 40.dp).cursorForHand(),
             ) {
-                Text("Preview")
+                Text(LocalStrings.current.common.preview)
             }
         }
 
@@ -345,7 +353,7 @@ private fun TemplatesContent(
                 onClick = { showNotificationContextDialog = true },
                 modifier = Modifier.cursorForHand()
             ) {
-                Text("Notification Context")
+                Text(notificationStrings.notificationContext)
 
             }
 
@@ -353,7 +361,7 @@ private fun TemplatesContent(
                 onClick = onTemplateSend,
                 modifier = Modifier.cursorForHand()
             ) {
-                Text("Test Send")
+                Text(notificationStrings.testSend)
             }
 
             FilledTonalButton(
@@ -361,7 +369,7 @@ private fun TemplatesContent(
                 enabled = true,
                 modifier = Modifier.cursorForHand()
             ) {
-                Text("Save")
+                Text(LocalStrings.current.common.save)
             }
         }
     }
@@ -387,24 +395,25 @@ private fun TemplatesEditor(
     onFieldDelete: (EmbedFieldState) -> Unit,
     footerTemplate: StateHolder<String>,
 ) {
+    val discordStrings = LocalStrings.current.komf.notifications.discord
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         TextField(
             value = titleTemplate.value,
             onValueChange = { titleTemplate.setValue(it) },
-            label = { Text("Title. 256 characters max") },
+            label = { Text(discordStrings.titleMax256) },
             maxLines = 1,
             modifier = Modifier.fillMaxWidth()
         )
         HttpTextField(
             value = titleUrlTemplate.value,
             onValueChange = { titleUrlTemplate.setValue(it) },
-            label = { Text("Title Url") },
+            label = { Text(discordStrings.titleUrl) },
             modifier = Modifier.fillMaxWidth()
         )
         TextField(
             value = descriptionTemplate.value,
             onValueChange = { descriptionTemplate.setValue(it) },
-            label = { Text("Description. 4096 characters max") },
+            label = { Text(discordStrings.descriptionMax4096) },
             minLines = 4,
             modifier = Modifier.fillMaxWidth()
         )
@@ -413,7 +422,7 @@ private fun TemplatesEditor(
         TextField(
             value = footerTemplate.value,
             onValueChange = { footerTemplate.setValue(it) },
-            label = { Text("Footer. 2048 characters max") },
+            label = { Text(discordStrings.footerMax2048) },
             maxLines = 1,
             modifier = Modifier.fillMaxWidth()
         )
@@ -426,6 +435,7 @@ private fun TemplateFieldsEditor(
     onFieldAdd: () -> Unit,
     onFieldDelete: (EmbedFieldState) -> Unit,
 ) {
+    val discordStrings = LocalStrings.current.komf.notifications.discord
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -441,7 +451,7 @@ private fun TemplateFieldsEditor(
 
                 ) {
                     Icon(if (showField) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null)
-                    Text("Field ${index + 1}")
+                    Text(discordStrings.field(index + 1))
                     Spacer(Modifier.weight(1f))
                     IconButton(onClick = { onFieldDelete(field) }) {
                         Icon(Icons.Default.Delete, null)
@@ -463,7 +473,7 @@ private fun TemplateFieldsEditor(
             enabled = fieldTemplates.size < 25,
             modifier = Modifier.cursorForHand()
         ) {
-            Text("Add Field")
+            Text(discordStrings.addField)
         }
     }
 
@@ -473,6 +483,7 @@ private fun TemplateFieldsEditor(
 private fun TemplateFieldEditor(
     state: EmbedFieldState
 ) {
+    val discordStrings = LocalStrings.current.komf.notifications.discord
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(5.dp),
@@ -481,19 +492,19 @@ private fun TemplateFieldEditor(
             TextField(
                 value = state.nameTemplate,
                 onValueChange = { state.nameTemplate = it },
-                label = { Text("Field name. 256 characters max") },
+                label = { Text(discordStrings.fieldNameMax256) },
                 maxLines = 1,
                 modifier = Modifier.weight(1f),
             )
             CheckboxWithLabel(
                 checked = state.inline,
                 onCheckedChange = { state.inline = it },
-                label = { Text("Inline") })
+                label = { Text(discordStrings.inline) })
         }
         TextField(
             value = state.valueTemplate,
             onValueChange = { state.valueTemplate = it },
-            label = { Text("Field value. 1024 characters max") },
+            label = { Text(discordStrings.fieldValueMax1024) },
             minLines = 4,
             modifier = Modifier.fillMaxWidth(),
         )
@@ -621,5 +632,4 @@ private fun PreviewContent(
         }
     }
 }
-
 

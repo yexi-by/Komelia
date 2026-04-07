@@ -1,0 +1,4 @@
+# 相对仓库根目录的白名单文件路径。
+# 仅在确有必要时添加，默认保持为空。
+komelia-epub-reader/ttu-ebook-reader/src/lib/components/Reader.svelte
+komelia-epub-reader/ttu-ebook-reader/src/lib/components/settings/settings-dimension-content.svelte

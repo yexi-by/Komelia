@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.components.DropdownChoiceMenu
 import snd.komelia.ui.common.components.LabeledEntry
 import snd.komelia.ui.home.EqualityOpState
@@ -409,6 +410,7 @@ private fun SeriesSharingLabelConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     SeriesConditionLayout(
         type = SeriesConditionType.SharingLabel,
         onTypeChange = onConditionTypeChange,
@@ -417,7 +419,7 @@ private fun SeriesSharingLabelConditionContent(
         EqualityNullableOpDropdownSearchContent(
             state = state,
             options = state.sharingLabels.collectAsState(emptyList()).value,
-            label = "Sharing Label"
+            label = commonStrings.sharingLabel
         )
     }
 }
@@ -428,6 +430,7 @@ private fun SeriesCompleteConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     SeriesConditionLayout(
         type = SeriesConditionType.Complete,
         onTypeChange = onConditionTypeChange,
@@ -446,6 +449,7 @@ private fun SeriesGenreConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     SeriesConditionLayout(
         type = SeriesConditionType.Genre,
         onTypeChange = onConditionTypeChange,
@@ -454,7 +458,7 @@ private fun SeriesGenreConditionContent(
         EqualityNullableOpDropdownSearchContent(
             state = state,
             options = state.genres.collectAsState(emptyList()).value,
-            label = "Genre"
+            label = commonStrings.genre
         )
     }
 }
@@ -465,6 +469,7 @@ private fun SeriesLanguageConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     SeriesConditionLayout(
         type = SeriesConditionType.Language,
         onTypeChange = onConditionTypeChange,
@@ -473,7 +478,7 @@ private fun SeriesLanguageConditionContent(
         EqualityOpDropdownSearchContent(
             state = state,
             options = state.languages.collectAsState(emptyList()).value,
-            label = "Language"
+            label = commonStrings.language
         )
     }
 }
@@ -484,6 +489,7 @@ private fun SeriesPublisherConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     SeriesConditionLayout(
         type = SeriesConditionType.Publisher,
         onTypeChange = onConditionTypeChange,
@@ -492,7 +498,7 @@ private fun SeriesPublisherConditionContent(
         EqualityOpDropdownSearchContent(
             state = state,
             options = state.publishers.collectAsState(emptyList()).value,
-            label = "Publisher"
+            label = commonStrings.publisher
         )
     }
 }
@@ -503,6 +509,7 @@ fun SeriesStatusConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     SeriesConditionLayout(
         type = SeriesConditionType.Status,
         onTypeChange = onConditionTypeChange,
@@ -526,6 +533,7 @@ fun SeriesAgeRatingConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     SeriesConditionLayout(
         type = SeriesConditionType.AgeRating,
         onTypeChange = onConditionTypeChange,
@@ -537,13 +545,13 @@ fun SeriesAgeRatingConditionContent(
             options = NumericNullableOpState.Op.entries.map { LabeledEntry(it, it.name) },
             onOptionChange = { state.setOp(it.value) },
             inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
-            label = { Text("Operator") }
+            label = { Text(commonStrings.operator) }
         )
         if (operator != NumericNullableOpState.Op.IsNull && operator != NumericNullableOpState.Op.IsNotNull)
             IntTextField(
                 value = state.value.collectAsState().value,
                 onValueChange = state::setValue,
-                label = "Age",
+                label = commonStrings.age,
             )
     }
 }
@@ -554,6 +562,7 @@ fun CollectionIdConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     SeriesConditionLayout(
         type = SeriesConditionType.Collection,
         onTypeChange = onConditionTypeChange,
@@ -566,14 +575,14 @@ fun CollectionIdConditionContent(
             options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.name) },
             onOptionChange = { state.setOp(it.value) },
             inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
-            label = { Text("Operator") }
+            label = { Text(commonStrings.operator) }
         )
         SearchableOptionSelectionField(
             searchText = state.searchText.collectAsState().value,
             onSearchTextChange = state::onSearchTextChange,
             options = remember(options) { options.map { LabeledEntry(it, it.name) } },
             onValueChange = state::onCollectionSelect,
-            label = "Collection"
+            label = commonStrings.collection
         )
     }
 }

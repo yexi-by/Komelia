@@ -28,6 +28,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.common.components.PasswordTextField
 import snd.komelia.ui.dialogs.AppDialog
@@ -52,6 +53,9 @@ fun PasswordChangeDialog(
     onPasswordChange: suspend (String) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val dialogStrings = LocalStrings.current.dialogs.passwordChange
+    val validationStrings = LocalStrings.current.validation
     var password by remember { mutableStateOf("") }
     var passwordError by remember { mutableStateOf<String?>(null) }
 
@@ -63,7 +67,7 @@ fun PasswordChangeDialog(
         modifier = Modifier.widthIn(max = 600.dp),
         header = {
             Text(
-                text = "Change Password",
+                text = commonStrings.changePassword,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(horizontal = 15.dp, vertical = 10.dp)
             )
@@ -79,7 +83,7 @@ fun PasswordChangeDialog(
                 PasswordTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("New password") },
+                    label = { Text(dialogStrings.newPassword) },
                     isError = passwordError != null,
                     supportingText = { passwordError?.let { Text(it) } },
                     modifier = Modifier.fillMaxWidth()
@@ -90,7 +94,7 @@ fun PasswordChangeDialog(
                 PasswordTextField(
                     value = repeatPassword,
                     onValueChange = { repeatPassword = it },
-                    label = { Text("Repeat new password") },
+                    label = { Text(dialogStrings.repeatNewPassword) },
                     isError = repeatPasswordError != null,
                     supportingText = { repeatPasswordError?.let { Text(it) } },
                     modifier = Modifier.fillMaxWidth()
@@ -111,14 +115,14 @@ fun PasswordChangeDialog(
                     onClick = onDismiss,
                     modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
                 ) {
-                    Text("Cancel")
+                    Text(commonStrings.cancel)
                 }
 
                 FilledTonalButton(
                     onClick = {
                         when {
-                            password.isBlank() -> passwordError = "New password is required"
-                            password != repeatPassword -> repeatPasswordError = "Passwords must be identical"
+                            password.isBlank() -> passwordError = validationStrings.newPasswordRequired
+                            password != repeatPassword -> repeatPasswordError = validationStrings.passwordsMustMatch
                             else -> coroutineScope.launch {
                                 onPasswordChange(password)
                                 onDismiss()
@@ -127,7 +131,7 @@ fun PasswordChangeDialog(
                     },
                     modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
                 ) {
-                    Text("Change Password")
+                    Text(commonStrings.changePassword)
                 }
             }
         }

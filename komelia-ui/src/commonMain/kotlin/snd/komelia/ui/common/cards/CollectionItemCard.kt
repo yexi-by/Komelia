@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import snd.komelia.ui.LocalKomgaState
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.images.CollectionThumbnail
 import snd.komelia.ui.common.menus.CollectionActionsMenu
 import snd.komga.client.collection.KomgaCollection
@@ -110,6 +111,7 @@ private fun CollectionImageOverlay(
     collection: KomgaCollection,
     content: @Composable () -> Unit
 ) {
+    val strings = LocalStrings.current.screens.collection
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -119,7 +121,7 @@ private fun CollectionImageOverlay(
         CardGradientOverlay()
         Column(Modifier.padding(10.dp)) {
             CardOutlinedText(collection.name)
-            CardOutlinedText("${collection.seriesIds.size} series")
+            CardOutlinedText(strings.seriesCount(collection.seriesIds.size))
         }
     }
 

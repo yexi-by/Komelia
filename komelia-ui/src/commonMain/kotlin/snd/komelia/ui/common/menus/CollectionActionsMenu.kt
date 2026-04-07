@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import snd.komelia.ui.dialogs.ConfirmationDialog
 import snd.komelia.ui.dialogs.collectionedit.CollectionEditDialog
 import snd.komga.client.collection.KomgaCollection
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun CollectionActionsMenu(
@@ -26,12 +27,13 @@ fun CollectionActionsMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
 ) {
+    val collectionStrings = LocalStrings.current.screens.collection
     var showDeleteDialog by remember { mutableStateOf(false) }
     if (showDeleteDialog) {
         ConfirmationDialog(
-            title = "Delete Collection",
-            body = "Collection ${collection.name} will be removed from this server. Your media files will not be affected. This cannot be undone. Continue?",
-            confirmText = "Yes, delete collection \"${collection.name}\"",
+            title = collectionStrings.deleteCollectionTitle,
+            body = collectionStrings.deleteCollectionBody(collection.name),
+            confirmText = collectionStrings.deleteCollectionConfirm(collection.name),
             onDialogConfirm = {
                 onCollectionDelete()
                 onDismissRequest()
@@ -61,12 +63,12 @@ fun CollectionActionsMenu(
         val deleteInteractionSource = remember { MutableInteractionSource() }
         val deleteIsHovered = deleteInteractionSource.collectIsHoveredAsState()
         DropdownMenuItem(
-            text = { Text("Edit") },
+            text = { Text(LocalStrings.current.common.edit) },
             onClick = { showEditDialog = true },
         )
 
         DropdownMenuItem(
-            text = { Text("Delete") },
+            text = { Text(LocalStrings.current.common.delete) },
             onClick = { showDeleteDialog = true },
             modifier = Modifier
                 .hoverable(deleteInteractionSource)

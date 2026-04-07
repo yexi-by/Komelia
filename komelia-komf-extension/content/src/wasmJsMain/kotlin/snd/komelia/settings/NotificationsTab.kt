@@ -14,11 +14,13 @@ import io.github.snd_r.komelia.ui.dialogs.tabs.TabItem
 import io.github.snd_r.komelia.ui.error.formatExceptionMessage
 import io.github.snd_r.komelia.ui.settings.komf.notifications.view.KomfSettingsContent
 import snd.komelia.LocalKomfViewModelFactory
+import snd.komelia.strings.LocalExtensionStrings
 
 class NotificationsTab : DialogTab {
 
+    @Composable
     override fun options() = TabItem(
-        title = "Notifications",
+        title = LocalExtensionStrings.current.content.notificationsTab,
         icon = Icons.Default.Notifications
     )
 
@@ -43,3 +45,6 @@ class NotificationsTab : DialogTab {
 
     }
 }
+
+
+

@@ -262,6 +262,7 @@ class ViewModelFactory(
 
     fun getLoginViewModel(): LoginViewModel {
         return LoginViewModel(
+            appStrings = dependencies.appStrings,
             settingsRepository = appRepositories.settingsRepository,
             secretsRepository = appRepositories.secretsRepository,
             komgaUserApi = dependencies.komgaApi.map { it.userApi },
@@ -568,6 +569,7 @@ class ViewModelFactory(
             komfMetadataClient = dependencies.komfClientFactory.metadataClient(KOMGA),
             komfJobClient = dependencies.komfClientFactory.jobClient(),
             appNotifications = dependencies.appNotifications,
+            appStrings = dependencies.appStrings,
             onDismiss = onDismissRequest,
         )
     }
@@ -589,6 +591,7 @@ class ViewModelFactory(
             libraryId = KomfServerLibraryId(library.id.value),
             komfMetadataClient = dependencies.komfClientFactory.metadataClient(KOMGA),
             appNotifications = dependencies.appNotifications,
+            appStrings = dependencies.appStrings,
         )
     }
 
@@ -609,6 +612,8 @@ class ViewModelFactory(
             epubSettingsRepository = appRepositories.epubReaderSettingsRepository,
             fontsRepository = appRepositories.fontsRepository,
             notifications = dependencies.appNotifications,
+            appStrings = dependencies.appStrings,
+            appLanguage = dependencies.appLanguage,
             windowState = dependencies.windowState,
             platformType = platformType,
             bookSiblingsContext = bookSiblingsContext,

@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import snd.komelia.komga.api.model.KomeliaBook
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.cards.BookSimpleImageCard
 import snd.komelia.ui.common.cards.SeriesSimpleImageCard
 import snd.komelia.ui.common.components.NoPaddingTextField
@@ -69,6 +70,7 @@ fun SearchBar(
     onBookClick: (KomeliaBook) -> Unit,
     onSeriesClick: (KomgaSeries) -> Unit,
 ) {
+    val searchStrings = LocalStrings.current.screens.search
     val interactionSource = remember { MutableInteractionSource() }
     var isFocused by remember { mutableStateOf(false) }
     LaunchedEffect(interactionSource) {
@@ -137,6 +139,8 @@ private fun ColumnScope.SearchResultsDropDownBox(
     onBookClick: (KomeliaBook) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val searchStrings = LocalStrings.current.screens.search
     if (currentQuery.isBlank()) return
 
     Box(
@@ -151,7 +155,7 @@ private fun ColumnScope.SearchResultsDropDownBox(
             .padding(horizontal = 5.dp),
         contentAlignment = Alignment.CenterStart
     ) {
-        Text("Search all...")
+        Text(searchStrings.searchAll)
     }
     if (isLoading) LinearProgressIndicator(
         color = MaterialTheme.colorScheme.tertiary,
@@ -164,7 +168,7 @@ private fun ColumnScope.SearchResultsDropDownBox(
     ) {
         val series = searchResults.series
         if (series.isNotEmpty()) {
-            Text(text = "Series")
+            Text(text = commonStrings.series)
             series.forEach {
                 SeriesSearchEntry(
                     series = it,
@@ -179,7 +183,7 @@ private fun ColumnScope.SearchResultsDropDownBox(
         val books = searchResults.books
         if (books.isNotEmpty()) {
             Text(
-                text = "Books",
+                text = commonStrings.books,
                 modifier = Modifier.padding(5.dp)
             )
             books.forEach {
@@ -220,6 +224,7 @@ private fun SeriesSearchEntry(
     library: KomgaLibrary?,
     onSeriesClick: () -> Unit,
 ) {
+    val searchStrings = LocalStrings.current.screens.search
     EntryContainer(onSeriesClick) {
         SeriesSimpleImageCard(
             series = series,
@@ -230,7 +235,7 @@ private fun SeriesSearchEntry(
         )
         Column {
             Text(series.metadata.title, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            library?.let { Text("in ${library.name}") }
+            library?.let { Text(searchStrings.inLibrary(it.name)) }
         }
     }
 }
@@ -241,6 +246,7 @@ private fun BookSearchEntry(
     library: KomgaLibrary?,
     onBookClick: () -> Unit,
 ) {
+    val searchStrings = LocalStrings.current.screens.search
     EntryContainer(onBookClick) {
         BookSimpleImageCard(
             book = book,
@@ -251,7 +257,7 @@ private fun BookSearchEntry(
         )
         Column {
             Text(book.metadata.title, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            library?.let { Text("in ${library.name}") }
+            library?.let { Text(searchStrings.inLibrary(it.name)) }
         }
     }
 }
@@ -266,10 +272,11 @@ fun SearchTextField(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     modifier: Modifier = Modifier,
 ) {
+    val searchStrings = LocalStrings.current.screens.search
     val focusManager = LocalFocusManager.current
     NoPaddingTextField(
         text = query,
-        placeholder = "Search",
+        placeholder = searchStrings.searchPlaceholder,
         onTextChange = onQueryChange,
         shape = CircleShape,
         colors = OutlinedTextFieldDefaults.colors(

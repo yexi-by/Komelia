@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.dialogs.tabs.TabDialog
 import snd.komga.client.collection.KomgaCollection
@@ -20,11 +21,12 @@ fun CollectionEditDialog(
     LaunchedEffect(collection) { vm.initialize() }
 
     val coroutineScope = rememberCoroutineScope()
+    val strings = LocalStrings.current.dialogs.collectionEdit
     TabDialog(
-        title = "Edit ${collection.name}",
+        title = strings.title(collection.name),
         currentTab = vm.currentTab,
         tabs = vm.tabs(),
-        confirmationText = "Save Changes",
+        confirmationText = LocalStrings.current.common.saveChanges,
         confirmEnabled = vm.canSave(),
         onConfirm = { coroutineScope.launch { vm.saveChanges() } },
         onTabChange = { vm.currentTab = it },

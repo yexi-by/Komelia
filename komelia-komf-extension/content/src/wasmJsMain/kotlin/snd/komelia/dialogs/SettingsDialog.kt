@@ -11,6 +11,7 @@ import snd.komelia.settings.JobsTab
 import snd.komelia.settings.NotificationsTab
 import snd.komelia.settings.ProcessingTab
 import snd.komelia.settings.ProvidersTab
+import snd.komelia.strings.LocalExtensionStrings
 import snd.komf.api.MediaServer
 
 @Composable
@@ -18,6 +19,7 @@ fun SettingsDialog(
     mediaServer: MediaServer,
     onDismiss: () -> Unit
 ) {
+    val strings = LocalExtensionStrings.current.content
     val tabs = remember {
         listOf(
             ConnectionTab(mediaServer),
@@ -29,13 +31,13 @@ fun SettingsDialog(
     }
     var currentTab by remember { mutableStateOf(tabs.first()) }
     TabDialog(
-        title = "Komf Settings",
+        title = strings.settingsTitle,
         currentTab = currentTab,
         tabs = tabs,
         onTabChange = { currentTab = it },
         onDismissRequest = onDismiss,
         onConfirm = onDismiss,
-        confirmationText = "Close",
+        confirmationText = strings.settingsClose,
         showCancelButton = false
     )
 }

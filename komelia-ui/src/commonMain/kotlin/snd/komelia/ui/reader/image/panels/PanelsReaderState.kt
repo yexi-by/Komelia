@@ -148,8 +148,15 @@ class PanelsReaderState(
             .onEach { newBook -> onNewBookLoaded(newBook) }
             .launchIn(stateScope)
 
-        val strings = appStrings.first().pagedReader
-        appNotifications.add(AppNotification.Normal("Panels ${strings.forReadingDirection(readingDirection.value)}"))
+        val strings = appStrings.first()
+        appNotifications.add(
+            AppNotification.Normal(
+                strings.reader.modeWithDirection(
+                    strings.reader.forReaderType(snd.komelia.settings.model.ReaderType.PANELS),
+                    strings.pagedReader.forReadingDirection(readingDirection.value)
+                )
+            )
+        )
     }
 
     fun stop() {

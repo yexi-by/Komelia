@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import snd.komelia.komga.api.model.KomeliaBook
 import snd.komelia.ui.LocalKomgaState
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalWindowWidth
 import snd.komelia.ui.common.components.PageSizeSelectionDropdown
 import snd.komelia.ui.common.itemlist.BookLazyCardGrid
@@ -66,7 +67,7 @@ fun ReadListContent(
 
     cardMinSize: Dp,
 ) {
-
+    val readListStrings = LocalStrings.current.screens.readList
     Column {
         if (editMode)
             BulkActionsToolbar(
@@ -129,6 +130,7 @@ private fun ReadListToolbar(
     pageSize: Int,
     onPageSizeChange: (Int) -> Unit,
 ) {
+    val readListStrings = LocalStrings.current.screens.readList
     Row(
         modifier = Modifier.padding(start = 10.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -139,7 +141,7 @@ private fun ReadListToolbar(
             horizontalArrangement = Arrangement.spacedBy(5.dp)
         ) {
             Text(
-                "read list",
+                readListStrings.typeLabel,
                 style = MaterialTheme.typography.labelMedium,
                 fontStyle = FontStyle.Italic
             )
@@ -148,7 +150,7 @@ private fun ReadListToolbar(
 
         SuggestionChip(
             onClick = {},
-            label = { Text("${readList.bookIds.size} books", style = MaterialTheme.typography.bodyMedium) },
+            label = { Text(readListStrings.booksCount(readList.bookIds.size), style = MaterialTheme.typography.bodyMedium) },
             modifier = Modifier.padding(10.dp, 0.dp),
         )
 
@@ -183,6 +185,7 @@ private fun BulkActionsToolbar(
     selectedBooks: List<KomeliaBook>,
     onBookSelect: (KomeliaBook) -> Unit,
 ) {
+    val readListStrings = LocalStrings.current.screens.readList
     BulkActionsContainer(
         onCancel = onCancel,
         selectedCount = selectedBooks.size,
@@ -194,8 +197,8 @@ private fun BulkActionsToolbar(
     ) {
         when (LocalWindowWidth.current) {
             WindowSizeClass.FULL -> {
-                if (readList.ordered) Text("Edit mode: Click to select, drag to change order")
-                else Text("Selection mode: Click on items to select or deselect them")
+                if (readList.ordered) Text(readListStrings.orderedSelectionHint)
+                else Text(readListStrings.unorderedSelectionHint)
                 if (selectedBooks.isNotEmpty()) {
                     Spacer(Modifier.weight(1f))
 
@@ -205,8 +208,8 @@ private fun BulkActionsToolbar(
 
             WindowSizeClass.EXPANDED -> {
                 if (selectedBooks.isEmpty()) {
-                    if (readList.ordered) Text("Edit mode: Click to select, drag to change order")
-                    else Text("Selection mode: Click on items to select or deselect them")
+                    if (readList.ordered) Text(readListStrings.orderedSelectionHint)
+                    else Text(readListStrings.unorderedSelectionHint)
                 } else {
                     Spacer(Modifier.weight(1f))
                     ReadListBulkActionsContent(readList, books, false)

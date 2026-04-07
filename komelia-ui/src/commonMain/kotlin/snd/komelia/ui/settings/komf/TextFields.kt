@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import snd.komelia.ui.common.components.HttpTextField
 import snd.komelia.ui.common.components.LabeledEntry
 import snd.komelia.ui.common.components.PasswordTextField
+import snd.komelia.ui.LocalStrings
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -90,7 +91,7 @@ fun SavableTextField(
                         textFieldValue = ""
                     },
                 ) {
-                    Text("Edit")
+                    Text(LocalStrings.current.common.edit)
                 }
             }
 
@@ -104,7 +105,7 @@ fun SavableTextField(
                             textFieldValue = currentValue
                         },
                     ) {
-                        Text("Discard")
+                        Text(LocalStrings.current.common.discard)
                     }
                     FilledTonalButton(
                         onClick = {
@@ -114,7 +115,7 @@ fun SavableTextField(
                         },
                         enabled = isChanged,
                     ) {
-                        Text("Save")
+                        Text(LocalStrings.current.common.save)
                     }
                 }
             }
@@ -129,7 +130,7 @@ fun SavableHttpTextField(
     label: String,
     currentValue: String,
     onValueSave: (String) -> Unit,
-    confirmationText: String = "Save",
+    confirmationText: String,
     isError: Boolean = false,
     supportingText: @Composable (() -> Unit)? = null,
 ) {
@@ -158,7 +159,7 @@ fun SavableHttpTextField(
                     textFieldValue = currentValue
                 },
             ) {
-                Text("Discard")
+                Text(LocalStrings.current.common.discard)
             }
             FilledTonalButton(
                 onClick = {
@@ -175,17 +176,17 @@ fun SavableHttpTextField(
 }
 
 val komfLanguageTagsSuggestions = listOf(
-    LabeledEntry("en", "English (en)"),
-    LabeledEntry("ja", "Japanese (ja)"),
-    LabeledEntry("ja-ro", "Japanese romanized (ja-ro)"),
-    LabeledEntry("ko", "Korean (ko)"),
-    LabeledEntry("ko-ro", "Korean romanized (ko-ro)"),
-    LabeledEntry("zh", "Simplified Chinese (zh)"),
-    LabeledEntry("zh-hk", "Traditional Chinese (zh-hk)"),
-    LabeledEntry("zh-ro", "Chinese romanized (zh-ro)"),
-    LabeledEntry("pt-br", "Brazilian Portugese (pt-br)"),
-    LabeledEntry("es", "Castilian Spanish (es)"),
-    LabeledEntry("es-la", "Latin American Spanish (es-la)"),
+    LabeledEntry("en", "English / 英语 (en)"),
+    LabeledEntry("ja", "Japanese / 日语 (ja)"),
+    LabeledEntry("ja-ro", "Japanese Romanized / 日语罗马音 (ja-ro)"),
+    LabeledEntry("ko", "Korean / 韩语 (ko)"),
+    LabeledEntry("ko-ro", "Korean Romanized / 韩语罗马音 (ko-ro)"),
+    LabeledEntry("zh", "Simplified Chinese / 简体中文 (zh)"),
+    LabeledEntry("zh-hk", "Traditional Chinese / 繁体中文 (zh-hk)"),
+    LabeledEntry("zh-ro", "Chinese Romanized / 中文罗马音 (zh-ro)"),
+    LabeledEntry("pt-br", "Brazilian Portuguese / 巴西葡萄牙语 (pt-br)"),
+    LabeledEntry("es", "Castilian Spanish / 卡斯蒂利亚西班牙语 (es)"),
+    LabeledEntry("es-la", "Latin American Spanish / 拉丁美洲西班牙语 (es-la)"),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -246,7 +247,7 @@ fun LanguageSelectionField(
             },
             enabled = isChanged,
         ) {
-            Text("Save")
+            Text(LocalStrings.current.common.save)
         }
     }
 }

@@ -48,6 +48,7 @@ fun UpscaleModeSelector(
     onModelPathChange: (PlatformFile?) -> Unit,
 ) {
     val strings = LocalStrings.current.imageSettings
+    val commonStrings = LocalStrings.current.common
     DropdownChoiceMenu(
         selectedOption = LabeledEntry(currentMode, strings.forOnnxRuntimeUpscaleMode(currentMode)),
         options = remember {
@@ -56,7 +57,7 @@ fun UpscaleModeSelector(
             }
         },
         onOptionChange = { onModeChange(it.value) },
-        label = { Text("OnnxRuntime upscale mode") },
+        label = { Text(strings.onnxRuntimeUpscaleMode) },
         inputFieldModifier = Modifier.fillMaxSize()
     )
     AnimatedVisibility(currentMode == UpscaleMode.USER_SPECIFIED_MODEL) {
@@ -73,7 +74,7 @@ fun UpscaleModeSelector(
                 value = currentModelPath?.toString() ?: "",
                 onValueChange = {},
                 enabled = false,
-                label = { Text("ONNX model path") },
+                label = { Text(strings.onnxModelPath) },
                 readOnly = true,
                 modifier = Modifier.weight(7f),
             )
@@ -82,7 +83,7 @@ fun UpscaleModeSelector(
                 onClick = { launcher.launch() },
                 modifier = Modifier.padding(horizontal = 10.dp),
             ) {
-                Text("Browse")
+                Text(strings.browse)
             }
         }
     }
@@ -94,16 +95,19 @@ fun TileSizeSelector(
     tileSize: Int,
     onTileSizeChange: (Int) -> Unit,
 ) {
-
+    val strings = LocalStrings.current.imageSettings
+    val commonStrings = LocalStrings.current.common
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         DropdownChoiceMenu(
-            selectedOption = remember(tileSize) { if (tileSize == 0) LabeledEntry(0, "None") else intEntry(tileSize) },
+            selectedOption = remember(tileSize, commonStrings.none) {
+                if (tileSize == 0) LabeledEntry(0, commonStrings.none) else intEntry(tileSize)
+            },
             options = remember {
                 listOf(
-                    LabeledEntry(0, "None"),
+                    LabeledEntry(0, commonStrings.none),
                     intEntry(4096),
                     intEntry(2048),
                     intEntry(1024),
@@ -113,7 +117,7 @@ fun TileSizeSelector(
                 )
             },
             onOptionChange = { onTileSizeChange(it.value) },
-            label = { Text("Tile size") },
+            label = { Text(strings.tileSize) },
             modifier = Modifier.weight(1f),
             inputFieldModifier = Modifier.fillMaxSize()
         )
@@ -126,12 +130,7 @@ fun TileSizeSelector(
                     border = BorderStroke(Dp.Hairline, MaterialTheme.colorScheme.surface)
                 ) {
                     Text(
-                        text = """
-                            Splits image into small regions of specified size and upscales them individually
-                            Upscaled regions are then recombined back into single upscaled image
-                            
-                            This helps upscaling without running out of VRAM for big images
-                            """.trimIndent(),
+                        text = strings.tileSizeHelpText,
                         modifier = Modifier.padding(10.dp),
                     )
                 }
@@ -155,11 +154,14 @@ fun DeviceSelector(
         val selectedDevice = remember(currentDeviceId) {
             availableDevices.find { it.id == currentDeviceId } ?: availableDevices.first()
         }
+        val strings = LocalStrings.current.imageSettings
         DropdownChoiceMenu(
-            selectedOption = LabeledEntry(selectedDevice, "${selectedDevice.name} ${selectedDevice.memoryGb()}GiB"),
-            options = remember { availableDevices.map { LabeledEntry(it, "${it.name} ${it.memoryGb()}GiB") } },
+            selectedOption = LabeledEntry(selectedDevice, strings.deviceLabel(selectedDevice.name, selectedDevice.memoryGb())),
+            options = remember(availableDevices, strings) {
+                availableDevices.map { LabeledEntry(it, strings.deviceLabel(it.name, it.memoryGb())) }
+            },
             onOptionChange = { onDeviceIdChange(it.value.id) },
-            label = { Text("GPU") },
+            label = { Text(strings.gpu) },
             inputFieldModifier = Modifier.fillMaxSize()
         )
     }

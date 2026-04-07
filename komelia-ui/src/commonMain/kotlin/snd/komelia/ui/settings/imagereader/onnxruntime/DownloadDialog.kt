@@ -26,6 +26,7 @@ import snd.komelia.formatDecimal
 import snd.komelia.ui.dialogs.AppDialog
 import snd.komelia.ui.platform.cursorForHand
 import snd.komelia.updates.UpdateProgress
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun DownloadDialog(
@@ -57,7 +58,7 @@ fun DownloadDialog(
                 TextButton(
                     onClick = onDismiss,
                     modifier = Modifier.cursorForHand(),
-                    content = { Text("Cancel") }
+                    content = { Text(LocalStrings.current.common.cancel) }
                 )
             }
         },
@@ -69,6 +70,7 @@ fun DownloadDialog(
 internal fun UpdateProgressContent(
     progress: UpdateProgress
 ) {
+    val topBarStrings = LocalStrings.current.screens.topBar
     Column(
         Modifier.padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -89,7 +91,7 @@ internal fun UpdateProgressContent(
             val completedMb = remember(progress.completed) {
                 (progress.completed.toFloat() / 1024 / 1024).formatDecimal(2)
             }
-            Text("${completedMb}MiB / ${totalMb}MiB")
+            Text(topBarStrings.downloadProgress(completedMb, totalMb))
         }
     }
 }

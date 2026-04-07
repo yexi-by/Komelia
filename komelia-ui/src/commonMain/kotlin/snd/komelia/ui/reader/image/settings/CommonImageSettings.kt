@@ -60,6 +60,7 @@ fun CommonImageSettings(
 ) {
     val strings = LocalStrings.current
     val readerStrings = strings.reader
+    val imageStrings = strings.imageSettings
     val platform = LocalPlatform.current
     Column(modifier = modifier) {
         SwitchWithLabel(
@@ -73,7 +74,7 @@ fun CommonImageSettings(
             SwitchWithLabel(
                 checked = cropBorders,
                 onCheckedChange = onCropBordersChange,
-                label = { Text("Crop borders") },
+                label = { Text(imageStrings.cropBorders) },
                 contentPadding = PaddingValues(horizontal = 10.dp)
             )
         }
@@ -86,7 +87,7 @@ fun CommonImageSettings(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Color Correction")
+            Text(imageStrings.colorCorrection)
             Spacer(Modifier.width(10.dp))
             Icon(
                 imageVector = Icons.Default.BarChart,
@@ -96,7 +97,7 @@ fun CommonImageSettings(
             )
             if (isColorCorrectionsActive) {
                 Text(
-                    "active",
+                    imageStrings.active,
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )
@@ -109,8 +110,8 @@ fun CommonImageSettings(
             SwitchWithLabel(
                 checked = flashEnabled,
                 onCheckedChange = onFlashEnabledChange,
-                label = { Text("Flash on page change") },
-                supportingText = { Text("Prevents ghosting on e-ink devices") },
+                label = { Text(imageStrings.flashOnPageChange) },
+                supportingText = { Text(imageStrings.flashOnPageChangeDescription) },
                 contentPadding = PaddingValues(horizontal = 10.dp)
             )
             AnimatedVisibility(flashEnabled) {
@@ -120,8 +121,8 @@ fun CommonImageSettings(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.width(100.dp)) {
-                            Text("Flash Duration", style = MaterialTheme.typography.labelLarge)
-                            Text("$flashDuration ms", style = MaterialTheme.typography.labelMedium)
+                            Text(imageStrings.flashDuration, style = MaterialTheme.typography.labelLarge)
+                            Text(imageStrings.flashDurationValue(flashDuration), style = MaterialTheme.typography.labelMedium)
                         }
                         Slider(
                             value = flashDuration.toFloat(),
@@ -134,11 +135,8 @@ fun CommonImageSettings(
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.width(100.dp)) {
-                            Text("Flash every", style = MaterialTheme.typography.labelLarge)
-                            val pagesText = remember(flashEveryNPages) {
-                                if (flashEveryNPages == 1) "$flashEveryNPages page"
-                                else "$flashEveryNPages pages"
-                            }
+                            Text(imageStrings.flashEvery, style = MaterialTheme.typography.labelLarge)
+                            val pagesText = remember(flashEveryNPages) { imageStrings.flashEveryValue(flashEveryNPages) }
                             Text(pagesText, style = MaterialTheme.typography.labelMedium)
                         }
                         Slider(
@@ -151,24 +149,24 @@ fun CommonImageSettings(
                     }
 
                     Column {
-                        Text("Flash with")
+                        Text(imageStrings.flashWith)
                         FlowRow(
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             InputChip(
                                 selected = flashWith == ReaderFlashColor.BLACK,
                                 onClick = { onFlashWithChange(ReaderFlashColor.BLACK) },
-                                label = { Text("Black") }
+                                label = { Text(imageStrings.flashColorBlack) }
                             )
                             InputChip(
                                 selected = flashWith == ReaderFlashColor.WHITE,
                                 onClick = { onFlashWithChange(ReaderFlashColor.WHITE) },
-                                label = { Text("White") }
+                                label = { Text(imageStrings.flashColorWhite) }
                             )
                             InputChip(
                                 selected = flashWith == ReaderFlashColor.WHITE_AND_BLACK,
                                 onClick = { onFlashWithChange(ReaderFlashColor.WHITE_AND_BLACK) },
-                                label = { Text("White and Black") }
+                                label = { Text(imageStrings.flashColorWhiteAndBlack) }
                             )
                         }
                     }

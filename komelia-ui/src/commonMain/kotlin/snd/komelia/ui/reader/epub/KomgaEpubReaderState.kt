@@ -8,6 +8,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.snd_r.komelia.ui.komelia_ui.generated.resources.Res
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -30,6 +31,7 @@ import snd.komelia.ui.book.BookScreen
 import snd.komelia.ui.book.bookScreen
 import snd.komelia.ui.platform.PlatformType
 import snd.komelia.ui.platform.PlatformType.WEB_KOMF
+import snd.komelia.ui.strings.AppLanguage
 import snd.komga.client.book.KomgaBookId
 import snd.komga.client.book.R2Progression
 import snd.komga.client.readlist.KomgaReadListId
@@ -54,6 +56,7 @@ class KomgaEpubReaderState(
     private val platformType: PlatformType,
     private val coroutineScope: CoroutineScope,
     private val bookSiblingsContext: BookSiblingsContext,
+    private val appLanguage: StateFlow<AppLanguage>,
 ) : EpubReaderState {
     override val state = MutableStateFlow<LoadState<Unit>>(Uninitialized)
     override val book = MutableStateFlow(book)
@@ -165,6 +168,9 @@ class KomgaEpubReaderState(
 
         webview.bind<Unit, JsonObject>("getSettings") {
             epubSettingsRepository.getKomgaReaderSettings()
+        }
+        webview.bind<Unit, String>("getUiLanguageTag") {
+            appLanguage.value.primaryTag
         }
 
         webview.bind<JsonObject, Unit>("saveSettings") { newSettings ->

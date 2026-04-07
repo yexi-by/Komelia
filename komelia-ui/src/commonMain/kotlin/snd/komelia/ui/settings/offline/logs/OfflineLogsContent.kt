@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import snd.komelia.DefaultDateTimeFormats.toSystemTimeString
 import snd.komelia.offline.sync.model.OfflineLogEntry
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.components.AppFilterChipDefaults
 import snd.komelia.ui.common.components.Pagination
 import snd.komelia.ui.dialogs.ConfirmationDialog
@@ -42,6 +43,7 @@ fun OfflineLogsContent(
     onTabSelect: (TaskTab) -> Unit,
     onDelete: () -> Unit
 ) {
+    val settingsStrings = LocalStrings.current.screens.settings
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         StatusFilters(selectedTab, onTabSelect, onDelete)
 
@@ -53,7 +55,7 @@ fun OfflineLogsContent(
         )
 
         if (logs.isEmpty()) {
-            Text("Nothing to show")
+            Text(settingsStrings.nothingToShow)
         } else {
             LogsContent(logs)
 
@@ -78,20 +80,21 @@ private fun StatusFilters(
     onTabSelect: (TaskTab) -> Unit,
     onDelete: () -> Unit
 ) {
+    val settingsStrings = LocalStrings.current.screens.settings
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(5.dp),
     ) {
         FilterChip(
             selected = selectedTab == TaskTab.ERROR,
             onClick = { onTabSelect(TaskTab.ERROR) },
-            label = { Text("Errors") },
+            label = { Text(settingsStrings.errors) },
             colors = AppFilterChipDefaults.filterChipColors(),
             border = null
         )
         FilterChip(
             selected = selectedTab == TaskTab.INFO,
             onClick = { onTabSelect(TaskTab.INFO) },
-            label = { Text("Info") },
+            label = { Text(settingsStrings.info) },
             colors = AppFilterChipDefaults.filterChipColors(),
             border = null
         )
@@ -99,11 +102,11 @@ private fun StatusFilters(
         var showDeleteDialog by remember { mutableStateOf(false) }
 
         Spacer(Modifier.weight(1f))
-        FilledTonalButton(onClick = { showDeleteDialog = true }) { Text("Delete all") }
+        FilledTonalButton(onClick = { showDeleteDialog = true }) { Text(settingsStrings.deleteAll) }
 
         if (showDeleteDialog) {
             ConfirmationDialog(
-                body = "Delete job history?",
+                body = settingsStrings.deleteJobHistory,
                 onDialogDismiss = { showDeleteDialog = false },
                 onDialogConfirm = onDelete
             )

@@ -18,6 +18,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -43,6 +44,8 @@ import snd.komelia.ui.book.BookScreen
 import snd.komelia.ui.book.bookScreen
 import snd.komelia.ui.platform.PlatformType
 import snd.komelia.ui.platform.PlatformType.WEB_KOMF
+import snd.komelia.ui.strings.AppLanguage
+import snd.komelia.ui.strings.AppStrings
 import snd.komga.client.book.KomgaBookId
 import snd.komga.client.book.KomgaBookReadProgressUpdateRequest
 import snd.komga.client.book.R2Device
@@ -75,6 +78,8 @@ class TtsuReaderState(
     private val platformType: PlatformType,
     private val coroutineScope: CoroutineScope,
     private val bookSiblingsContext: BookSiblingsContext,
+    private val appStrings: StateFlow<AppStrings>,
+    private val appLanguage: StateFlow<AppLanguage>,
 ) : EpubReaderState {
     override val state = MutableStateFlow<LoadState<Unit>>(LoadState.Uninitialized)
     override val book = MutableStateFlow(book)
@@ -159,6 +164,9 @@ class TtsuReaderState(
             val settings = epubSettingsRepository.getTtsuReaderSettings()
             if (!markReadProgress) settings.copy(autoBookmark = false)
             else settings
+        }
+        webview.bind<Unit, String>("getUiLanguageTag") {
+            appLanguage.value.primaryTag
         }
         webview.bind<TtsuReaderSettings, Unit>("putSettings") {
             epubSettingsRepository.putTtsuReaderSettings(it)
@@ -463,7 +471,7 @@ class TtsuReaderState(
                             startCharacter = currentCharCount,
                             characters = chapterCharCount,
                             parentChapter = null,
-                            label = "Preface",
+                            label = appStrings.first().common.preface,
                         )
                     )
                     currentMainChapterIndex = sectionData.size - 1

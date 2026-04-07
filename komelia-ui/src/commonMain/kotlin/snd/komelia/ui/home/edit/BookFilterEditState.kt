@@ -23,6 +23,8 @@ import snd.komelia.komga.api.KomgaBookApi
 import snd.komelia.komga.api.KomgaReadListApi
 import snd.komelia.komga.api.KomgaSeriesApi
 import snd.komelia.komga.api.model.KomeliaBook
+import snd.komelia.ui.home.localizedLabel
+import snd.komelia.ui.strings.RuntimeAppStrings
 import snd.komga.client.book.KomgaBookSearch
 import snd.komga.client.common.KomgaPageRequest
 import snd.komga.client.common.KomgaSort
@@ -41,7 +43,10 @@ class BookFilterEditState(
     initialFilter: BooksHomeScreenFilter?,
     initialBooks: List<KomeliaBook>?,
 ) : FilterEditState {
-    override val label = MutableStateFlow(initialFilter?.label ?: "Book Filter")
+    override val label = MutableStateFlow(
+        initialFilter?.localizedLabel(RuntimeAppStrings.strings.value.screens.home)
+            ?: RuntimeAppStrings.strings.value.screens.home.defaultBookFilter
+    )
 
     val filter: MutableStateFlow<BookFilterStateType> = MutableStateFlow(
         initialFilter?.let { initial ->
@@ -573,3 +578,4 @@ class BookMatchConditionState(
 //        }
 //    }
 }
+

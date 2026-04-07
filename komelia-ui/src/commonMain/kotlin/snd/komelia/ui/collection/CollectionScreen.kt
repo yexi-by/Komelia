@@ -12,6 +12,7 @@ import snd.komelia.ui.LoadState.Error
 import snd.komelia.ui.LoadState.Loading
 import snd.komelia.ui.LoadState.Success
 import snd.komelia.ui.LoadState.Uninitialized
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalReloadEvents
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.ReloadableScreen
@@ -72,7 +73,7 @@ class CollectionScreen(val collectionId: KomgaCollectionId) : ReloadableScreen {
                     )
             }
 
-            is Error -> Text("Error")
+            is Error -> Text(LocalStrings.current.screens.error.error)
         }
 
         BackPressHandler { navigator.pop() }

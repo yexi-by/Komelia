@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.platform.cursorForHand
 import snd.komf.api.mediaserver.KomfMediaServerLibrary
 import snd.komf.api.mediaserver.KomfMediaServerLibraryId
@@ -62,6 +63,8 @@ fun <T> LibraryTabs(
     libraries: List<KomfMediaServerLibrary>,
     content: @Composable (T) -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val komfStrings = LocalStrings.current.komf.general
 
     Column {
         var selectedTabIndex by remember { mutableStateOf(0) }
@@ -83,7 +86,7 @@ fun <T> LibraryTabs(
                     },
                 ) {
                     Text(
-                        "Default",
+                        commonStrings.defaultValue,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
                     )
@@ -103,7 +106,7 @@ fun <T> LibraryTabs(
                     ) {
                         Text(
                             libraries.firstOrNull { it.id == libraryId }?.name
-                                ?: "Unknown library ${libraryId.value}",
+                                ?: komfStrings.unknownLibrary(libraryId.value),
                             overflow = TextOverflow.Ellipsis, maxLines = 1
                         )
                         Box(

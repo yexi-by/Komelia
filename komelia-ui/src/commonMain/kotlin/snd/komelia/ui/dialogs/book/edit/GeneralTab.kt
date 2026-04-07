@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import snd.komelia.formatDecimal
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.StateHolder
 import snd.komelia.ui.common.components.LockableTextField
 import snd.komelia.ui.dialogs.tabs.DialogTab
@@ -22,8 +23,9 @@ import snd.komelia.ui.dialogs.tabs.TabItem
 class GeneralTab(
     private val vm: BookEditMetadataState
 ) : DialogTab {
+    @Composable
     override fun options() = TabItem(
-        title = "GENERAL",
+        title = LocalStrings.current.common.general,
         icon = Icons.Default.FormatAlignCenter
     )
 
@@ -61,14 +63,15 @@ private fun GeneralTabContent(
     isbn: StateHolder<String>,
     isbnLock: StateHolder<Boolean>,
 ) {
+    val strings = LocalStrings.current.bookEdit
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         LockableTextField(
             text = title.value,
             onTextChange = title.setValue,
-            errorMessage = title.errorMessage,
-            label = "Title",
+                errorMessage = title.errorMessage,
+                label = strings.title,
             lock = titleLock,
             modifier = Modifier.fillMaxWidth()
         )
@@ -78,7 +81,7 @@ private fun GeneralTabContent(
                 text = number.value,
                 onTextChange = number.setValue,
                 errorMessage = number.errorMessage,
-                label = "Number",
+                label = strings.number,
                 lock = numberLock,
                 modifier = Modifier.weight(.5f)
             )
@@ -99,7 +102,7 @@ private fun GeneralTabContent(
                     }
                 },
                 errorMessage = sortNumber.errorMessage,
-                label = "Sort Number",
+                label = strings.sortNumber,
                 lock = sortNumberLock,
                 modifier = Modifier.weight(.5f)
             )
@@ -110,7 +113,7 @@ private fun GeneralTabContent(
             text = summary.value,
             onTextChange = summary.setValue,
             errorMessage = summary.errorMessage,
-            label = "Summary",
+            label = strings.summary,
             lock = summaryLock,
             minLines = 6,
             maxLines = 12,
@@ -123,7 +126,7 @@ private fun GeneralTabContent(
                 text = releaseDate.value,
                 onTextChange = { releaseDate.setValue(it) },
                 errorMessage = releaseDate.errorMessage,
-                label = "Release Date",
+                label = strings.releaseDate,
                 lock = releaseDateLock,
                 maxLines = 1,
                 modifier = Modifier.weight(.5f)
@@ -133,7 +136,7 @@ private fun GeneralTabContent(
                 text = isbn.value,
                 onTextChange = isbn.setValue,
                 errorMessage = isbn.errorMessage,
-                label = "ISBN",
+                label = strings.isbn,
                 lock = isbnLock,
                 maxLines = 1,
                 modifier = Modifier.weight(.5f)
@@ -141,3 +144,6 @@ private fun GeneralTabContent(
         }
     }
 }
+
+
+

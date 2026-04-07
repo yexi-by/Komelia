@@ -193,6 +193,13 @@
                 t('bookreader.settings.general')
               }}
             </v-list-subheader>
+            <v-list-item v-if="!languageManagedByHost">
+              <settings-select
+                  :items="languageModeOptions"
+                  v-model="languageModeSelection"
+                  :label="t('bookreader.settings.app_language')"
+              />
+            </v-list-item>
             <v-list-item v-if="fixedLayout">
               <settings-select
                   :items="readingDirs"
@@ -337,6 +344,7 @@ import {createR2Progression, r2ProgressionToReadingPosition} from '@/functions/r
 import {useDisplay, useRtl} from "vuetify";
 import {EpubReaderSettings} from "@/types/epub-reader-settings";
 import {externalFunctions} from "@/main";
+import {languageManagedByHost, languageMode, type LanguageMode, updateLanguageMode} from "@/i18n";
 import IconFormatLineSpacingDown from "@/components/IconFormatLineSpacingDown.vue";
 import {
   mdiArrowLeft,
@@ -376,52 +384,51 @@ const showToolbars = ref(false)
 const showToc = ref(false)
 const showHelp = ref(false)
 const tab: Ref<string> = ref("hasToc")
-const readingDirs = ref(
-    [
-      {
-        title: t('enums.epubreader.reading_direction.auto').toString(),
-        value: 'auto',
-      },
-      {
-        title: t('enums.epubreader.reading_direction.ltr').toString(),
-        value: 'ltr',
-      },
-      {
-        title: t('enums.epubreader.reading_direction.rtl').toString(),
-        value: 'rtl',
-      },
-    ]
-)
-const appearances = ref(
-    [
-      {
-        text: t('enums.epubreader.appearances.day').toString(),
-        value: 'readium-default-on',
-        color: 'white',
-        class: 'black--text',
-      },
-      {
-        text: t('enums.epubreader.appearances.sepia').toString(),
-        value: 'readium-sepia-on',
-        color: '#faf4e8',
-        class: 'black--text',
-      },
-      {
-        text: t('enums.epubreader.appearances.night').toString(),
-        value: 'readium-night-on',
-        color: 'black',
-        class: 'white--text',
-      },
-    ]
-)
+const readingDirs = computed(() => [
+  {
+    title: t('enums.epubreader.reading_direction.auto').toString(),
+    value: 'auto',
+  },
+  {
+    title: t('enums.epubreader.reading_direction.ltr').toString(),
+    value: 'ltr',
+  },
+  {
+    title: t('enums.epubreader.reading_direction.rtl').toString(),
+    value: 'rtl',
+  },
+])
+const appearances = computed(() => [
+  {
+    text: t('enums.epubreader.appearances.day').toString(),
+    value: 'readium-default-on',
+    color: 'white',
+    class: 'black--text',
+  },
+  {
+    text: t('enums.epubreader.appearances.sepia').toString(),
+    value: 'readium-sepia-on',
+    color: '#faf4e8',
+    class: 'black--text',
+  },
+  {
+    text: t('enums.epubreader.appearances.night').toString(),
+    value: 'readium-night-on',
+    color: 'black',
+    class: 'white--text',
+  },
+])
 
-const columnCounts = ref(
-    [
-      {text: t('enums.epubreader.column_count.auto').toString(), value: 'auto'},
-      {text: t('enums.epubreader.column_count.one').toString(), value: '1'},
-      {text: t('enums.epubreader.column_count.two').toString(), value: '2'},
-    ]
-)
+const columnCounts = computed(() => [
+  {text: t('enums.epubreader.column_count.auto').toString(), value: 'auto'},
+  {text: t('enums.epubreader.column_count.one').toString(), value: '1'},
+  {text: t('enums.epubreader.column_count.two').toString(), value: '2'},
+])
+const languageModeOptions = computed(() => [
+  {title: t('bookreader.settings.app_language_system').toString(), value: 'SYSTEM'},
+  {title: t('bookreader.settings.app_language_english').toString(), value: 'ENGLISH'},
+  {title: t('bookreader.settings.app_language_simplified_chinese').toString(), value: 'SIMPLIFIED_CHINESE'},
+])
 
 const settings = reactive(
     {
@@ -441,13 +448,11 @@ const settings = reactive(
       navigationButtons: true,
     } as EpubReaderSettings
 )
-const navigationOptions = ref(
-    [
-      {title: t('epubreader.settings.navigation_options.buttons'), value: 'button'},
-      {title: t('epubreader.settings.navigation_options.click'), value: 'click'},
-      {title: t('epubreader.settings.navigation_options.both'), value: 'buttonclick'},
-    ]
-)
+const navigationOptions = computed(() => [
+  {title: t('epubreader.settings.navigation_options.buttons'), value: 'button'},
+  {title: t('epubreader.settings.navigation_options.click'), value: 'click'},
+  {title: t('epubreader.settings.navigation_options.both'), value: 'buttonclick'},
+])
 
 const tocs = reactive({
   toc: undefined as unknown as TocEntry[],
@@ -722,6 +727,16 @@ const navigationMode = computed({
     settings.navigationButtons = value.includes('button')
     settings.navigationClick = value.includes('click')
     externalFunctions.saveReaderSettings(settings)
+  },
+})
+const languageModeSelection = computed({
+  get(): LanguageMode {
+    return languageMode.value
+  },
+  set(value: LanguageMode): void {
+    if (value === 'SYSTEM' || value === 'ENGLISH' || value === 'SIMPLIFIED_CHINESE') {
+      updateLanguageMode(value)
+    }
   },
 })
 

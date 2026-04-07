@@ -37,6 +37,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import snd.komelia.ui.LocalLibraries
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.components.NoPaddingChip
 import snd.komelia.ui.common.images.SeriesThumbnail
 import snd.komelia.ui.common.menus.SeriesActionsMenu
@@ -176,6 +177,7 @@ private fun SeriesImageOverlay(
     showTitle: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopStart,
@@ -195,7 +197,7 @@ private fun SeriesImageOverlay(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        "${series.booksUnreadCount}",
+                        series.booksUnreadCount.toString(),
                         color = MaterialTheme.colorScheme.onTertiary,
                         style = MaterialTheme.typography.labelLarge
                     )
@@ -211,7 +213,7 @@ private fun SeriesImageOverlay(
 
                 CardOutlinedText(text = series.metadata.title, maxLines = 4)
                 if (series.deleted || libraryIsDeleted) {
-                    CardOutlinedText(text = "Unavailable", textColor = MaterialTheme.colorScheme.error)
+                    CardOutlinedText(text = commonStrings.unavailable, textColor = MaterialTheme.colorScheme.error)
                 }
             }
         }

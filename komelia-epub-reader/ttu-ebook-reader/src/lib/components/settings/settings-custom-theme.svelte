@@ -6,6 +6,7 @@
   import { buttonClasses } from '$lib/css-classes';
   import { customThemes$, theme$ } from '$lib/data/store';
   import { availableThemes, type CustomThemeValue, type ThemeOption } from '$lib/data/theme-option';
+  import {epubStrings$} from '$lib/i18n/strings';
   import { createEventDispatcher, onMount } from 'svelte';
 
   export let selectedTheme: string;
@@ -132,13 +133,13 @@
     themeNameElm.setCustomValidity('');
 
     if (!themeName) {
-      themeNameElm.setCustomValidity('You have to enter a Name!');
+      themeNameElm.setCustomValidity($epubStrings$.settings.requiredThemeName);
       themeNameElm.reportValidity();
       return;
     }
 
     if (availableThemes.has(themeName)) {
-      themeNameElm.setCustomValidity('This Name is reserved!');
+      themeNameElm.setCustomValidity($epubStrings$.settings.reservedThemeName);
       themeNameElm.reportValidity();
       return;
     }
@@ -201,42 +202,42 @@
         {/each}
       </select>
       <button class={buttonClasses} on:click={handleCopyTheme}
-        >Copy
+        >{$epubStrings$.settings.copy}
         <Ripple />
       </button>
-      <span class="hidden sm:block">Attribute</span>
-      <span class="hidden sm:block">Color</span>
-      <span class="hidden sm:block">Alpha</span>
+      <span class="hidden sm:block">{$epubStrings$.settings.attribute}</span>
+      <span class="hidden sm:block">{$epubStrings$.settings.color}</span>
+      <span class="hidden sm:block">{$epubStrings$.settings.alpha}</span>
       <SettingsCustomThemeInput
-        label="Font"
+        label={$epubStrings$.settings.font}
         attribute="fontColor"
         values={customTheme.fontColor}
         on:color={handleColorValueChange}
         on:alpha={handleAlphaValueChange}
       />
       <SettingsCustomThemeInput
-        label="Background"
+        label={$epubStrings$.settings.background}
         attribute="backgroundColor"
         values={customTheme.backgroundColor}
         on:color={handleColorValueChange}
         on:alpha={handleAlphaValueChange}
       />
       <SettingsCustomThemeInput
-        label="Furigana Partial Hide Font"
+        label={$epubStrings$.settings.furiganaHideFont}
         attribute="hintFuriganaFontColor"
         values={customTheme.hintFuriganaFontColor}
         on:color={handleColorValueChange}
         on:alpha={handleAlphaValueChange}
       />
       <SettingsCustomThemeInput
-        label="Furigana Partial/Full Hide Shadow"
+        label={$epubStrings$.settings.furiganaHideShadow}
         attribute="hintFuriganaShadowColor"
         values={customTheme.hintFuriganaShadowColor}
         on:color={handleColorValueChange}
         on:alpha={handleAlphaValueChange}
       />
       <SettingsCustomThemeInput
-        label="Footer Font"
+        label={$epubStrings$.settings.footerFont}
         attribute="tooltipTextFontColor"
         values={customTheme.tooltipTextFontColor}
         on:color={handleColorValueChange}
@@ -245,7 +246,7 @@
       <input
         class="sm:col-span-2"
         type="text"
-        placeholder="Theme Name"
+        placeholder={$epubStrings$.settings.themeNamePlaceholder}
         bind:value={themeName}
         bind:this={themeNameElm}
       />
@@ -261,11 +262,11 @@
   </div>
   <div class="mt-2 flex grow justify-between" slot="footer">
     <button class={buttonClasses} on:click={() => dispatch('close')}>
-      Cancel
+      {$epubStrings$.settings.cancel}
       <Ripple />
     </button>
     <button class={buttonClasses} on:click={handleSave}>
-      Save
+      {$epubStrings$.settings.save}
       <Ripple />
     </button>
   </div>

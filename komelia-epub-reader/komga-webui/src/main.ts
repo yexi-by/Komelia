@@ -1,20 +1,12 @@
 import {registerPlugins} from '@/plugins'
 import App from './App.vue'
 import {createApp} from 'vue'
-import {createI18n} from "vue-i18n";
-import en from './locales/en.json'
 import './external'
 import ExternalFunctions from "@/external";
+import {i18n, initializeI18n} from "@/i18n";
 
 export const externalFunctions = new ExternalFunctions()
-
-const i18n = createI18n({
-  locale: 'en',
-  fallbackLocale: 'en',
-  messages: {
-    en: en
-  },
-})
+await initializeI18n(() => externalFunctions.getUiLanguageTag())
 const app = createApp(App)
 registerPlugins(app)
 app.use(i18n)

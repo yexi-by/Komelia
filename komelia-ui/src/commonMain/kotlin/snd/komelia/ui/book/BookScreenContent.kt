@@ -51,6 +51,7 @@ import snd.komelia.offline.sync.model.DownloadEvent
 import snd.komelia.ui.LocalBookDownloadEvents
 import snd.komelia.ui.LocalKomgaState
 import snd.komelia.ui.LocalOfflineMode
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalWindowWidth
 import snd.komelia.ui.common.BookReadButton
 import snd.komelia.ui.common.components.ExpandableText
@@ -88,6 +89,7 @@ fun BookScreenContent(
     onFilterClick: (SeriesScreenFilter) -> Unit,
     cardWidth: Dp
 ) {
+    val bookStrings = LocalStrings.current.screens.book
 
     val scrollState: ScrollState = rememberScrollState()
     Column(modifier = Modifier.fillMaxSize()) {
@@ -218,6 +220,7 @@ private fun FlowRowScope.BookMainInfo(
     onDownload: () -> Unit,
     onDownloadDelete: () -> Unit
 ) {
+    val bookStrings = LocalStrings.current.screens.book
     val maxWidth = when (LocalWindowWidth.current) {
         FULL -> 1200.dp
         else -> Dp.Unspecified
@@ -253,7 +256,7 @@ private fun FlowRowScope.BookMainInfo(
                     onClick = onDownloadDelete,
                     border = BorderStroke(2.dp, MaterialTheme.colorScheme.errorContainer)
                 ) {
-                    Text("Delete downloaded")
+                    Text(bookStrings.deleteDownloaded)
                 }
             }
         }
@@ -310,7 +313,7 @@ fun DownloadButton(
             }
         }
         Spacer(Modifier.width(3.dp))
-        Text("Download")
+        Text(LocalStrings.current.common.download)
 
 
     }
@@ -321,7 +324,7 @@ fun DownloadButton(
 
         if (permissionRequested) {
             ConfirmationDialog(
-                body = "Download book ${book.name}",
+                body = LocalStrings.current.screens.book.downloadBody(book.name),
                 onDialogConfirm = onDownload,
                 onDialogDismiss = { showDownloadConfirmation = false }
             )

@@ -42,7 +42,7 @@ fun EpubReaderSettingsContent(
                 },
                 options = remember { EpubReaderType.entries.map { LabeledEntry(it, strings.forEpubReaderType(it)) } },
                 onOptionChange = { onReaderChange(it.value) },
-                label = { Text("Reader Type") },
+                label = { Text(strings.epubReaderTypeLabel) },
                 inputFieldModifier = Modifier.fillMaxWidth().animateContentSize(),
                 modifier = Modifier.weight(1f),
             )
@@ -53,21 +53,16 @@ fun EpubReaderSettingsContent(
                     onClick = { uriHandler.openUri("https://github.com/ttu-ttu/ebook-reader") },
                     modifier = Modifier.cursorForHand().padding(start = 20.dp)
                 ) {
-                    Text("Project on Github")
+                    Text(strings.projectOnGithub)
                 }
             }
         }
 
 
         when (readerType) {
-            TTSU_EPUB -> Text(
-                """
-                    Loads entire book data at once. May cause long load times or performance issues
-                    Adapted for use in Komelia with storage/statistics features removed
-                """.trimIndent()
-            )
+            TTSU_EPUB -> Text(strings.epubReaderTtsuDescription)
 
-            KOMGA_EPUB -> Text("Komga webui epub reader adapted for use in Komelia")
+            KOMGA_EPUB -> Text(strings.epubReaderKomgaDescription)
 
         }
     }

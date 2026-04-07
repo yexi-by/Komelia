@@ -12,6 +12,7 @@ import {pulseElement} from '$lib/functions/range-util';
 import {
     toggleImageGalleryPictureSpoiler$
 } from '$lib/components/book-reader/book-reader-image-gallery/book-reader-image-gallery';
+import {epubStrings$} from '$lib/i18n/strings';
 
 export function reactiveElements(
   document: Document,
@@ -74,10 +75,10 @@ function spoilerImageListener(document: Document) {
     const elements = Array.from(contentEl.querySelectorAll('[data-ttu-spoiler-img]'));
     const obs$ = elements.map((el) => {
       const spoilerLabelEl = document.createElement('span');
-      spoilerLabelEl.title = 'Show Image';
+      spoilerLabelEl.title = epubStrings$.value.reader.showImage;
       spoilerLabelEl.classList.add('spoiler-label');
       spoilerLabelEl.setAttribute('aria-hidden', 'true');
-      spoilerLabelEl.innerText = 'ネタバレ';
+      spoilerLabelEl.innerText = epubStrings$.value.reader.spoilerLabel;
       el.appendChild(spoilerLabelEl);
 
       const imageElement = el.querySelector('img,image');

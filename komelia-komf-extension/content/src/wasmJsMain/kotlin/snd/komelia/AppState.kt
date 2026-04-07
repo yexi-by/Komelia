@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -48,6 +49,10 @@ import snd.komelia.dialogs.ResetSeriesMetadataDialog
 import snd.komelia.dialogs.SettingsDialog
 import snd.komelia.kavita.KavitaComponent
 import snd.komelia.komga.KomgaComponent
+import snd.komelia.strings.ExtensionStringsProvider
+import snd.komelia.strings.LocalExtensionStrings
+import snd.komelia.strings.LocalExtensionStringsProvider
+import snd.komelia.strings.RuntimeExtensionStrings
 import snd.komf.api.KomfServerLibraryId
 import snd.komf.api.KomfServerSeriesId
 import snd.komf.api.MediaServer
@@ -150,7 +155,12 @@ class AppState(
 
     @OptIn(ExperimentalComposeUiApi::class)
     private fun startDialogContentApp() {
+        val stringsProvider = ExtensionStringsProvider(coroutineScope)
         ComposeViewport(viewportContainerId = komfAppMountElement.id) {
+            val extensionStrings = stringsProvider.strings.collectAsState().value
+            LaunchedEffect(extensionStrings) {
+                RuntimeExtensionStrings.update(extensionStrings)
+            }
             val theme = this.theme.collectAsState().value
             Box(
                 modifier = Modifier
@@ -170,7 +180,9 @@ class AppState(
                         LocalTheme provides theme,
                         LocalWindowWidth provides windowWidth.collectAsState().value,
                         LocalWindowHeight provides windowHeight.collectAsState().value,
-                        LocalKomfViewModelFactory provides viewModelFactory
+                        LocalKomfViewModelFactory provides viewModelFactory,
+                        LocalExtensionStrings provides extensionStrings,
+                        LocalExtensionStringsProvider provides stringsProvider,
                     ) {
                         val currentDialog = currentDialog.collectAsState().value
                         val onDismissRequest = {

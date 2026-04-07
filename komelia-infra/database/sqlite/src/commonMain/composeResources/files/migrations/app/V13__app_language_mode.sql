@@ -1,0 +1,2 @@
+ALTER TABLE AppSettings
+    ADD COLUMN language_mode TEXT NOT NULL DEFAULT 'SYSTEM';

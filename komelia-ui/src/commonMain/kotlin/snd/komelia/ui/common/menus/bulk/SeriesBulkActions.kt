@@ -24,12 +24,14 @@ import snd.komelia.offline.tasks.OfflineTaskEmitter
 import snd.komelia.ui.LocalKomfIntegration
 import snd.komelia.ui.LocalKomgaState
 import snd.komelia.ui.LocalOfflineMode
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.dialogs.ConfirmationDialog
 import snd.komelia.ui.dialogs.collectionadd.AddToCollectionDialog
 import snd.komelia.ui.dialogs.permissions.DownloadNotificationRequestDialog
 import snd.komelia.ui.dialogs.series.edit.SeriesEditDialog
 import snd.komelia.ui.dialogs.series.editbulk.SeriesBulkEditDialog
+import snd.komelia.ui.strings.RuntimeAppStrings
 import snd.komf.api.KomfServerLibraryId
 import snd.komf.api.KomfServerSeriesId
 import snd.komf.client.KomfMetadataClient
@@ -50,6 +52,7 @@ fun SeriesBulkActionsContent(
 fun SeriesBulkActionDialogs(
     state: SeriesBulkActionsState,
 ) {
+    val bulkStrings = LocalStrings.current.menus.bulk
     val coroutineScope = rememberCoroutineScope()
 
     if (state.showAddToCollectionDialog) {
@@ -66,9 +69,9 @@ fun SeriesBulkActionDialogs(
 
     if (state.showDeleteDialog) {
         ConfirmationDialog(
-            title = "Delete Series",
-            body = "${state.series.size} series will be removed from this server alongside with stored media files. This cannot be undone. Continue?",
-            confirmText = "Yes, delete ${state.series.size} series and their files",
+            title = bulkStrings.deleteSeriesTitle,
+            body = bulkStrings.deleteSeriesBody(state.series.size),
+            confirmText = bulkStrings.confirmDeleteSeries(state.series.size),
             onDialogConfirm = {
                 coroutineScope.launch { state.actions.delete(state.series) }
                 state.showDeleteDialog = false
@@ -80,8 +83,8 @@ fun SeriesBulkActionDialogs(
 
     if (state.showDeleteDownloadedDialog) {
         ConfirmationDialog(
-            title = "Delete downloaded Series",
-            body = "${state.series.size} series will be removed from this device",
+            title = bulkStrings.deleteDownloadedSeriesTitle,
+            body = bulkStrings.deleteDownloadedSeriesBody(state.series.size),
             onDialogConfirm = {
                 coroutineScope.launch { state.actions.deleteDownloaded(state.series) }
                 state.showDeleteDownloadedDialog = false
@@ -93,8 +96,8 @@ fun SeriesBulkActionDialogs(
 
     if (state.showKomfIdentifyDialog) {
         ConfirmationDialog(
-            title = "Komf series auto-identify",
-            body = "${state.series.size} series will be auto-identified by Komf",
+            title = bulkStrings.autoIdentify,
+            body = bulkStrings.seriesAutoIdentifyBody(state.series.size),
             onDialogConfirm = {
                 coroutineScope.launch { state.actions.komfIdentify(state.series) }
                 state.showKomfIdentifyDialog = false
@@ -108,11 +111,7 @@ fun SeriesBulkActionDialogs(
         DownloadNotificationRequestDialog { permissionRequested = true }
 
         val bodyText = remember(state.series) {
-            buildString {
-                append("Download ")
-                if (state.series.size == 1) append("${state.series.first().metadata.title}?")
-                else append("${state.series.size} series?")
-            }
+            bulkStrings.downloadSeriesBody(state.series.size, state.series.first().metadata.title)
         }
         if (permissionRequested) {
             ConfirmationDialog(
@@ -157,6 +156,7 @@ data class SeriesBulkActionsState(
     private val isKomfEnabled: Boolean,
     private val isAdmin: Boolean,
 ) {
+    private val bulkStrings = RuntimeAppStrings.strings.value.menus.bulk
     var showAddToCollectionDialog by mutableStateOf(false)
     var showEditDialog by mutableStateOf(false)
     var showDeleteDialog by mutableStateOf(false)
@@ -167,14 +167,14 @@ data class SeriesBulkActionsState(
     val buttons = buildList {
         add(
             BulkActionButtonData(
-                description = "Mark read",
+                description = bulkStrings.markAsRead,
                 icon = Icons.Default.BookmarkAdd,
                 onClick = { coroutineScope.launch { actions.markAsRead(series) } }
             )
         )
         add(
             BulkActionButtonData(
-                description = "Mark unread",
+                description = bulkStrings.markAsUnread,
                 icon = Icons.Default.BookmarkRemove,
                 onClick = { coroutineScope.launch { actions.markAsUnread(series) } }
             )
@@ -182,14 +182,14 @@ data class SeriesBulkActionsState(
         if (!isOffline && isAdmin) {
             add(
                 BulkActionButtonData(
-                    description = "Edit",
+                    description = bulkStrings.edit,
                     icon = Icons.Default.Edit,
                     onClick = { showEditDialog = true }
                 )
             )
             add(
                 BulkActionButtonData(
-                    description = "Add to collection",
+                    description = bulkStrings.addToCollection,
                     icon = Icons.AutoMirrored.Default.PlaylistAdd,
                     onClick = { showAddToCollectionDialog = true }
                 )
@@ -199,7 +199,7 @@ data class SeriesBulkActionsState(
         if (!isOffline) {
             add(
                 BulkActionButtonData(
-                    description = "Download",
+                    description = bulkStrings.download,
                     icon = Icons.Default.Download,
                     onClick = { showDownloadDialog = true }
                 )
@@ -209,7 +209,7 @@ data class SeriesBulkActionsState(
         if (isOffline) {
             add(
                 BulkActionButtonData(
-                    description = "Delete downloaded",
+                    description = bulkStrings.deleteDownloaded,
                     icon = Icons.Default.Delete,
                     onClick = { showDeleteDownloadedDialog = true }
                 )
@@ -218,7 +218,7 @@ data class SeriesBulkActionsState(
         if (isKomfEnabled) {
             add(
                 BulkActionButtonData(
-                    description = "Auto-identify",
+                    description = bulkStrings.autoIdentify,
                     icon = Icons.Default.Extension,
                     onClick = { showKomfIdentifyDialog = true }
                 )
@@ -284,3 +284,4 @@ data class SeriesBulkActions(
         }
     )
 }
+

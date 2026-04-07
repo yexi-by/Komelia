@@ -10,6 +10,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import snd.komelia.ui.LoadState
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.MainScreen
 import snd.komelia.ui.error.formatExceptionMessage
@@ -27,7 +28,7 @@ class KomfJobsScreen(private val enableSeriesResolution: Boolean = true) : Scree
         LaunchedEffect(Unit) { vm.initialize() }
         val state = vm.state.collectAsState().value
 
-        SettingsScreenContainer(title = "Metadata Update Jobs") {
+        SettingsScreenContainer(title = LocalStrings.current.screens.settings.metadataUpdateJobs) {
             when (state) {
                 is LoadState.Error -> Text(formatExceptionMessage(state.exception))
                 LoadState.Uninitialized, LoadState.Loading, is LoadState.Success -> KomfJobsContent(

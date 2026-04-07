@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import snd.komelia.komga.api.model.KomeliaBook
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.dialogs.AppDialog
 import snd.komelia.ui.platform.cursorForHand
@@ -61,12 +62,13 @@ fun AddToReadListDialog(
 
 @Composable
 private fun Header(onDismissRequest: () -> Unit) {
+    val commonStrings = LocalStrings.current.common
     Column {
         Row(
             modifier = Modifier.padding(horizontal = 15.dp, vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Add to read list", style = MaterialTheme.typography.titleLarge)
+            Text(LocalStrings.current.menus.book.addToReadList, style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.weight(1f))
             IconButton(onClick = onDismissRequest) { Icon(Icons.Default.Close, null) }
         }
@@ -81,6 +83,9 @@ private fun DialogContent(
     onCreateNewReadList: suspend (name: String) -> Unit,
     onAddToReadList: suspend (KomgaReadList) -> Unit,
 ) {
+    val dialogStrings = LocalStrings.current.dialogs.readListAdd
+    val commonStrings = LocalStrings.current.common
+    val validationStrings = LocalStrings.current.validation
     val coroutineScope = rememberCoroutineScope()
     Column(Modifier.padding(20.dp)) {
         var query by remember { mutableStateOf("") }
@@ -93,11 +98,11 @@ private fun DialogContent(
             TextField(
                 value = query,
                 onValueChange = { query = it },
-                label = { Text("Search or create read list") },
+                label = { Text(dialogStrings.searchOrCreateReadList) },
                 supportingText = {
                     if (readListExistsForQuery.value)
                         Text(
-                            "A read list with this name already exists",
+                            validationStrings.readListAlreadyExists,
                             color = MaterialTheme.colorScheme.error
                         )
                 },
@@ -106,7 +111,7 @@ private fun DialogContent(
             FilledTonalButton(
                 onClick = { coroutineScope.launch { onCreateNewReadList(query) } },
                 enabled = query.isNotBlank() && !readListExistsForQuery.value,
-                content = { Text("Create") },
+                content = { Text(commonStrings.create) },
             )
         }
 
@@ -134,6 +139,8 @@ private fun ReadListEntry(
     alreadyContainsSeries: Boolean,
     onClick: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
+    val validationStrings = LocalStrings.current.validation
     Column(
         Modifier
             .clickable(enabled = !alreadyContainsSeries) { onClick() }
@@ -147,9 +154,9 @@ private fun ReadListEntry(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("${readList.bookIds.size} books", style = MaterialTheme.typography.labelLarge)
+            Text(commonStrings.itemsCount(readList.bookIds.size, commonStrings.books.lowercase()), style = MaterialTheme.typography.labelLarge)
             if (alreadyContainsSeries) Text(
-                "already contains this book",
+                validationStrings.alreadyContainsBook,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.tertiary
             )

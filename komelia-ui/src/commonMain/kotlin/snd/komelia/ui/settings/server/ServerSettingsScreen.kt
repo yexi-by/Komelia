@@ -13,6 +13,7 @@ import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.OptionsStateHolder
 import snd.komelia.ui.StateHolder
 import snd.komelia.ui.common.components.LoadingMaxSizeIndicator
+import snd.komelia.ui.error.formatExceptionMessage
 import snd.komelia.ui.settings.SettingsScreenContainer
 import snd.komga.client.settings.KomgaThumbnailSize
 
@@ -25,10 +26,10 @@ class ServerSettingsScreen : Screen {
         LaunchedEffect(Unit) { vm.initialize() }
         val state = vm.state.collectAsState().value
 
-        val strings = LocalStrings.current.settings
-        SettingsScreenContainer(strings.serverSettings) {
+        val strings = LocalStrings.current
+        SettingsScreenContainer(strings.settings.serverSettings) {
             when (state) {
-                is LoadState.Error -> Text("Error ${state.exception.message}")
+                is LoadState.Error -> Text(formatExceptionMessage(state.exception))
                 LoadState.Loading, LoadState.Uninitialized -> LoadingMaxSizeIndicator()
                 is LoadState.Success -> {
                     val thumbnailSize = vm.thumbnailSize.collectAsState()

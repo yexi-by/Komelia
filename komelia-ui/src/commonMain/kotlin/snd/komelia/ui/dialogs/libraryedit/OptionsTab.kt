@@ -21,8 +21,9 @@ internal class OptionsTab(
     private val vm: LibraryEditDialogViewModel,
 ) : DialogTab {
 
+    @Composable
     override fun options() = TabItem(
-        title = "OPTIONS",
+        title = LocalStrings.current.common.options,
         icon = Icons.Default.Tune
     )
 
@@ -93,3 +94,7 @@ private fun OptionsTabContent(
 
     }
 }
+
+
+
+

@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.platform.TitleBarScope
 
 @Composable
@@ -23,6 +24,7 @@ fun TitleBarScope.TitleBarContent(
     title: String,
     onExit: () -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
     IconButton(
         onClick = onExit,
         modifier = Modifier
@@ -32,7 +34,7 @@ fun TitleBarScope.TitleBarContent(
     ) {
         Icon(
             Icons.AutoMirrored.Filled.ArrowBack,
-            "Leave",
+            commonStrings.exit,
         )
     }
     Spacer(
