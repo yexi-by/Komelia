@@ -34,6 +34,7 @@ import snd.komelia.ui.home.edit.BookMatchConditionState
 import snd.komelia.ui.home.edit.BookMatchConditionState.BookConditionType
 import snd.komelia.ui.home.edit.BookSort
 import snd.komelia.ui.home.edit.DeletedConditionState
+import snd.komelia.ui.home.edit.localizedLabel
 import snd.komelia.ui.home.edit.LibraryConditionState
 import snd.komelia.ui.home.edit.MatchType
 import snd.komelia.ui.home.edit.MediaProfileConditionState
@@ -55,13 +56,14 @@ import snd.komga.client.search.KomgaSearchCondition.PosterMatch
 fun BookConditionContent(
     state: BookCustomFilterState,
 ) {
+    val strings = LocalStrings.current
     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
         val sort = state.sort.collectAsState().value
         PageSettingsContent(
             pageSize = state.pageSize.collectAsState().value,
             onPageSizeChange = state::onPagSizeChange,
-            sort = remember(sort) { LabeledEntry(sort, sort.name) },
-            sortOptions = remember { BookSort.entries.map { LabeledEntry(it, it.name) } },
+            sort = remember(sort, strings) { LabeledEntry(sort, sort.localizedLabel(strings)) },
+            sortOptions = remember(strings) { BookSort.entries.map { LabeledEntry(it, it.localizedLabel(strings)) } },
             onSortChange = state::onSortChange,
             sortDirection = state.sortDirection.collectAsState().value,
             onSortDirectionChange = state::onSortDirectionChange
@@ -81,6 +83,7 @@ fun BookMatchConditionContent(
     state: BookMatchConditionState,
     onConditionRemove: () -> Unit
 ) {
+    val strings = LocalStrings.current
     Column(
         modifier = Modifier
             .widthIn(min = 280.dp)
@@ -95,8 +98,10 @@ fun BookMatchConditionContent(
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 val type = state.matchType.collectAsState().value
                 DropdownChoiceMenu(
-                    selectedOption = LabeledEntry(type, type.name),
-                    options = MatchType.entries.map { LabeledEntry(it, it.name) },
+                    selectedOption = LabeledEntry(type, if (type == MatchType.Any) strings.screens.home.matchAny else strings.screens.home.matchAll),
+                    options = MatchType.entries.map {
+                        LabeledEntry(it, if (it == MatchType.Any) strings.screens.home.matchAny else strings.screens.home.matchAll)
+                    },
                     onOptionChange = { state.setMatchType(it.value) }
                 )
                 IconButton(onClick = onConditionRemove) {
@@ -109,7 +114,7 @@ fun BookMatchConditionContent(
         }
 
         ConditionAddButton(
-            conditions = remember { BookConditionType.entries.map { LabeledEntry(it, it.name) } },
+            conditions = remember(strings) { BookConditionType.entries.map { LabeledEntry(it, it.localizedLabel(strings)) } },
             onConditionAdd = state::addCondition,
         )
     }
@@ -242,8 +247,9 @@ private fun ConditionContent(
         )
 
         null -> {
+            val strings = LocalStrings.current
             ConditionAddButton(
-                conditions = remember { BookConditionType.entries.map { LabeledEntry(it, it.name) } },
+                conditions = remember(strings) { BookConditionType.entries.map { LabeledEntry(it, it.localizedLabel(strings)) } },
                 onConditionAdd = onConditionAdd,
             )
         }
@@ -258,9 +264,10 @@ private fun BookConditionLayout(
     onConditionRemove: () -> Unit,
     content: @Composable RowScope.() -> Unit
 ) {
+    val strings = LocalStrings.current
     SimpleConditionLayout(
-        conditionType = remember { LabeledEntry(type, type.name) },
-        options = remember { BookConditionType.entries.map { LabeledEntry(it, it.name) } },
+        conditionType = remember(type, strings) { LabeledEntry(type, type.localizedLabel(strings)) },
+        options = remember(strings) { BookConditionType.entries.map { LabeledEntry(it, it.localizedLabel(strings)) } },
         onConditionTypeChange = onTypeChange,
         onConditionRemove = onConditionRemove
     ) {
@@ -328,6 +335,7 @@ fun SeriesIdConditionContent(
     onConditionRemove: () -> Unit
 ) {
     val commonStrings = LocalStrings.current.common
+    val strings = LocalStrings.current
     BookConditionLayout(
         type = BookConditionType.Series,
         onTypeChange = onConditionTypeChange,
@@ -336,8 +344,8 @@ fun SeriesIdConditionContent(
         val options = state.seriesSuggestions.collectAsState(emptyList()).value
         val operator = state.operator.collectAsState().value
         DropdownChoiceMenu(
-            selectedOption = LabeledEntry(operator, operator.name),
-            options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.name) },
+            selectedOption = LabeledEntry(operator, operator.localizedLabel(strings)),
+            options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.localizedLabel(strings)) },
             onOptionChange = { state.setOp(it.value) },
             inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
             label = { Text(commonStrings.operator) }
@@ -377,12 +385,13 @@ fun MediaProfileConditionContent(
         onTypeChange = onConditionTypeChange,
         onConditionRemove = onConditionRemove
     ) {
+        val strings = LocalStrings.current
         val value = state.value.collectAsState().value
         EqualityOpDropDownContent(
             operator = state.operator.collectAsState().value,
             onOpChange = state::setOp,
-            selectedValue = remember(value) { value?.let { LabeledEntry(it, it.name) } },
-            valueOptions = remember { MediaProfile.entries.map { LabeledEntry(it, it.name) } },
+            selectedValue = remember(value, strings) { value?.let { LabeledEntry(it, it.localizedLabel(strings)) } },
+            valueOptions = remember(strings) { MediaProfile.entries.map { LabeledEntry(it, it.localizedLabel(strings)) } },
             onValueChange = state::setValue
         )
     }
@@ -399,12 +408,13 @@ fun MediaStatusConditionContent(
         onTypeChange = onConditionTypeChange,
         onConditionRemove = onConditionRemove
     ) {
+        val strings = LocalStrings.current
         val value = state.value.collectAsState().value
         EqualityOpDropDownContent(
             operator = state.operator.collectAsState().value,
             onOpChange = state::setOp,
-            selectedValue = remember(value) { value?.let { LabeledEntry(it, it.name) } },
-            valueOptions = remember { KomgaMediaStatus.entries.map { LabeledEntry(it, it.name) } },
+            selectedValue = remember(value, strings) { value?.let { LabeledEntry(it, it.localizedLabel(strings)) } },
+            valueOptions = remember(strings) { KomgaMediaStatus.entries.map { LabeledEntry(it, it.localizedLabel(strings)) } },
             onValueChange = state::setValue
         )
     }
@@ -417,6 +427,7 @@ fun NumberSortConditionContent(
     onConditionRemove: () -> Unit
 ) {
     val commonStrings = LocalStrings.current.common
+    val strings = LocalStrings.current
     BookConditionLayout(
         type = BookConditionType.NumberSort,
         onTypeChange = onConditionTypeChange,
@@ -424,8 +435,8 @@ fun NumberSortConditionContent(
     ) {
         val operator = state.operator.collectAsState().value
         DropdownChoiceMenu(
-            selectedOption = LabeledEntry(operator, operator.name),
-            options = NumericOpState.Op.entries.map { LabeledEntry(it, it.name) },
+            selectedOption = LabeledEntry(operator, operator.localizedLabel(strings)),
+            options = NumericOpState.Op.entries.map { LabeledEntry(it, it.localizedLabel(strings)) },
             onOptionChange = { state.setOp(it.value) },
             inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
             label = { Text(commonStrings.operator) }
@@ -446,6 +457,7 @@ fun PosterConditionContent(
 ) {
     val commonStrings = LocalStrings.current.common
     val filterStrings = LocalStrings.current.filters
+    val strings = LocalStrings.current
     BookConditionLayout(
         type = BookConditionType.Poster,
         onTypeChange = onConditionTypeChange,
@@ -454,8 +466,8 @@ fun PosterConditionContent(
         val operator = state.operator.collectAsState().value
         val currentValue = state.value.collectAsState().value
         DropdownChoiceMenu(
-            selectedOption = LabeledEntry(operator, operator.name),
-            options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.name) },
+            selectedOption = LabeledEntry(operator, operator.localizedLabel(strings)),
+            options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.localizedLabel(strings)) },
             onOptionChange = { state.setOp(it.value) },
             inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
             label = { Text(commonStrings.operator) }
@@ -465,16 +477,16 @@ fun PosterConditionContent(
             selectedOption = remember(currentValue) {
                 LabeledEntry(
                     currentValue?.type,
-                    currentValue?.type?.name ?: filterStrings.anyValue
+                    currentValue?.type?.localizedLabel(strings) ?: filterStrings.anyValue
                 )
             },
-            options = remember {
+            options = remember(strings) {
                 listOf(
                     LabeledEntry<PosterMatch.Type?>(
                         null,
                         filterStrings.anyValue
                     )
-                ).plus(PosterMatch.Type.entries.map { LabeledEntry(it, it.name) }
+                ).plus(PosterMatch.Type.entries.map { LabeledEntry(it, it.localizedLabel(strings)) }
                 )
             },
             onOptionChange = { state.setType(it.value) },
@@ -486,7 +498,8 @@ fun PosterConditionContent(
             selectedOption = remember(currentValue) {
                 LabeledEntry(
                     currentValue?.selected,
-                    currentValue?.selected?.toString() ?: filterStrings.anyValue
+                    currentValue?.selected?.let { if (it) commonStrings.trueValue else commonStrings.falseValue }
+                        ?: filterStrings.anyValue
                 )
             },
             options = remember {
@@ -511,6 +524,7 @@ fun ReadListConditionContent(
     onConditionRemove: () -> Unit
 ) {
     val commonStrings = LocalStrings.current.common
+    val strings = LocalStrings.current
     BookConditionLayout(
         type = BookConditionType.ReadList,
         onTypeChange = onConditionTypeChange,
@@ -519,8 +533,8 @@ fun ReadListConditionContent(
         val options = state.readListSuggestions.collectAsState(emptyList()).value
         val operator = state.operator.collectAsState().value
         DropdownChoiceMenu(
-            selectedOption = LabeledEntry(operator, operator.name),
-            options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.name) },
+            selectedOption = LabeledEntry(operator, operator.localizedLabel(strings)),
+            options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.localizedLabel(strings)) },
             onOptionChange = { state.setOp(it.value) },
             inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
             label = { Text(commonStrings.operator) }

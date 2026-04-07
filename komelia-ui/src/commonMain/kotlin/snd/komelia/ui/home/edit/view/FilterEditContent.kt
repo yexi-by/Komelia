@@ -69,6 +69,7 @@ import snd.komelia.ui.home.edit.BookFilterEditState
 import snd.komelia.ui.home.edit.BookOnDeckFilterState
 import snd.komelia.ui.home.edit.FilterEditState
 import snd.komelia.ui.home.edit.FilterEditViewModel
+import snd.komelia.ui.home.edit.localizedLabel
 import snd.komelia.ui.home.edit.SeriesCustomFilterState
 import snd.komelia.ui.home.edit.SeriesFilterEditState
 import snd.komelia.ui.home.edit.SeriesRecentlyAddedFilterState
@@ -190,6 +191,7 @@ fun AddConditionButton(
     modifier: Modifier = Modifier
 ) {
     val commonStrings = LocalStrings.current.common
+    val strings = LocalStrings.current
     var dropDownExpanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(
         expanded = dropDownExpanded,
@@ -212,7 +214,7 @@ fun AddConditionButton(
         ) {
             FilterEditViewModel.FilterType.entries.forEach {
                 DropdownMenuItem(
-                    text = { Text(it.name) },
+                    text = { Text(it.localizedLabel(strings)) },
                     onClick = {
                         dropDownExpanded = false
                         onConditionAdd(it)
@@ -340,12 +342,15 @@ private fun ReorderableCollectionItemScope.FilterContent(
 
 @Composable
 private fun BookFilterEditContent(state: BookFilterEditState) {
+    val strings = LocalStrings.current
     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
         val filter = state.filter.collectAsState().value
         val type = state.type.collectAsState().value
         DropdownChoiceMenu(
-            selectedOption = LabeledEntry(type, type.name),
-            options = remember { BookFilterEditState.FilterType.entries.map { LabeledEntry(it, it.name) } },
+            selectedOption = LabeledEntry(type, type.localizedLabel(strings)),
+            options = remember(strings) {
+                BookFilterEditState.FilterType.entries.map { LabeledEntry(it, it.localizedLabel(strings)) }
+            },
             onOptionChange = { state.onTypeChange(it.value) },
         )
 
@@ -372,12 +377,15 @@ private fun BookFilterEditContent(state: BookFilterEditState) {
 
 @Composable
 private fun SeriesFilterEditContent(state: SeriesFilterEditState) {
+    val strings = LocalStrings.current
     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
         val filter = state.filter.collectAsState().value
         val type = state.type.collectAsState().value
         DropdownChoiceMenu(
-            selectedOption = LabeledEntry(type, type.name),
-            options = remember { SeriesFilterEditState.FilterType.entries.map { LabeledEntry(it, it.name) } },
+            selectedOption = LabeledEntry(type, type.localizedLabel(strings)),
+            options = remember(strings) {
+                SeriesFilterEditState.FilterType.entries.map { LabeledEntry(it, it.localizedLabel(strings)) }
+            },
             onOptionChange = { state.onTypeChange(it.value) },
         )
 

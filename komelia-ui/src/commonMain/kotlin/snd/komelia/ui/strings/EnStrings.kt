@@ -56,7 +56,7 @@ val EnStrings = AppStrings(
         pubStatusHiatus = "Hiatus",
 
         complete = "Complete",
-        oneshot = "Oneshot",
+        oneshot = "One-shot",
         authors = "Authors",
         publisher = "Publisher",
         language = "Language",

@@ -53,6 +53,7 @@ import snd.komelia.ui.home.DateOpState
 import snd.komelia.ui.home.EqualityNullableOpState
 import snd.komelia.ui.home.EqualityOpState
 import snd.komelia.ui.home.StringOpState
+import snd.komelia.ui.home.edit.localizedLabel
 import snd.komelia.ui.home.edit.AuthorConditionState
 import snd.komelia.ui.home.edit.DeletedConditionState
 import snd.komelia.ui.home.edit.LibraryConditionState
@@ -109,12 +110,13 @@ fun TagConditionContent(state: TagConditionState) {
 
 @Composable
 fun RowScope.ReadStatusConditionContent(state: ReadStatusConditionState) {
+    val strings = LocalStrings.current
     val value = state.value.collectAsState().value
     EqualityOpDropDownContent(
         operator = state.operator.collectAsState().value,
         onOpChange = state::setOp,
-        selectedValue = remember(value) { value?.let { LabeledEntry(it, it.name) } },
-        valueOptions = remember { KomgaReadStatus.entries.map { LabeledEntry(it, it.name) } },
+        selectedValue = remember(value, strings) { value?.let { LabeledEntry(it, it.localizedLabel(strings)) } },
+        valueOptions = remember(strings) { KomgaReadStatus.entries.map { LabeledEntry(it, it.localizedLabel(strings)) } },
         onValueChange = state::setValue
     )
 }
@@ -157,13 +159,14 @@ fun RowScope.AuthorConditionContent(
 ) {
     val commonStrings = LocalStrings.current.common
     val filterStrings = LocalStrings.current.filters
+    val strings = LocalStrings.current
     val operator = state.operator.collectAsState().value
     val roleOptions = state.roleOptions.collectAsState(emptyList()).value
     val nameOptions = state.nameOptions.collectAsState(emptyList()).value
     val currentValue = state.value.collectAsState().value
     DropdownChoiceMenu(
-        selectedOption = LabeledEntry(operator, operator.name),
-        options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.name) },
+        selectedOption = LabeledEntry(operator, operator.localizedLabel(strings)),
+        options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.localizedLabel(strings)) },
         onOptionChange = { state.setOp(it.value) },
         inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
         label = { Text(commonStrings.operator) }
@@ -231,11 +234,12 @@ fun RowScope.EqualityNullableOpContent(
     options: List<String>,
 ) {
     val commonStrings = LocalStrings.current.common
+    val strings = LocalStrings.current
     val operator = state.operator.collectAsState().value
     var value by remember { mutableStateOf(state.value.value ?: "") }
     DropdownChoiceMenu(
-        selectedOption = LabeledEntry(operator, operator.name),
-        options = EqualityNullableOpState.Op.entries.map { LabeledEntry(it, it.name) },
+        selectedOption = LabeledEntry(operator, operator.localizedLabel(strings)),
+        options = EqualityNullableOpState.Op.entries.map { LabeledEntry(it, it.localizedLabel(strings)) },
         onOptionChange = { state.setOp(it.value) },
         inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
         label = { Text(commonStrings.operator) }
@@ -258,9 +262,10 @@ fun RowScope.BooleanOpContent(
     onOperatorChange: (BooleanOpState.Op) -> Unit,
 ) {
     val commonStrings = LocalStrings.current.common
+    val strings = LocalStrings.current
     DropdownChoiceMenu(
-        selectedOption = LabeledEntry(operator, operator.name),
-        options = BooleanOpState.Op.entries.map { LabeledEntry(it, it.name) },
+        selectedOption = LabeledEntry(operator, operator.localizedLabel(strings)),
+        options = BooleanOpState.Op.entries.map { LabeledEntry(it, it.localizedLabel(strings)) },
         onOptionChange = { onOperatorChange(it.value) },
         inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
         label = { Text(commonStrings.operator) }
@@ -276,9 +281,10 @@ fun <T> RowScope.EqualityOpDropDownContent(
     onValueChange: (T) -> Unit,
 ) {
     val commonStrings = LocalStrings.current.common
+    val strings = LocalStrings.current
     DropdownChoiceMenu(
-        selectedOption = LabeledEntry(operator, operator.name),
-        options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.name) },
+        selectedOption = LabeledEntry(operator, operator.localizedLabel(strings)),
+        options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.localizedLabel(strings)) },
         onOptionChange = { onOpChange(it.value) },
         inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
         label = { Text(commonStrings.operator) }
@@ -414,9 +420,10 @@ fun RowScope.StringOpContent(
     onValueChange: (String) -> Unit,
 ) {
     val commonStrings = LocalStrings.current.common
+    val strings = LocalStrings.current
     DropdownChoiceMenu(
-        selectedOption = LabeledEntry(operator, operator.name),
-        options = StringOpState.Op.entries.map { LabeledEntry(it, it.name) },
+        selectedOption = LabeledEntry(operator, operator.localizedLabel(strings)),
+        options = StringOpState.Op.entries.map { LabeledEntry(it, it.localizedLabel(strings)) },
         onOptionChange = { onOperatorChange(it.value) },
         inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
         label = { Text(commonStrings.operator) }
@@ -446,9 +453,10 @@ private fun RowScope.DateOpContent(
     onDurationChange: (Duration?) -> Unit,
 ) {
     val commonStrings = LocalStrings.current.common
+    val strings = LocalStrings.current
     DropdownChoiceMenu(
-        selectedOption = LabeledEntry(operator, operator.name),
-        options = DateOpState.Op.entries.map { LabeledEntry(it, it.name) },
+        selectedOption = LabeledEntry(operator, operator.localizedLabel(strings)),
+        options = DateOpState.Op.entries.map { LabeledEntry(it, it.localizedLabel(strings)) },
         onOptionChange = { onOperatorChange(it.value) },
         inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
         label = { Text(commonStrings.operator) }
@@ -650,12 +658,13 @@ fun EqualityNullableOpDropdownSearchContent(
     label: String
 ) {
     val commonStrings = LocalStrings.current.common
+    val strings = LocalStrings.current
     var suggestedOptions by remember(options) { mutableStateOf(options.take(50)) }
     val operator = state.operator.collectAsState().value
     val value = state.value.collectAsState().value
     DropdownChoiceMenu(
-        selectedOption = LabeledEntry(operator, operator.name),
-        options = EqualityNullableOpState.Op.entries.map { LabeledEntry(it, it.name) },
+        selectedOption = LabeledEntry(operator, operator.localizedLabel(strings)),
+        options = EqualityNullableOpState.Op.entries.map { LabeledEntry(it, it.localizedLabel(strings)) },
         onOptionChange = { state.setOp(it.value) },
         inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
         label = { Text(commonStrings.operator) }
@@ -683,12 +692,13 @@ fun EqualityOpDropdownSearchContent(
     label: String
 ) {
     val commonStrings = LocalStrings.current.common
+    val strings = LocalStrings.current
     var suggestedOptions by remember(options) { mutableStateOf(options.take(50)) }
     val operator = state.operator.collectAsState().value
     val value = state.value.collectAsState().value
     DropdownChoiceMenu(
-        selectedOption = LabeledEntry(operator, operator.name),
-        options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.name) },
+        selectedOption = LabeledEntry(operator, operator.localizedLabel(strings)),
+        options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.localizedLabel(strings)) },
         onOptionChange = { state.setOp(it.value) },
         inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
         label = { Text(commonStrings.operator) }
@@ -718,6 +728,7 @@ fun <T> PageSettingsContent(
     onSortDirectionChange: (KomgaSort.Direction) -> Unit
 ) {
     val commonStrings = LocalStrings.current.common
+    val strings = LocalStrings.current
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp),
@@ -730,8 +741,12 @@ fun <T> PageSettingsContent(
             inputFieldModifier = Modifier.widthIn(min = 150.dp)
         )
         DropdownChoiceMenu(
-            selectedOption = remember(sortDirection) { LabeledEntry(sortDirection, sortDirection.name) },
-            options = remember { KomgaSort.Direction.entries.map { LabeledEntry(it, it.name) } },
+            selectedOption = remember(sortDirection, strings) {
+                LabeledEntry(sortDirection, sortDirection.localizedLabel(strings))
+            },
+            options = remember(strings) {
+                KomgaSort.Direction.entries.map { LabeledEntry(it, it.localizedLabel(strings)) }
+            },
             onOptionChange = { onSortDirectionChange(it.value) },
             label = { Text(commonStrings.direction) },
             inputFieldModifier = Modifier.widthIn(min = 60.dp)
