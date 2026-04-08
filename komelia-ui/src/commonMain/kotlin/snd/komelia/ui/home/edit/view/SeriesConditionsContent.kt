@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.components.DropdownChoiceMenu
 import snd.komelia.ui.common.components.LabeledEntry
 import snd.komelia.ui.home.EqualityOpState
@@ -49,19 +50,21 @@ import snd.komelia.ui.home.edit.SharingLabelConditionState
 import snd.komelia.ui.home.edit.TagConditionState
 import snd.komelia.ui.home.edit.TitleConditionState
 import snd.komelia.ui.home.edit.TitleSortConditionState
+import snd.komelia.ui.home.edit.localizedLabel
 import snd.komga.client.series.KomgaSeriesStatus
 
 @Composable
 fun SeriesConditionContent(
     state: SeriesCustomFilterState,
 ) {
+    val strings = LocalStrings.current
     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
         val sort = state.sort.collectAsState().value
         PageSettingsContent(
             pageSize = state.pageSize.collectAsState().value,
             onPageSizeChange = state::onPagSizeChange,
-            sort = remember(sort) { LabeledEntry(sort, sort.name) },
-            sortOptions = remember { SeriesSort.entries.map { LabeledEntry(it, it.name) } },
+            sort = remember(sort, strings) { LabeledEntry(sort, sort.localizedLabel(strings)) },
+            sortOptions = remember(strings) { SeriesSort.entries.map { LabeledEntry(it, it.localizedLabel(strings)) } },
             onSortChange = state::onSortChange,
             sortDirection = state.sortDirection.collectAsState().value,
             onSortDirectionChange = state::onSortDirectionChange
@@ -81,6 +84,7 @@ fun SeriesMatchConditionContent(
     state: SeriesMatchConditionState,
     onConditionRemove: () -> Unit
 ) {
+    val strings = LocalStrings.current
     Column(
         modifier = Modifier
             .widthIn(min = 280.dp)
@@ -94,8 +98,10 @@ fun SeriesMatchConditionContent(
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 val type = state.matchType.collectAsState().value
                 DropdownChoiceMenu(
-                    selectedOption = LabeledEntry(type, type.name),
-                    options = MatchType.entries.map { LabeledEntry(it, it.name) },
+                    selectedOption = LabeledEntry(type, if (type == MatchType.Any) strings.screens.home.matchAny else strings.screens.home.matchAll),
+                    options = MatchType.entries.map {
+                        LabeledEntry(it, if (it == MatchType.Any) strings.screens.home.matchAny else strings.screens.home.matchAll)
+                    },
                     onOptionChange = { state.setMatchType(it.value) }
                 )
                 IconButton(onClick = onConditionRemove) {
@@ -108,7 +114,7 @@ fun SeriesMatchConditionContent(
 
         }
         ConditionAddButton(
-            conditions = remember { SeriesConditionType.entries.map { LabeledEntry(it, it.name) } },
+            conditions = remember(strings) { SeriesConditionType.entries.map { LabeledEntry(it, it.localizedLabel(strings)) } },
             onConditionAdd = state::addCondition,
         )
     }
@@ -150,10 +156,11 @@ private fun ConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit,
 ) {
+    val strings = LocalStrings.current
     when (condition) {
         is SeriesMatchConditionState -> SeriesMatchConditionContent(condition, onConditionRemove)
         null -> ConditionAddButton(
-            conditions = remember { SeriesConditionType.entries.map { LabeledEntry(it, it.name) } },
+            conditions = remember(strings) { SeriesConditionType.entries.map { LabeledEntry(it, it.localizedLabel(strings)) } },
             onConditionAdd = onConditionAdd,
         )
 
@@ -269,9 +276,10 @@ private fun SeriesConditionLayout(
     onConditionRemove: () -> Unit,
     content: @Composable RowScope.() -> Unit
 ) {
+    val strings = LocalStrings.current
     SimpleConditionLayout(
-        conditionType = remember { LabeledEntry(type, type.name) },
-        options = remember { SeriesConditionType.entries.map { LabeledEntry(it, it.name) } },
+        conditionType = remember(type, strings) { LabeledEntry(type, type.localizedLabel(strings)) },
+        options = remember(strings) { SeriesConditionType.entries.map { LabeledEntry(it, it.localizedLabel(strings)) } },
         onConditionTypeChange = onTypeChange,
         onConditionRemove = onConditionRemove
     ) {
@@ -409,6 +417,7 @@ private fun SeriesSharingLabelConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     SeriesConditionLayout(
         type = SeriesConditionType.SharingLabel,
         onTypeChange = onConditionTypeChange,
@@ -417,7 +426,7 @@ private fun SeriesSharingLabelConditionContent(
         EqualityNullableOpDropdownSearchContent(
             state = state,
             options = state.sharingLabels.collectAsState(emptyList()).value,
-            label = "Sharing Label"
+            label = commonStrings.sharingLabel
         )
     }
 }
@@ -428,6 +437,7 @@ private fun SeriesCompleteConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     SeriesConditionLayout(
         type = SeriesConditionType.Complete,
         onTypeChange = onConditionTypeChange,
@@ -446,6 +456,7 @@ private fun SeriesGenreConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     SeriesConditionLayout(
         type = SeriesConditionType.Genre,
         onTypeChange = onConditionTypeChange,
@@ -454,7 +465,7 @@ private fun SeriesGenreConditionContent(
         EqualityNullableOpDropdownSearchContent(
             state = state,
             options = state.genres.collectAsState(emptyList()).value,
-            label = "Genre"
+            label = commonStrings.genre
         )
     }
 }
@@ -465,6 +476,7 @@ private fun SeriesLanguageConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     SeriesConditionLayout(
         type = SeriesConditionType.Language,
         onTypeChange = onConditionTypeChange,
@@ -473,7 +485,7 @@ private fun SeriesLanguageConditionContent(
         EqualityOpDropdownSearchContent(
             state = state,
             options = state.languages.collectAsState(emptyList()).value,
-            label = "Language"
+            label = commonStrings.language
         )
     }
 }
@@ -484,6 +496,7 @@ private fun SeriesPublisherConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
     SeriesConditionLayout(
         type = SeriesConditionType.Publisher,
         onTypeChange = onConditionTypeChange,
@@ -492,7 +505,7 @@ private fun SeriesPublisherConditionContent(
         EqualityOpDropdownSearchContent(
             state = state,
             options = state.publishers.collectAsState(emptyList()).value,
-            label = "Publisher"
+            label = commonStrings.publisher
         )
     }
 }
@@ -503,6 +516,8 @@ fun SeriesStatusConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
+    val strings = LocalStrings.current
     SeriesConditionLayout(
         type = SeriesConditionType.Status,
         onTypeChange = onConditionTypeChange,
@@ -512,8 +527,8 @@ fun SeriesStatusConditionContent(
         EqualityOpDropDownContent(
             operator = state.operator.collectAsState().value,
             onOpChange = state::setOp,
-            selectedValue = remember(value) { value?.let { LabeledEntry(it, it.name) } },
-            valueOptions = remember { KomgaSeriesStatus.entries.map { LabeledEntry(it, it.name) } },
+            selectedValue = remember(value, strings) { value?.let { LabeledEntry(it, it.localizedLabel(strings)) } },
+            valueOptions = remember(strings) { KomgaSeriesStatus.entries.map { LabeledEntry(it, it.localizedLabel(strings)) } },
             onValueChange = state::setValue
         )
     }
@@ -526,6 +541,8 @@ fun SeriesAgeRatingConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
+    val strings = LocalStrings.current
     SeriesConditionLayout(
         type = SeriesConditionType.AgeRating,
         onTypeChange = onConditionTypeChange,
@@ -533,17 +550,17 @@ fun SeriesAgeRatingConditionContent(
     ) {
         val operator = state.operator.collectAsState().value
         DropdownChoiceMenu(
-            selectedOption = LabeledEntry(operator, operator.name),
-            options = NumericNullableOpState.Op.entries.map { LabeledEntry(it, it.name) },
+            selectedOption = LabeledEntry(operator, operator.localizedLabel(strings)),
+            options = NumericNullableOpState.Op.entries.map { LabeledEntry(it, it.localizedLabel(strings)) },
             onOptionChange = { state.setOp(it.value) },
             inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
-            label = { Text("Operator") }
+            label = { Text(commonStrings.operator) }
         )
         if (operator != NumericNullableOpState.Op.IsNull && operator != NumericNullableOpState.Op.IsNotNull)
             IntTextField(
                 value = state.value.collectAsState().value,
                 onValueChange = state::setValue,
-                label = "Age",
+                label = commonStrings.age,
             )
     }
 }
@@ -554,6 +571,8 @@ fun CollectionIdConditionContent(
     onConditionTypeChange: (SeriesConditionType) -> Unit,
     onConditionRemove: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
+    val strings = LocalStrings.current
     SeriesConditionLayout(
         type = SeriesConditionType.Collection,
         onTypeChange = onConditionTypeChange,
@@ -562,18 +581,18 @@ fun CollectionIdConditionContent(
         val options = state.collectionsSuggestions.collectAsState(emptyList()).value
         val operator = state.operator.collectAsState().value
         DropdownChoiceMenu(
-            selectedOption = LabeledEntry(operator, operator.name),
-            options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.name) },
+            selectedOption = LabeledEntry(operator, operator.localizedLabel(strings)),
+            options = EqualityOpState.Op.entries.map { LabeledEntry(it, it.localizedLabel(strings)) },
             onOptionChange = { state.setOp(it.value) },
             inputFieldModifier = Modifier.widthIn(min = conditionInputMinWidth),
-            label = { Text("Operator") }
+            label = { Text(commonStrings.operator) }
         )
         SearchableOptionSelectionField(
             searchText = state.searchText.collectAsState().value,
             onSearchTextChange = state::onSearchTextChange,
             options = remember(options) { options.map { LabeledEntry(it, it.name) } },
             onValueChange = state::onCollectionSelect,
-            label = "Collection"
+            label = commonStrings.collection
         )
     }
 }

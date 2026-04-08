@@ -1,5 +1,6 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.file.DuplicatesStrategy.EXCLUDE
+import java.util.regex.Pattern
 
 plugins {
     // this is necessary to avoid the plugins to be loaded multiple times
@@ -80,9 +81,27 @@ val androidLibs = linuxCommonLibs + setOf(
     "libkomelia_android_bitmap.so",
     "libiconv.so",
     "libomp.so",
+    "libpng16.so",
     "libonnxruntime.so",
     "libonnxruntime_providers_shared.so",
 )
+val androidAbiToTask = mapOf(
+    "arm64-v8a" to "android-arm64_copyJniLibs",
+    "armeabi-v7a" to "android-armv7a_copyJniLibs",
+    "x86_64" to "android-x86_64_copyJniLibs",
+    "x86" to "android-x86_copyJniLibs",
+)
+val requestedAndroidAbi = providers.gradleProperty("komelia.android.abi").orNull
+val skipAndroidJniVerification = providers.gradleProperty("komelia.android.skipJniVerification")
+    .orNull
+    ?.toBooleanStrictOrNull()
+    ?: false
+val activeAndroidAbis = requestedAndroidAbi?.let { abi ->
+    require(androidAbiToTask.containsKey(abi)) {
+        "不支持的 Android ABI: $abi。支持的值：${androidAbiToTask.keys.joinToString()}"
+    }
+    listOf(abi)
+} ?: androidAbiToTask.keys.toList()
 val desktopLinuxLibs = linuxCommonLibs + setOf(
     "libkomelia_onnxruntime.so",
     "libkomelia_enumerate_devices_cuda.so",
@@ -149,7 +168,7 @@ tasks.register<Sync>("linux-x86_64_copyJniLibs") {
     from("$linuxBuildDir/sysroot/lib/")
     into(resourcesDir)
     val dependencies = desktopLinuxLibs
-    include { it.name in dependencies }
+    include { it.file.isFile && it.name in dependencies }
 }
 
 
@@ -160,7 +179,7 @@ tasks.register<Sync>("android-aarch64_copyJniLibs") {
     from("$androidArm64BuildDir/sysroot/lib/")
     into("$androidJniLibsDir/arm64-v8a/")
     val dependencies = androidLibs
-    include { it.name in dependencies }
+    include { it.file.isFile && it.name in dependencies }
 }
 
 tasks.register<Sync>("android-arm64_copyJniLibs") {
@@ -170,7 +189,7 @@ tasks.register<Sync>("android-arm64_copyJniLibs") {
     from("$androidArm64BuildDir/sysroot/lib/")
     into("$androidJniLibsDir/arm64-v8a/")
     val dependencies = androidLibs
-    include { it.name in dependencies }
+    include { it.file.isFile && it.name in dependencies }
 }
 
 tasks.register<Sync>("android-armv7a_copyJniLibs") {
@@ -180,7 +199,7 @@ tasks.register<Sync>("android-armv7a_copyJniLibs") {
     from("$androidArmv7aBuildDir/sysroot/lib/")
     into("$androidJniLibsDir/armeabi-v7a/")
     val dependencies = androidLibs
-    include { it.name in dependencies }
+    include { it.file.isFile && it.name in dependencies }
 }
 
 tasks.register<Sync>("android-x86_64_copyJniLibs") {
@@ -189,7 +208,7 @@ tasks.register<Sync>("android-x86_64_copyJniLibs") {
     from("$androidx8664BuildDir/sysroot/lib/")
     into("$androidJniLibsDir/x86_64/")
     val dependencies = androidLibs
-    include { it.name in dependencies }
+    include { it.file.isFile && it.name in dependencies }
 }
 
 tasks.register<Sync>("android-x86_copyJniLibs") {
@@ -198,7 +217,42 @@ tasks.register<Sync>("android-x86_copyJniLibs") {
     from("$androidx86BuildDir/sysroot/lib/")
     into("$androidJniLibsDir/x86/")
     val dependencies = androidLibs
-    include { it.name in dependencies }
+    include { it.file.isFile && it.name in dependencies }
+}
+
+tasks.register("verifyAndroidJniLibs") {
+    group = "jni"
+    description = "校验 Android 构建所需的原生库是否已经复制到 jniLibs，缺失时直接失败，避免产出损坏的 APK。"
+    dependsOn(activeAndroidAbis.map { androidAbiToTask.getValue(it) })
+    notCompatibleWithConfigurationCache("该任务会直接读取构建脚本中的 JNI 目录配置并进行文件系统校验。")
+
+    doLast {
+        val missing = buildList {
+            activeAndroidAbis.forEach { abi ->
+                androidLibs.forEach { libName ->
+                    val libFile = file("$androidJniLibsDir/$abi/$libName")
+                    if (!libFile.exists()) {
+                        add("$abi/$libName")
+                    }
+                }
+            }
+        }
+
+        if (missing.isNotEmpty()) {
+            throw GradleException(
+                """
+                Android JNI 依赖不完整，已阻止继续构建损坏的 APK。
+                缺失库：
+                ${missing.joinToString(separator = "\n")}
+
+                请先按 README 的 Android 原生依赖流程构建并复制 JNI 库：
+                1. 使用 ./cmake/android.Dockerfile 构建 Android 原生依赖
+                2. 运行 ./gradlew ${activeAndroidAbis.joinToString(" ") { androidAbiToTask.getValue(it) }}
+                3. 再执行 APK 构建
+                """.trimIndent()
+            )
+        }
+    }
 }
 
 tasks.register<Delete>("cleanJni") {
@@ -369,4 +423,215 @@ tasks.register("komeliaBuildNonJvmDependencies") {
     group = "build"
     dependsOn("buildWebui")
     dependsOn("cmakeSystemDepsCopyJniLibs")
+}
+
+gradle.projectsEvaluated {
+    project(":komelia-app").tasks.named("preBuild") {
+        if (!skipAndroidJniVerification) {
+            dependsOn(":verifyAndroidJniLibs")
+        }
+    }
+
+    val androidJniCopyTasks = activeAndroidAbis.map { abi ->
+        ":${androidAbiToTask.getValue(abi)}"
+    }
+    project(":komelia-infra:jni").tasks.matching {
+        it.name.contains("JniLibFolders")
+    }.configureEach {
+        dependsOn(androidJniCopyTasks)
+    }
+}
+
+val uiStringsAuditRoots = listOf(
+    "komelia-ui/src/commonMain/kotlin/snd/komelia/ui",
+    "komelia-ui/src/androidMain/kotlin/snd/komelia/ui",
+    "komelia-ui/src/jvmMain/kotlin/snd/komelia/ui",
+    "komelia-komf-extension/content/src/wasmJsMain/kotlin",
+    "komelia-komf-extension/popup/src/wasmJsMain/kotlin",
+    "komelia-epub-reader/ttu-ebook-reader/src/lib/components",
+    "komelia-epub-reader/komga-webui/src/components",
+)
+
+val kotlinAuditPatterns = listOf(
+    "Text\\(\"[^\"]+\"",
+    "label = \\{ Text\\(\"[^\"]+\"\\) \\}",
+    "placeholder = \\{ Text\\(\"[^\"]+\"\\) \\}",
+    "supportingText = \\{ Text\\(\"[^\"]+\"\\)",
+    "tooltip = \\{ Text\\(\"[^\"]+\"\\)",
+    "title = \"[^\"]+\"",
+    "body = \"[^\"]+\"",
+    "confirmText = \"[^\"]+\"",
+    "message = \"[^\"]+\"",
+    "\\.title = \"[^\"]+\"",
+).map(Pattern::compile)
+
+val svelteAuditPatterns = listOf(
+    "title=\"[^\"]+\"",
+    "placeholder=\"[^\"]+\"",
+    ">\\s*[A-Za-z][^<{]*\\s*<",
+).map(Pattern::compile)
+
+val vueAuditPatterns = listOf(
+    "title=\"[^\"]+\"",
+    "placeholder=\"[^\"]+\"",
+    ">\\s*[A-Za-z][^<{]*\\s*<",
+).map(Pattern::compile)
+
+val i18nBypassAuditRoots = listOf(
+    "komelia-ui/src/commonMain/kotlin",
+    "komelia-ui/src/androidMain/kotlin",
+    "komelia-ui/src/jvmMain/kotlin",
+    "komelia-app/src/commonMain/kotlin",
+    "komelia-app/src/androidMain/kotlin",
+    "komelia-app/src/jvmMain/kotlin",
+    "komelia-app/src/wasmJsMain/kotlin",
+    "komelia-komf-extension/content/src/wasmJsMain/kotlin",
+    "komelia-komf-extension/popup/src/wasmJsMain/kotlin",
+    "komelia-epub-reader/ttu-ebook-reader/src",
+    "komelia-epub-reader/komga-webui/src",
+)
+
+val i18nBypassPatterns = listOf(
+    "import\\s+snd\\.komelia\\.ui\\.strings\\.EnStrings",
+    "import\\s+snd\\.komelia\\.strings\\.EnExtensionStrings",
+    "EnStrings\\.",
+    "EnExtensionStrings\\.",
+    "enEpubStrings",
+    "locale:\\s*['\"]en['\"]",
+    "fallbackLocale:\\s*['\"]en['\"]",
+).map(Pattern::compile)
+
+fun loadUiStringsWhitelist(): Set<String> {
+    val whitelistFile = rootProject.file("config/ui-strings-audit-whitelist.txt")
+    if (!whitelistFile.exists()) return emptySet()
+    return whitelistFile.readLines()
+        .map(String::trim)
+        .filter { it.isNotEmpty() && !it.startsWith("#") }
+        .toSet()
+}
+
+fun collectUiStringsAuditMatches(): List<String> {
+    val whitelist = loadUiStringsWhitelist()
+    val matches = mutableListOf<String>()
+    uiStringsAuditRoots
+        .map(rootProject::file)
+        .filter { it.exists() }
+        .forEach { root ->
+            root.walkTopDown()
+                .filter { it.isFile }
+                .filterNot { file ->
+                    val relativePath = file.relativeTo(rootProject.projectDir).invariantSeparatorsPath
+                    relativePath in whitelist || relativePath.contains("/strings/") || relativePath.contains("/i18n/")
+                }
+                .forEach { file ->
+                    val patterns = when (file.extension) {
+                        "kt" -> kotlinAuditPatterns
+                        "svelte" -> svelteAuditPatterns
+                        "vue" -> vueAuditPatterns
+                        else -> emptyList()
+                    }
+                    if (patterns.isEmpty()) return@forEach
+
+                    file.readLines().forEachIndexed { index, line ->
+                        if (patterns.any { it.matcher(line).find() }) {
+                            val relativePath = file.relativeTo(rootProject.projectDir).invariantSeparatorsPath
+                            matches += "$relativePath:${index + 1}: ${line.trim()}"
+                        }
+                    }
+                }
+        }
+    return matches
+}
+
+fun collectI18nBypassMatches(): List<String> {
+    val matches = mutableListOf<String>()
+    i18nBypassAuditRoots
+        .map(rootProject::file)
+        .filter { it.exists() }
+        .forEach { root ->
+            root.walkTopDown()
+                .filter { it.isFile }
+                .filterNot { file ->
+                    val relativePath = file.relativeTo(rootProject.projectDir).invariantSeparatorsPath
+                    relativePath.contains("/strings/") ||
+                        relativePath.contains("/i18n/") ||
+                        relativePath.endsWith("/i18n.ts")
+                }
+                .forEach { file ->
+                    val extension = file.extension
+                    if (extension !in setOf("kt", "ts", "svelte", "vue")) return@forEach
+
+                    file.readLines().forEachIndexed { index, line ->
+                        if (i18nBypassPatterns.any { it.matcher(line).find() }) {
+                            val relativePath = file.relativeTo(rootProject.projectDir).invariantSeparatorsPath
+                            matches += "$relativePath:${index + 1}: ${line.trim()}"
+                        }
+                    }
+                }
+        }
+    return matches
+}
+
+tasks.register("auditUiStringsReport") {
+    group = "verification"
+    description = "列出运行时 UI 中疑似仍为硬编码的用户可见文案。"
+    notCompatibleWithConfigurationCache("审计任务会直接读取脚本级扫描配置。")
+    doLast {
+        val matches = collectUiStringsAuditMatches()
+        if (matches.isEmpty()) {
+            logger.lifecycle("No hardcoded UI strings were found in scoped runtime UI sources.")
+        } else {
+            logger.lifecycle("Found ${matches.size} potential hardcoded UI strings:")
+            matches.forEach { logger.lifecycle(it) }
+        }
+    }
+}
+
+tasks.register("auditUiStrings") {
+    group = "verification"
+    description = "校验运行时 UI 中不存在疑似硬编码的用户可见文案。"
+    notCompatibleWithConfigurationCache("审计任务会直接读取脚本级扫描配置。")
+    doLast {
+        val matches = collectUiStringsAuditMatches()
+        if (matches.isNotEmpty()) {
+            error(
+                buildString {
+                    appendLine("Found hardcoded UI strings in scoped runtime UI sources.")
+                    matches.forEach { appendLine(it) }
+                }
+            )
+        }
+    }
+}
+
+tasks.register("auditI18nBypassReport") {
+    group = "verification"
+    description = "列出运行时代码中疑似绕过 i18n provider 的调用点。"
+    notCompatibleWithConfigurationCache("审计任务会直接读取脚本级扫描配置。")
+    doLast {
+        val matches = collectI18nBypassMatches()
+        if (matches.isEmpty()) {
+            logger.lifecycle("No i18n bypasses were found in scoped runtime sources.")
+        } else {
+            logger.lifecycle("Found ${matches.size} potential i18n bypasses:")
+            matches.forEach { logger.lifecycle(it) }
+        }
+    }
+}
+
+tasks.register("auditI18nBypass") {
+    group = "verification"
+    description = "校验运行时代码中不存在疑似绕过 i18n provider 的调用点。"
+    notCompatibleWithConfigurationCache("审计任务会直接读取脚本级扫描配置。")
+    doLast {
+        val matches = collectI18nBypassMatches()
+        if (matches.isNotEmpty()) {
+            error(
+                buildString {
+                    appendLine("Found i18n bypasses in scoped runtime sources.")
+                    matches.forEach { appendLine(it) }
+                }
+            )
+        }
+    }
 }

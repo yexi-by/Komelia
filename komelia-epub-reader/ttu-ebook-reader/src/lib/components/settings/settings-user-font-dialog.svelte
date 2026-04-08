@@ -5,6 +5,7 @@
   import {logger} from '$lib/data/logger';
   import {userFonts$} from '$lib/data/store';
   import {dummyFn} from '$lib/functions/utils';
+  import {epubStrings$} from '$lib/i18n/strings';
   import {faSpinner, faTrashCan} from '@fortawesome/free-solid-svg-icons';
   import type {BehaviorSubject} from 'rxjs';
   import {type Font, loadFont, type UserFont} from "$lib/data/fonts";
@@ -18,7 +19,7 @@
 
   let {currentFont, defaultFont}: Props = $props();
 
-  const tabs = ['Stored', 'Add'];
+  const tabs = [$epubStrings$.settings.stored, $epubStrings$.settings.add];
 
   let isLoading = $state(false);
   let currentTab = $state('Stored');
@@ -77,7 +78,7 @@
       </ul>
     </div>
     <div class="mt-5">
-      {#if currentTab === 'Stored'}
+      {#if currentTab === $epubStrings$.settings.stored}
         {#if $userFonts$.length}
           <div
               class="grid grid-cols-[repeat(2,auto)] items-center gap-y-4 gap-x-4 max-h-[50vh] overflow-auto break-all md:gap-x-14"
@@ -86,7 +87,7 @@
               <div
                   tabindex="0"
                   role="button"
-                  title="Click to select Font"
+                  title={$epubStrings$.settings.clickToSelectFont}
                   class="hover:text-blue-700"
                   onclick={() => selectFont(userFont)}
                   onkeyup={dummyFn}
@@ -96,7 +97,7 @@
               <div
                   tabindex="0"
                   role="button"
-                  title="Remove Font"
+                  title={$epubStrings$.settings.removeFont}
                   class="hover:text-blue-700"
                   onclick={() => removeFont(userFont)}
                   onkeyup={dummyFn}
@@ -106,7 +107,7 @@
             {/each}
           </div>
         {:else}
-          <div>You have currently no stored Fonts</div>
+          <div>{$epubStrings$.settings.noStoredFonts}</div>
         {/if}
       {:else}
         <SvelteUserFontAdd bind:isLoading/>

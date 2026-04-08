@@ -235,8 +235,15 @@ class ContinuousReaderState(
 
         imageDisplayFlow.drop(1).onEach { pageChangeFlow.emit(Unit) }.launchIn(stateScope)
 
-        val strings = appStrings.first().continuousReader
-        notifications.add(AppNotification.Normal("Continuous ${strings.forReadingDirection(readingDirection.value)}"))
+        val strings = appStrings.first()
+        notifications.add(
+            AppNotification.Normal(
+                strings.reader.modeWithDirection(
+                    strings.reader.forReaderType(snd.komelia.settings.model.ReaderType.CONTINUOUS),
+                    strings.continuousReader.forReadingDirection(readingDirection.value)
+                )
+            )
+        )
     }
 
     fun stop() {

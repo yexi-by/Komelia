@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -18,6 +19,7 @@ import kotlinx.coroutines.launch
 import snd.komelia.AppNotifications
 import snd.komelia.ui.LoadState
 import snd.komelia.ui.settings.komf.KomfSharedState
+import snd.komelia.ui.strings.AppStrings
 import snd.komf.api.KomfProviders
 import snd.komf.api.KomfServerLibraryId
 import snd.komf.api.KomfServerSeriesId
@@ -42,6 +44,7 @@ class KomfIdentifyDialogViewModel(
     komfJobClient: KomfJobClient,
     private val komfConfig: KomfSharedState,
     private val appNotifications: AppNotifications,
+    private val appStrings: StateFlow<AppStrings>,
     onDismiss: () -> Unit,
 ) {
     private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
@@ -82,6 +85,7 @@ class KomfIdentifyDialogViewModel(
     val identificationState = IdentificationState(
         komfJobClient = komfJobClient,
         appNotifications = appNotifications,
+        appStrings = appStrings,
         coroutineScope = coroutineScope,
         state = mutableState,
         onDismiss = onDismiss,
@@ -106,6 +110,7 @@ class KomfIdentifyDialogViewModel(
     class IdentificationState(
         private val komfJobClient: KomfJobClient,
         private val appNotifications: AppNotifications,
+        private val appStrings: StateFlow<AppStrings>,
         private val state: MutableStateFlow<LoadState<Unit>>,
         private val coroutineScope: CoroutineScope,
         val onDismiss: () -> Unit,
@@ -118,6 +123,7 @@ class KomfIdentifyDialogViewModel(
         var postProcessing by mutableStateOf(false)
 
         fun launchEventCollection(jobId: KomfMetadataJobId) {
+            val dialogStrings = appStrings.value.dialogs.komf
             coroutineScope.launch {
                 appNotifications.runCatchingToNotifications {
 
@@ -139,7 +145,7 @@ class KomfIdentifyDialogViewModel(
                             is ProviderBookEvent -> providersProgress.addOrReplace(
                                 ProviderProgressStatus(
                                     provider = event.provider,
-                                    message = "Retrieving book data: ${event.bookProgress}/${event.totalBooks}",
+                                    message = dialogStrings.retrievingBookData(event.bookProgress, event.totalBooks),
                                     totalProgress = event.totalBooks,
                                     currentProgress = event.bookProgress,
                                     status = ProgressStatus.RUNNING,
@@ -149,7 +155,7 @@ class KomfIdentifyDialogViewModel(
                             is ProviderSeriesEvent -> providersProgress.addOrReplace(
                                 ProviderProgressStatus(
                                     provider = event.provider,
-                                    message = "Retrieving series data",
+                                    message = dialogStrings.retrievingSeriesData,
                                     totalProgress = null,
                                     currentProgress = null,
                                     status = ProgressStatus.RUNNING

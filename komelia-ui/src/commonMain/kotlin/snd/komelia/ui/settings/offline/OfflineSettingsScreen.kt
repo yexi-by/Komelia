@@ -26,6 +26,7 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.settings.SettingsScreenContainer
 import snd.komelia.ui.settings.offline.downloads.OfflineDownloadsContent
@@ -36,6 +37,7 @@ class OfflineSettingsScreen : Screen {
 
     @Composable
     override fun Content() {
+        val settingsStrings = LocalStrings.current.screens.settings
         val currentNavigator = LocalNavigator.currentOrThrow
         val viewModelFactory = LocalViewModelFactory.current
         val vm = rememberScreenModel { viewModelFactory.getOfflineModeSettingsViewModel() }
@@ -44,7 +46,7 @@ class OfflineSettingsScreen : Screen {
             vm.initialize(currentNavigator)
         }
 
-        SettingsScreenContainer("Offline mode") {
+        SettingsScreenContainer(settingsStrings.offlineMode) {
             var selectedTab by rememberSaveable { mutableStateOf(0) }
 
             SecondaryTabRow(selectedTabIndex = selectedTab) {
@@ -55,7 +57,7 @@ class OfflineSettingsScreen : Screen {
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                         Icon(Icons.Default.Person, null)
-                        Text("Users")
+                        Text(settingsStrings.users)
                     }
                 }
                 Tab(
@@ -65,7 +67,7 @@ class OfflineSettingsScreen : Screen {
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                         Icon(Icons.Default.Download, null)
-                        Text("Downloads")
+                        Text(settingsStrings.downloads)
                     }
                 }
 
@@ -76,7 +78,7 @@ class OfflineSettingsScreen : Screen {
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                         Icon(Icons.Default.Cached, null)
-                        Text("Logs")
+                        Text(settingsStrings.logs)
                     }
                 }
             }

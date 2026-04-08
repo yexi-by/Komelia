@@ -31,15 +31,16 @@ import snd.komelia.ui.common.components.CheckboxWithLabel
 import snd.komelia.ui.common.components.DropdownChoiceMenu
 import snd.komelia.ui.common.components.LabeledEntry
 import snd.komelia.ui.dialogs.tabs.DialogTab
-import snd.komelia.ui.dialogs.tabs.TabItem
 import snd.komga.client.library.ScanInterval
+import snd.komelia.ui.dialogs.tabs.TabItem
 
 internal class ScannerTab(
     private val vm: LibraryEditDialogViewModel,
 ) : DialogTab {
 
+    @Composable
     override fun options() = TabItem(
-        title = "SCANNER",
+        title = LocalStrings.current.common.scanner,
         icon = Icons.AutoMirrored.Filled.ManageSearch
     )
 
@@ -73,6 +74,7 @@ private fun ScannerTabContent(
     excludeDirectories: StateHolder<List<String>>,
 ) {
     val strings = LocalStrings.current.libraryEdit
+    val dialogStrings = LocalStrings.current.dialogs.libraryEdit
 
     Column {
         CheckboxWithLabel(
@@ -131,21 +133,22 @@ private fun ScanFileTypes(
     scanEpub: StateHolder<Boolean>,
     scanPdf: StateHolder<Boolean>,
 ) {
+    val dialogStrings = LocalStrings.current.dialogs.libraryEdit
     Column(Modifier.padding(vertical = 15.dp)) {
-        Text("Scan for these file types")
+        Text(dialogStrings.scanFileTypes)
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             ScanFiletypeChip(
-                label = { Text("Comic Book archives") },
+                label = { Text(dialogStrings.comicBookArchives) },
                 selected = scanCbx.value,
                 onValueChange = scanCbx.setValue
             )
             ScanFiletypeChip(
-                label = { Text("PDF") },
+                label = { Text(dialogStrings.pdf) },
                 selected = scanPdf.value,
                 onValueChange = scanPdf.setValue
             )
             ScanFiletypeChip(
-                label = { Text("Epub") },
+                label = { Text(dialogStrings.epub) },
                 selected = scanEpub.value,
                 onValueChange = scanEpub.setValue
             )
@@ -178,3 +181,7 @@ private fun ScanFiletypeChip(
         },
     )
 }
+
+
+
+

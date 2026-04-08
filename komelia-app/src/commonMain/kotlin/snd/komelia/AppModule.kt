@@ -16,6 +16,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -56,7 +57,7 @@ import snd.komelia.offline.OfflineRepositories
 import snd.komelia.onnxruntime.OnnxRuntime
 import snd.komelia.settings.ImageReaderSettingsRepository
 import snd.komelia.ui.DependencyContainer
-import snd.komelia.ui.strings.EnStrings
+import snd.komelia.ui.strings.StringsProvider
 import snd.komelia.updates.AppUpdater
 import snd.komelia.updates.OnnxModelDownloader
 import snd.komelia.updates.OnnxRuntimeInstaller
@@ -204,8 +205,21 @@ abstract class AppModule {
             onnxRuntimeUpscaler = upscaler,
         )
 
+        val appLanguageMode = appRepositories.settingsRepository
+            .getAppLanguageMode()
+            .stateIn(initScope, SharingStarted.Eagerly, snd.komelia.settings.model.AppLanguageMode.SYSTEM)
+        val stringsProvider = StringsProvider(
+            scope = initScope,
+            languageMode = appLanguageMode,
+            systemLanguageTag = appLanguageMode
+                .map { currentSystemLanguageTag() }
+                .stateIn(initScope, SharingStarted.Eagerly, currentSystemLanguageTag()),
+        )
+
         return DependencyContainer(
-            appStrings = MutableStateFlow(EnStrings),
+            appStrings = stringsProvider.strings,
+            appLanguage = stringsProvider.language,
+            appLanguageMode = stringsProvider.languageMode,
             appRepositories = appRepositories,
 
             komgaApi = komgaApi,

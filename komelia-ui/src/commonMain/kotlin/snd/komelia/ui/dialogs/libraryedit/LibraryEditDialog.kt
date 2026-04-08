@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.dialogs.tabs.TabDialog
 import snd.komga.client.library.KomgaLibrary
@@ -16,13 +17,15 @@ fun LibraryEditDialogs(
     val viewModelFactory = LocalViewModelFactory.current
     val vm = remember { viewModelFactory.getLibraryEditDialogViewModel(library, onDismissRequest) }
     val coroutineScope = rememberCoroutineScope()
+    val dialogStrings = LocalStrings.current.dialogs.libraryEdit
+    val commonStrings = LocalStrings.current.common
 
-    val title = if (library != null) "Edit Library" else "Add Library"
+    val title = if (library != null) dialogStrings.editTitle else dialogStrings.addTitle
     val confirmationText = remember(library, vm.currentTab) {
         when {
-            library != null -> "Edit"
-            vm.currentTab is MetadataTab -> "Add"
-            else -> "Next"
+            library != null -> commonStrings.edit
+            vm.currentTab is MetadataTab -> commonStrings.add
+            else -> dialogStrings.next
         }
     }
 

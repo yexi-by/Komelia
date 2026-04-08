@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun ErrorContent(
@@ -23,16 +24,29 @@ fun ErrorContent(
     onReload: (() -> Unit)? = null,
     onExit: (() -> Unit)? = null,
 ) {
+    val strings = LocalStrings.current
     val messageString = remember(exception) {
         exception.message?.let { message -> "${exception::class.simpleName} $message" }
-            ?: exception::class.simpleName ?: "Unknown Error"
+            ?: exception::class.simpleName ?: strings.screens.error.error
     }
-    ErrorContent(messageString, onReload, onExit)
+    ErrorContent(messageString, strings.common.reload, strings.common.exit, onReload, onExit)
 }
 
 @Composable
 fun ErrorContent(
     message: String,
+    onReload: (() -> Unit)? = null,
+    onExit: (() -> Unit)? = null,
+) {
+    val commonStrings = LocalStrings.current.common
+    ErrorContent(message, commonStrings.reload, commonStrings.exit, onReload, onExit)
+}
+
+@Composable
+fun ErrorContent(
+    message: String,
+    reloadText: String,
+    exitText: String,
     onReload: (() -> Unit)? = null,
     onExit: (() -> Unit)? = null,
 ) {
@@ -51,13 +65,13 @@ fun ErrorContent(
             Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
                 if (onReload != null) {
                     FilledTonalButton(onClick = onReload) {
-                        Text("Reload")
+                        Text(reloadText)
                     }
                 }
 
                 if (onExit != null) {
                     FilledTonalButton(onClick = onExit) {
-                        Text("Exit")
+                        Text(exitText)
                     }
                 }
             }

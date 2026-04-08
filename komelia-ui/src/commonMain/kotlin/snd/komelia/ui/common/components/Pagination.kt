@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.components.LabeledEntry.Companion.intEntry
 
 @Composable
@@ -35,6 +36,7 @@ fun Pagination(
     navigationButtons: Boolean = true,
     modifier: Modifier = Modifier
 ) {
+    val commonStrings = LocalStrings.current.common
     if (totalPages <= 1) {
         Box(modifier)
         return
@@ -76,13 +78,13 @@ fun Pagination(
             PageNumberButton(1, currentPage, onPageChange)
 
             if (buttonsRange.first > 2) {
-                Text("...", Modifier.width(20.dp))
+                Text(commonStrings.ellipsis, Modifier.width(20.dp))
             }
             for (pageNumber in buttonsRange) {
                 PageNumberButton(pageNumber, currentPage, onPageChange)
             }
             if (buttonsRange.last < totalPages - 1) {
-                Text("...", Modifier.width(20.dp))
+                Text(commonStrings.ellipsis, Modifier.width(20.dp))
             }
 
             PageNumberButton(totalPages, currentPage, onPageChange)

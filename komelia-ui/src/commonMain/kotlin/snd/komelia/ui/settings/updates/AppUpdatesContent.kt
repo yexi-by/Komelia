@@ -23,6 +23,7 @@ import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import snd.komelia.DefaultDateTimeFormats.localDateFormat
 import snd.komelia.ui.LocalPlatform
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.components.SwitchWithLabel
 import snd.komelia.ui.dialogs.update.UpdateProgressDialog
 import snd.komelia.ui.platform.PlatformType
@@ -47,6 +48,8 @@ fun AppUpdatesContent(
     onUpdateCancel: () -> Unit,
     downloadProgress: UpdateProgress?,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val settingsStrings = LocalStrings.current.screens.settings
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
@@ -54,7 +57,7 @@ fun AppUpdatesContent(
         SwitchWithLabel(
             checked = checkForUpdates,
             onCheckedChange = onCheckForUpdatesChange,
-            label = { Text("Check for updates on startup") }
+            label = { Text(settingsStrings.checkForUpdatesOnStartup) }
         )
         HorizontalDivider(Modifier.padding(bottom = 20.dp))
         VersionDetails(currentVersion, latestVersion, lastChecked, versionCheckInProgress)
@@ -66,20 +69,20 @@ fun AppUpdatesContent(
 
             FilledTonalButton(
                 onClick = { onCheckForUpdates() },
-            ) { Text("Check for updates") }
+            ) { Text(settingsStrings.checkForUpdates) }
 
             if (LocalPlatform.current != PlatformType.WEB_KOMF &&
                 latestVersion != null && currentVersion < latestVersion
             ) {
                 FilledTonalButton(
                     onClick = { onUpdate() },
-                ) { Text("Update") }
+                ) { Text(commonStrings.update) }
             }
         }
 
         if (releases.isNotEmpty()) {
             HorizontalDivider(Modifier.padding(vertical = 20.dp))
-            Text("Release notes:", style = MaterialTheme.typography.headlineMedium)
+            Text(settingsStrings.releaseNotes, style = MaterialTheme.typography.headlineMedium)
             releases.forEach {
                 ReleaseDetails(it)
                 HorizontalDivider()
@@ -99,6 +102,7 @@ fun AppUpdatesContent(
 
 @Composable
 private fun ReleaseDetails(release: AppRelease) {
+    val settingsStrings = LocalStrings.current.screens.settings
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(15.dp),
@@ -108,7 +112,7 @@ private fun ReleaseDetails(release: AppRelease) {
             val publishDate = remember {
                 release.publishDate.toLocalDateTime(TimeZone.currentSystemDefault()).format(localDateFormat)
             }
-            Text("release date: $publishDate", style = MaterialTheme.typography.labelLarge)
+            Text(settingsStrings.releaseDate(publishDate), style = MaterialTheme.typography.labelLarge)
         }
         val state = rememberRichTextState()
         state.config.apply {
@@ -129,6 +133,7 @@ private fun VersionDetails(
     lastChecked: Instant?,
     versionCheckInProgress: Boolean,
 ) {
+    val settingsStrings = LocalStrings.current.screens.settings
     Column(
         verticalArrangement = Arrangement.spacedBy(5.dp),
     ) {
@@ -137,8 +142,8 @@ private fun VersionDetails(
             horizontalArrangement = Arrangement.spacedBy(5.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("Current version:", modifier = Modifier.widthIn(min = 200.dp))
-            Text("$currentVersion")
+            Text(settingsStrings.currentVersion, modifier = Modifier.widthIn(min = 200.dp))
+            Text(currentVersion.toString())
         }
 
         Row(
@@ -146,8 +151,8 @@ private fun VersionDetails(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (latestVersion != null) {
-                Text("Latest checked version:", modifier = Modifier.widthIn(200.dp))
-                Text("$latestVersion")
+                Text(settingsStrings.latestCheckedVersion, modifier = Modifier.widthIn(200.dp))
+                Text(latestVersion.toString())
 
                 if (lastChecked != null) {
                     lastChecked.toString()
@@ -155,7 +160,7 @@ private fun VersionDetails(
                         lastChecked.toLocalDateTime(TimeZone.currentSystemDefault()).format(localDateFormat)
                     }
                     Text(
-                        "checked at $localDate",
+                        settingsStrings.checkedAt(localDate),
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }

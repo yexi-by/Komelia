@@ -18,6 +18,8 @@ import snd.komelia.settings.model.EpubReaderType.KOMGA_EPUB
 import snd.komelia.settings.model.EpubReaderType.TTSU_EPUB
 import snd.komelia.ui.BookSiblingsContext
 import snd.komelia.ui.LoadState
+import snd.komelia.ui.strings.AppLanguage
+import snd.komelia.ui.strings.AppStrings
 import snd.komelia.ui.platform.PlatformType
 import snd.komga.client.book.KomgaBookId
 import snd.webview.KomeliaWebview
@@ -34,6 +36,8 @@ class EpubReaderViewModel(
     private val epubSettingsRepository: EpubReaderSettingsRepository,
     private val fontsRepository: UserFontsRepository,
     private val notifications: AppNotifications,
+    private val appStrings: StateFlow<AppStrings>,
+    private val appLanguage: StateFlow<AppLanguage>,
     private val windowState: AppWindowState,
     private val platformType: PlatformType,
     private val bookSiblingsContext: BookSiblingsContext,
@@ -62,6 +66,7 @@ class EpubReaderViewModel(
                             platformType = platformType,
                             coroutineScope = screenModelScope,
                             bookSiblingsContext = bookSiblingsContext,
+                            appLanguage = appLanguage,
                         )
                         komgaState.initialize(navigator)
                         when (val res = komgaState.state.value) {
@@ -86,6 +91,8 @@ class EpubReaderViewModel(
                             platformType = platformType,
                             coroutineScope = screenModelScope,
                             bookSiblingsContext = bookSiblingsContext,
+                            appStrings = appStrings,
+                            appLanguage = appLanguage,
                         )
                         ttsuState.initialize(navigator)
                         when (val res = ttsuState.state.value) {

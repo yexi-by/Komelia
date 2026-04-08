@@ -36,6 +36,7 @@ import snd.komelia.ui.common.cards.BookImageCard
 import snd.komelia.ui.common.itemlist.ItemCardsSlider
 import snd.komelia.ui.platform.cursorForHand
 import snd.komga.client.readlist.KomgaReadList
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun BookReadListsContent(
@@ -57,7 +58,7 @@ fun BookReadListsContent(
                     .padding(20.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                Text("Read lists")
+                Text(LocalStrings.current.common.readLists)
                 if (show) Icon(Icons.Default.ExpandLess, null)
                 else Icon(Icons.Default.ExpandMore, null)
             }
@@ -91,10 +92,12 @@ fun BookReadListsContent(
 
 @Composable
 private fun ReadListLabel(readList: KomgaReadList) {
+    val strings = LocalStrings.current.screens.readList
     Text(
         buildAnnotatedString {
             withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
-                append("read list ")
+                append(strings.typeLabel)
+                append(' ')
             }
             append(readList.name)
         },

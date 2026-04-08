@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import snd.komelia.AppNotifications
 import snd.komelia.komga.api.KomgaLibraryApi
 import snd.komelia.ui.dialogs.tabs.DialogTab
+import snd.komelia.ui.strings.RuntimeAppStrings
+import snd.komelia.ui.strings.ValidationStrings
 import snd.komga.client.common.PatchValue
 import snd.komga.client.library.KomgaLibrary
 import snd.komga.client.library.KomgaLibraryCreateRequest
@@ -19,6 +21,7 @@ class LibraryEditDialogViewModel(
     val onDialogDismiss: () -> Unit,
     private val libraryApi: KomgaLibraryApi,
     private val appNotifications: AppNotifications,
+    private val validationStrings: ValidationStrings = RuntimeAppStrings.strings.value.validation,
 ) {
 
 
@@ -90,7 +93,7 @@ class LibraryEditDialogViewModel(
 
     fun setLibraryName(name: String) {
         libraryNameError =
-            if (name.isBlank()) "Required"
+            if (name.isBlank()) validationStrings.required
             else null
 
         libraryName.value = name
@@ -98,7 +101,7 @@ class LibraryEditDialogViewModel(
 
     fun setRootFolder(path: String) {
         rootFolderError =
-            if (path.isBlank()) "Required"
+            if (path.isBlank()) validationStrings.required
             else null
 
         rootFolder.value = path
@@ -110,10 +113,10 @@ class LibraryEditDialogViewModel(
 
 
         if (!validLibraryName) {
-            libraryNameError = "Required"
+            libraryNameError = validationStrings.required
         }
         if (!validRootFolder) {
-            rootFolderError = "Required"
+            rootFolderError = validationStrings.required
         }
 
         return validLibraryName && validRootFolder
@@ -206,3 +209,4 @@ class LibraryEditDialogViewModel(
         )
     }
 }
+

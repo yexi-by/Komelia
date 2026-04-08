@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import snd.komelia.ui.LocalViewModelFactory
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.components.SwitchWithLabel
 import snd.komelia.ui.dialogs.AppDialog
 import snd.komelia.ui.dialogs.DialogConfirmCancelButtons
@@ -96,10 +97,11 @@ fun ResetDialog(
 ) {
     val coroutineScope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(false) }
+    val dialogStrings = LocalStrings.current.dialogs.komf
     AppDialog(
         contentPadding = PaddingValues(20.dp),
         modifier = Modifier.widthIn(max = 650.dp),
-        header = { DialogSimpleHeader("Reset Library Metadata") },
+        header = { DialogSimpleHeader(dialogStrings.resetMetadataTitle) },
         content = { DialogContent(dialogText, removeComicInfo, onRemoveComicInfoChange) },
         controlButtons = {
             DialogConfirmCancelButtons(
@@ -124,6 +126,7 @@ private fun DialogContent(
     removeComicInfo: Boolean,
     onRemoveComicInfoChange: (Boolean) -> Unit,
 ) {
+    val dialogStrings = LocalStrings.current.dialogs.komf
     Column(
         modifier = Modifier.heightIn(min = 200.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -132,8 +135,8 @@ private fun DialogContent(
         SwitchWithLabel(
             checked = removeComicInfo,
             onCheckedChange = onRemoveComicInfoChange,
-            label = { Text("Remove ComicInfo.xml?") },
-            supportingText = { Text("Requires write access to files") }
+            label = { Text(dialogStrings.removeComicInfoXml) },
+            supportingText = { Text(dialogStrings.requiresWriteAccessToFiles) }
         )
     }
 }

@@ -229,14 +229,14 @@ fun PagedReaderPagesInfo(
             val pageSize = pageImage?.originalSize?.collectAsState()?.value
             if (pageImage != null) {
                 val currentSize = pageImage.currentSize.collectAsState().value
-                Text("${readerStrings.pageNumber} ${page.metadata.pageNumber}")
+                Text(readerStrings.pageNumberLine(page.metadata.pageNumber))
 
                 if (currentSize != null) {
-                    Text("${readerStrings.pageDisplaySize} ${currentSize.width} x ${currentSize.height}")
+                    Text(readerStrings.pageDisplaySizeLine(currentSize.width, currentSize.height))
                 }
 
                 if (pageSize != null) {
-                    Text("${readerStrings.pageOriginalSize}: ${pageSize.width} x ${pageSize.height}")
+                    Text(readerStrings.pageOriginalSizeLine(pageSize.width, pageSize.height))
                 }
             }
 
@@ -267,15 +267,15 @@ fun ContinuousReaderPagesInfo(
     val readerStrings = LocalStrings.current.reader
     Column(modifier) {
         for ((page, image) in visiblePages) {
-            Text("${readerStrings.pageNumber} ${page.pageNumber}.", style = MaterialTheme.typography.bodyMedium)
+            Text(readerStrings.pageNumberLine(page.pageNumber), style = MaterialTheme.typography.bodyMedium)
 
             val currentSize = image?.currentSize?.collectAsState()?.value
             if (currentSize != null) {
-                Text("${readerStrings.pageDisplaySize} ${currentSize.width} x ${currentSize.height}")
+                Text(readerStrings.pageDisplaySizeLine(currentSize.width, currentSize.height))
             }
 
             if (page.size != null) {
-                Text("${readerStrings.pageOriginalSize}: ${page.size.width} x ${page.size.height}")
+                Text(readerStrings.pageOriginalSizeLine(page.size.width, page.size.height))
             }
 
             HorizontalDivider(Modifier.padding(vertical = 5.dp))

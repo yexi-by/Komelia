@@ -197,6 +197,8 @@ class MainScreen(
         toggleLibrariesDrawer: () -> Unit,
         modifier: Modifier
     ) {
+        val commonStrings = LocalStrings.current.common
+        val topBarStrings = LocalStrings.current.screens.topBar
         Surface(
             color = MaterialTheme.colorScheme.surface,
         ) {
@@ -207,7 +209,7 @@ class MainScreen(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     CompactNavButton(
-                        text = "Libraries",
+                        text = topBarStrings.libraries,
                         icon = Icons.Default.LocalLibrary,
                         onClick = { toggleLibrariesDrawer() },
                         isSelected = false,
@@ -215,7 +217,7 @@ class MainScreen(
                     )
 
                     CompactNavButton(
-                        text = "Home",
+                        text = topBarStrings.home,
                         icon = Icons.Default.Home,
                         onClick = { navigator.replaceAll(HomeScreen()) },
                         isSelected = navigator.lastItem is HomeScreen,
@@ -224,7 +226,7 @@ class MainScreen(
 
 
                     CompactNavButton(
-                        text = "Search",
+                        text = commonStrings.search,
                         icon = Icons.Default.Search,
                         onClick = { navigator.push(SearchScreen(null)) },
                         isSelected = navigator.lastItem is SearchScreen,
@@ -232,7 +234,7 @@ class MainScreen(
                     )
 
                     CompactNavButton(
-                        text = "Settings",
+                        text = topBarStrings.settings,
                         icon = Icons.Default.Settings,
                         onClick = { navigator.parent!!.push(MobileSettingsScreen()) },
                         isSelected = navigator.lastItem is SettingsScreen,

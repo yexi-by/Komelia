@@ -29,6 +29,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import snd.komelia.strings.ExtensionLanguageMode
+import snd.komelia.strings.LocalExtensionStrings
 
 @Composable
 fun OriginSettings(
@@ -36,8 +38,11 @@ fun OriginSettings(
     allowedOriginsError: String?,
     onOriginAdd: (String) -> Unit,
     onOriginRemove: (String) -> Unit,
-    newOriginError: String?
+    newOriginError: String?,
+    languageMode: ExtensionLanguageMode,
+    onLanguageModeChange: (ExtensionLanguageMode) -> Unit,
 ) {
+    val strings = LocalExtensionStrings.current.popup
     Box(Modifier.fillMaxSize()) {
         val scrollState = rememberScrollState()
 
@@ -48,7 +53,7 @@ fun OriginSettings(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
-                text = "Permission Settings",
+                text = strings.permissionSettings,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
@@ -57,7 +62,7 @@ fun OriginSettings(
 
             Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                 Text(
-                    text = "Allowed Origins",
+                    text = strings.allowedOrigins,
                     style = MaterialTheme.typography.titleMedium,
                 )
                 allowedOrigins.forEach { domain ->
@@ -83,9 +88,34 @@ fun OriginSettings(
 
             HorizontalDivider()
 
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = strings.appLanguage,
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    ExtensionLanguageMode.entries.forEach { mode ->
+                        FilledTonalButton(
+                            onClick = { onLanguageModeChange(mode) },
+                            enabled = mode != languageMode,
+                        ) {
+                            Text(
+                                when (mode) {
+                                    ExtensionLanguageMode.SYSTEM -> strings.system
+                                    ExtensionLanguageMode.ENGLISH -> strings.english
+                                    ExtensionLanguageMode.SIMPLIFIED_CHINESE -> strings.simplifiedChinese
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            HorizontalDivider()
+
             Column {
                 Text(
-                    text = "Add New Origin",
+                    text = strings.addNewOrigin,
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Row(
@@ -96,21 +126,21 @@ fun OriginSettings(
                     OutlinedTextField(
                         value = textValue,
                         onValueChange = { textValue = it },
-                        label = { Text("Komga url") },
+                        label = { Text(strings.komgaUrl) },
                         supportingText = newOriginError?.let {
                             { Text(newOriginError, color = MaterialTheme.colorScheme.error) }
                         },
-                        placeholder = {Text("https://demo.komga.org/*")}
+                        placeholder = { Text(strings.placeholder) }
                     )
                     FilledTonalButton(onClick = { onOriginAdd(textValue) }) {
-                        Text("Add")
+                        Text(strings.add)
                     }
 
                 }
             }
 
-            Text("Firefox does not support port matching in url, enter hostname without port")
-            Text("Due to unresolved issue with Firefox, a browser restart might be required for host permissions to apply")
+            Text(strings.firefoxPortHint)
+            Text(strings.firefoxRestartHint)
         }
 
         VerticalScrollbar(ScrollbarAdapter(scrollState), Modifier.align(Alignment.TopEnd))

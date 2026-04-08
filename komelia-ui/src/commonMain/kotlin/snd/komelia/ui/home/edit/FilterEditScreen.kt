@@ -36,7 +36,7 @@ class FilterEditScreen(
 
         when (val state = vm.state.collectAsState().value) {
             is LoadState.Error -> ErrorContent(
-                message = state.exception.message ?: "Unknown Error",
+                exception = state.exception,
                 onExit = { navigator.replaceAll(HomeScreen()) }
             )
 

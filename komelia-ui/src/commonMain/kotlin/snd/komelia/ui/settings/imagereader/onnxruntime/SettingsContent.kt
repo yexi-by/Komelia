@@ -29,6 +29,7 @@ import snd.komelia.onnxruntime.OnnxRuntimeExecutionProvider.ROCm
 import snd.komelia.onnxruntime.OnnxRuntimeExecutionProvider.TENSOR_RT
 import snd.komelia.onnxruntime.OnnxRuntimeExecutionProvider.WEBGPU
 import snd.komelia.ui.LocalPlatform
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.platform.PlatformType
 import snd.komelia.ui.platform.cursorForHand
 import snd.komelia.updates.UpdateProgress
@@ -54,6 +55,7 @@ fun OnnxRuntimeSettingsContent(
     panelModelIsDownloaded: Boolean,
     onPanelDetectionModelDownloadRequest: () -> Flow<UpdateProgress>
 ) {
+    val imageStrings = LocalStrings.current.imageSettings
     val loadError = remember { onnxRuntimeLoadError() }
 
     var showOrtInstallDialog by remember { mutableStateOf(false) }
@@ -62,14 +64,14 @@ fun OnnxRuntimeSettingsContent(
         onInstallRequest = { onOrtInstall(it) },
         onDismiss = { showOrtInstallDialog = false }
     )
-    val ortExecutionProvider = remember {
+    val ortExecutionProvider = remember(executionProvider, imageStrings) {
         when (executionProvider) {
-            TENSOR_RT -> "TensorRT"
-            CUDA -> "Cuda"
-            ROCm -> "ROCm"
-            DirectML -> "DirectML"
-            CPU -> "CPU"
-            WEBGPU -> "WebGPU"
+            TENSOR_RT -> imageStrings.providerTensorRt
+            CUDA -> imageStrings.providerCuda
+            ROCm -> imageStrings.providerRocm
+            DirectML -> imageStrings.providerDirectMl
+            CPU -> imageStrings.providerCpu
+            WEBGPU -> imageStrings.providerWebGpu
         }
     }
     val platform = LocalPlatform.current
@@ -77,19 +79,19 @@ fun OnnxRuntimeSettingsContent(
 
     if (!isOnnxRuntimeInstalled() || loadError != null) {
         if (platform == PlatformType.DESKTOP) {
-            Text("ONNX Runtime", style = MaterialTheme.typography.titleLarge)
+            Text(imageStrings.onnxRuntime, style = MaterialTheme.typography.titleLarge)
             FilledTonalButton(
                 onClick = { showOrtInstallDialog = true },
-            ) { Text("Download ONNX Runtime") }
+            ) { Text(imageStrings.downloadOnnxRuntime) }
 
             if (loadError != null)
                 Text(
-                    "Failed to load ONNX Runtime:\n${loadError}",
+                    imageStrings.onnxRuntimeLoadError(loadError),
                     style = MaterialTheme.typography.bodySmall
                 )
         }
     } else {
-        Text("ONNX Runtime $ortExecutionProvider", style = MaterialTheme.typography.titleLarge)
+        Text(imageStrings.onnxRuntimeProvider(ortExecutionProvider), style = MaterialTheme.typography.titleLarge)
         if (platform == PlatformType.DESKTOP) {
             DeviceSelector(
                 availableDevices = availableDevices,
@@ -105,12 +107,12 @@ fun OnnxRuntimeSettingsContent(
                     onClick = { showOrtInstallDialog = true },
                     shape = RoundedCornerShape(5.dp),
                     modifier = Modifier.cursorForHand()
-                ) { Text("Update ONNX Runtime", maxLines = 1) }
+                ) { Text(imageStrings.updateOnnxRuntime, maxLines = 1) }
 
-                Text("Update or download another version of ONNX Runtime", style = MaterialTheme.typography.labelLarge)
+                Text(imageStrings.updateOnnxRuntimeDescription, style = MaterialTheme.typography.labelLarge)
             }
 
-            Text("Upscaler Settings", style = MaterialTheme.typography.titleMedium)
+            Text(imageStrings.upscalerSettings, style = MaterialTheme.typography.titleMedium)
             UpscalerSettings(
                 upscaleMode = upscaleMode,
                 onModeChange = onUpscaleModeChange,
@@ -123,7 +125,7 @@ fun OnnxRuntimeSettingsContent(
             )
             HorizontalDivider()
         }
-        Text("Panel Detection", style = MaterialTheme.typography.titleMedium)
+        Text(imageStrings.panelDetection, style = MaterialTheme.typography.titleMedium)
         PanelDetectionSettings(
             isDownloaded = panelModelIsDownloaded,
             onDownloadRequest = onPanelDetectionModelDownloadRequest

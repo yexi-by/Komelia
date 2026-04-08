@@ -40,6 +40,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import snd.komelia.komga.api.model.KomeliaBook
 import snd.komelia.ui.LocalKeyEvents
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalWindowState
 import snd.komelia.ui.LocalWindowWidth
 import snd.komelia.ui.ReloadableScreen
@@ -68,6 +69,7 @@ fun AppBar(
     isOffline: Boolean,
     onOfflineModeChange: () -> Unit
 ) {
+    val topBarStrings = LocalStrings.current.screens.topBar
     PlatformTitleBar {
         val coroutineScope = rememberCoroutineScope()
 
@@ -130,11 +132,11 @@ fun AppBar(
                 modifier = Modifier.align(Alignment.End).padding(end = 10.dp),
                 border = BorderStroke(2.dp, MaterialTheme.colorScheme.errorContainer)
             ) {
-                Text("Offline")
+                Text(topBarStrings.offline)
             }
             if (showConfirmationDialog) {
                 ConfirmationDialog(
-                    body = "Go Online?",
+                    body = topBarStrings.goOnlineBody,
                     onDialogConfirm = onOfflineModeChange,
                     onDialogDismiss = { showConfirmationDialog = false }
                 )

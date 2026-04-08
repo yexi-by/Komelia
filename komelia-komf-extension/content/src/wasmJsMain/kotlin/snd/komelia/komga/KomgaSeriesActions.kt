@@ -9,6 +9,7 @@ import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.asList
 import snd.komelia.KomfActiveDialog
+import snd.komelia.strings.RuntimeExtensionStrings
 import snd.komf.api.KomfServerLibraryId
 import snd.komf.api.KomfServerSeriesId
 
@@ -19,8 +20,8 @@ class KomgaSeriesActions(
     val element: HTMLButtonElement
     private val dropdown = KomgaDropdown(
         listOf(
-            KomgaDropdown.DropdownItem("Identify", this::onIdentifyClick),
-            KomgaDropdown.DropdownItem("Reset Metadata", this::onResetMetadataClick),
+            KomgaDropdown.DropdownItem(RuntimeExtensionStrings.strings.value.content.identifyTitle, this::onIdentifyClick),
+            KomgaDropdown.DropdownItem(RuntimeExtensionStrings.strings.value.content.resetMetadataTitle, this::onResetMetadataClick),
         )
     )
 
@@ -61,9 +62,15 @@ class KomgaSeriesActions(
         val libraryId = getLibraryId()
         val seriesTitle = getSeriesTitle()
         when {
-            seriesId == null -> currentDialog.value = KomfActiveDialog.ErrorDialog("Failed to fine seriesId")
-            libraryId == null -> currentDialog.value = KomfActiveDialog.ErrorDialog("Failed to find libraryId")
-            seriesTitle == null -> currentDialog.value = KomfActiveDialog.ErrorDialog("Failed to find series title")
+            seriesId == null -> currentDialog.value = KomfActiveDialog.ErrorDialog(
+                RuntimeExtensionStrings.strings.value.content.seriesIdNotFound
+            )
+            libraryId == null -> currentDialog.value = KomfActiveDialog.ErrorDialog(
+                RuntimeExtensionStrings.strings.value.content.libraryIdNotFound
+            )
+            seriesTitle == null -> currentDialog.value = KomfActiveDialog.ErrorDialog(
+                RuntimeExtensionStrings.strings.value.content.seriesTitleNotFound
+            )
             else -> currentDialog.value = KomfActiveDialog.SeriesIdentify(
                 seriesId = seriesId,
                 libraryId = libraryId,
@@ -76,8 +83,12 @@ class KomgaSeriesActions(
         val seriesId = getSeriesId()
         val libraryId = getLibraryId()
         when {
-            seriesId == null -> currentDialog.value = KomfActiveDialog.ErrorDialog("Failed to fine seriesId")
-            libraryId == null -> currentDialog.value = KomfActiveDialog.ErrorDialog("Failed to find libraryId")
+            seriesId == null -> currentDialog.value = KomfActiveDialog.ErrorDialog(
+                RuntimeExtensionStrings.strings.value.content.seriesIdNotFound
+            )
+            libraryId == null -> currentDialog.value = KomfActiveDialog.ErrorDialog(
+                RuntimeExtensionStrings.strings.value.content.libraryIdNotFound
+            )
             else -> currentDialog.value = KomfActiveDialog.SeriesReset(
                 seriesId = seriesId,
                 libraryId = libraryId,

@@ -1,6 +1,7 @@
 package snd.komelia.settings
 
 import kotlinx.coroutines.flow.Flow
+import snd.komelia.settings.model.AppLanguageMode
 import snd.komelia.settings.model.AppTheme
 import snd.komelia.settings.model.BooksLayout
 import snd.komelia.updates.AppVersion
@@ -24,6 +25,9 @@ interface CommonSettingsRepository {
 
     fun getBookListLayout(): Flow<BooksLayout>
     suspend fun putBookListLayout(layout: BooksLayout)
+
+    fun getAppLanguageMode(): Flow<AppLanguageMode>
+    suspend fun putAppLanguageMode(mode: AppLanguageMode)
 
     fun getCheckForUpdatesOnStartup(): Flow<Boolean>
     suspend fun putCheckForUpdatesOnStartup(check: Boolean)

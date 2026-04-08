@@ -3,6 +3,7 @@
   import Fa from 'svelte-fa';
   import {baseHeaderClasses, baseIconClasses} from '$lib/css-classes';
   import {dummyFn} from "$lib/functions/utils";
+  import {epubStrings$} from '$lib/i18n/strings';
 
   interface Props {
     onExit: () => void;
@@ -18,7 +19,7 @@
     <div
         tabindex="0"
         role="button"
-        title="Return"
+        title={$epubStrings$.settings.return}
         class={baseIconClasses}
         onclick={onExit}
         onkeyup={dummyFn}

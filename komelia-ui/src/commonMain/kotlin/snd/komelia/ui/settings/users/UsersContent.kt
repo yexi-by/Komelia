@@ -42,6 +42,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import snd.komelia.DefaultDateTimeFormats.localDateTimeFormat
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.dialogs.ConfirmationDialog
 import snd.komelia.ui.dialogs.user.PasswordChangeDialog
 import snd.komelia.ui.dialogs.user.UserAddDialog
@@ -58,6 +59,7 @@ fun UsersContent(
     onUserDelete: (KomgaUserId) -> Unit,
     onUserReloadRequest: () -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
@@ -77,7 +79,7 @@ fun UsersContent(
             modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
 
         ) {
-            Text("Add User")
+            Text(commonStrings.addUser)
         }
 
         if (showUserAddDialog) {
@@ -130,8 +132,9 @@ private fun UserCard(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun UserRoles(user: KomgaUser) {
+    val userStrings = LocalStrings.current.screens.users
     Column {
-        Text("Roles:", fontWeight = FontWeight.Bold)
+        Text(userStrings.rolesHeading, fontWeight = FontWeight.Bold)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
             user.roles.forEach { role ->
                 SuggestionChip(
@@ -148,6 +151,7 @@ private fun UserInfo(
     user: KomgaUser,
     latestActivity: KomgaAuthenticationActivity?
 ) {
+    val userStrings = LocalStrings.current.screens.users
     val isAdmin = remember(user) { user.roleAdmin() }
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -168,11 +172,11 @@ private fun UserInfo(
             Text(user.email)
 
             val activityText = latestActivity?.let {
-                "Latest activity: ${
+                userStrings.latestActivity(
                     it.dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).format(localDateTimeFormat)
-                }"
+                )
             }
-                ?: "No recent activity"
+                ?: userStrings.noRecentActivity
             Text(
                 activityText,
                 style = MaterialTheme.typography.bodyMedium
@@ -191,6 +195,9 @@ private fun UserActions(
     onUserDelete: (KomgaUserId) -> Unit,
     onUserReloadRequest: () -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val settingsStrings = LocalStrings.current.screens.settings
+    val userStrings = LocalStrings.current.screens.users
     val isSelf = remember { currentUser.id == user.id }
 
     var showEditDialog by remember { mutableStateOf(false) }
@@ -207,7 +214,7 @@ private fun UserActions(
             ) {
                 Icon(Icons.Default.Edit, null)
                 Spacer(Modifier.width(10.dp))
-                Text("Edit User")
+                Text(userStrings.editUser)
             }
 
         FilledTonalButton(
@@ -217,7 +224,7 @@ private fun UserActions(
         ) {
             Icon(Icons.Default.LockReset, null)
             Spacer(Modifier.width(10.dp))
-            Text("Change Password")
+            Text(commonStrings.changePassword)
         }
 
 
@@ -233,7 +240,7 @@ private fun UserActions(
             ) {
                 Icon(Icons.Default.Delete, null)
                 Spacer(Modifier.width(10.dp))
-                Text("Delete User")
+                Text(commonStrings.deleteUser)
             }
     }
 
@@ -249,10 +256,10 @@ private fun UserActions(
 
     if (showDeleteDialog) {
         ConfirmationDialog(
-            title = "Delete User",
-            body = "The user ${user.email} will be deleted from this server. This cannot be undone. Continue?",
-            confirmText = "Yes, delete \"${user.email}\"",
-            buttonConfirm = "DELETE",
+            title = settingsStrings.deleteUser,
+            body = settingsStrings.deleteUserBody(user.email),
+            confirmText = settingsStrings.deleteUserConfirm(user.email),
+            buttonConfirm = commonStrings.delete,
             buttonConfirmColor = MaterialTheme.colorScheme.errorContainer,
             onDialogConfirm = { onUserDelete(user.id) },
             onDialogDismiss = { showDeleteDialog = false }

@@ -119,6 +119,9 @@ fun SettingsSideMenuOverlay(
     onBackPress: () -> Unit,
     onShowHelpMenu: () -> Unit,
 ) {
+    val readerStrings = LocalStrings.current.reader
+    val continuousReaderStrings = LocalStrings.current.continuousReader
+    val imageStrings = LocalStrings.current.imageSettings
     Column(modifier = Modifier.fillMaxSize()) {
         Spacer(
             Modifier.fillMaxWidth()
@@ -143,7 +146,7 @@ fun SettingsSideMenuOverlay(
                 ) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                     Spacer(Modifier.width(3.dp))
-                    Text("Close Book")
+                    Text(readerStrings.closeBook)
                 }
                 Spacer(Modifier.weight(1f))
                 IconButton(onClick = { onShowHelpMenu() }) { Icon(Icons.AutoMirrored.Default.Help, null) }
@@ -153,10 +156,8 @@ fun SettingsSideMenuOverlay(
             }
 
             HorizontalDivider(modifier = Modifier.padding(top = 10.dp))
-            val strings = LocalStrings.current
-            val readerStrings = strings.reader
             val zoomPercentage = remember(zoom) { (zoom * 100).roundToInt() }
-            Text("${readerStrings.zoom}: $zoomPercentage%")
+            Text(readerStrings.zoomLine(zoomPercentage))
             Column {
                 DropdownChoiceMenu(
                     selectedOption = LabeledEntry(readerType, readerStrings.forReaderType(readerType)),
@@ -192,7 +193,7 @@ fun SettingsSideMenuOverlay(
                     .cursorForHand()
                     .padding(10.dp)
             ) {
-                Text("Image Settings")
+                Text(readerStrings.imageSettings)
                 Spacer(Modifier.weight(1f))
                 Icon(
                     Icons.Filled.ArrowDropDown,
@@ -243,7 +244,7 @@ fun SettingsSideMenuOverlay(
                         .cursorForHand()
                         .padding(10.dp)
                 ) {
-                    Text("OnnxRuntime")
+                    Text(imageStrings.onnxRuntime)
                     Spacer(Modifier.weight(1f))
                     Icon(
                         Icons.Filled.ArrowDropDown,
@@ -349,7 +350,7 @@ private fun ColumnScope.ContinuousReaderSettingsContent(state: ContinuousReaderS
         val padding = state.sidePaddingFraction.collectAsState().value
         NumberFieldWithIncrements(
             value = padding * 200,
-            label = { Text("side padding", style = MaterialTheme.typography.labelMedium) },
+            label = { Text(strings.sidePadding, style = MaterialTheme.typography.labelMedium) },
             onvValueChange = { state.onSidePaddingChange(it / 200) },
             stepSize = 5f,
             minValue = 0f,
@@ -360,7 +361,7 @@ private fun ColumnScope.ContinuousReaderSettingsContent(state: ContinuousReaderS
         val spacing = state.pageSpacing.collectAsState(Dispatchers.Main.immediate).value
         NumberFieldWithIncrements(
             value = spacing.toFloat(),
-            label = { Text("page spacing", style = MaterialTheme.typography.labelMedium) },
+            label = { Text(strings.pageSpacing, style = MaterialTheme.typography.labelMedium) },
             onvValueChange = { state.onPageSpacingChange(it.roundToInt()) },
             stepSize = 1f,
             minValue = 0f,
@@ -547,9 +548,9 @@ private fun SamplingModeSettings(
             SwitchWithLabel(
                 checked = linearLightDownsampling,
                 onCheckedChange = onLinearLightDownsamplingChange,
-                label = { Text("Linear light downsampling") },
+                label = { Text(strings.linearLightDownsampling) },
                 supportingText = {
-                    Text("slower but potentially more accurate", style = MaterialTheme.typography.labelMedium)
+                    Text(strings.linearLightDownsamplingDescription, style = MaterialTheme.typography.labelMedium)
                 },
                 contentPadding = PaddingValues(horizontal = 10.dp)
             )

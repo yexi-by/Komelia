@@ -17,6 +17,8 @@ if [ -z "$1" ] ; then
    exit
 fi
 
+BUILD_TARGET="$2"
+
 TOOLCHAIN_PATH=$ANDROID_NDK_PATH/toolchains/llvm/prebuilt/linux-x86_64/
 
 ARCH=$1
@@ -136,7 +138,11 @@ cmake ../.. -G Ninja \
     -DANDROID_NDK_PATH="${ANDROID_NDK_PATH}" \
     -DHOST_FLAG=--host="$AUTOCONF_HOST"
 
-cmake --build . -j $(nproc)
+if [ -n "$BUILD_TARGET" ]; then
+    cmake --build . --target "$BUILD_TARGET" -j $(nproc)
+else
+    cmake --build . -j $(nproc)
+fi
 
 cp "$CLANG_LIBOMP_PATH" ./sysroot/lib
 for lib in sysroot/lib/*so; do

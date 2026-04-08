@@ -79,6 +79,7 @@ fun <T> DropdownChoiceMenu(
     contentPadding: PaddingValues = PaddingValues(10.dp)
 ) {
     var isExpanded by remember { mutableStateOf(false) }
+    val strings = LocalStrings.current.filters
     ExposedDropdownMenuBox(
         modifier = modifier,
         expanded = isExpanded,
@@ -130,6 +131,7 @@ fun <T> DropdownMultiChoiceMenu(
     inputFieldColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     contentPadding: PaddingValues = PaddingValues(10.dp)
 ) {
+    val strings = LocalStrings.current.filters
     var isExpanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(
         modifier = modifier,
@@ -137,7 +139,7 @@ fun <T> DropdownMultiChoiceMenu(
         onExpandedChange = { isExpanded = it },
     ) {
         InputField(
-            value = selectedOptions.joinToString { it.label }.ifBlank { placeholder ?: "Any" },
+            value = selectedOptions.joinToString { it.label }.ifBlank { placeholder ?: strings.anyValue },
             modifier = Modifier
                 .menuAnchor(PrimaryNotEditable)
                 .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp))
@@ -223,6 +225,7 @@ fun <T> DropdownChoiceMenuWithSearch(
     contentPadding: PaddingValues = PaddingValues(10.dp)
 ) {
     var searchText by remember { mutableStateOf("") }
+    val strings = LocalStrings.current.filters
     LaunchedEffect(searchText) {
         delay(200)
         onSearch(searchText)
@@ -234,7 +237,7 @@ fun <T> DropdownChoiceMenuWithSearch(
         onExpandedChange = { isExpanded = it },
     ) {
         InputField(
-            value = selectedOptions.joinToString { it.label }.ifBlank { placeholder ?: "Any" },
+            value = selectedOptions.joinToString { it.label }.ifBlank { placeholder ?: strings.anyValue },
             modifier = Modifier
                 .menuAnchor(PrimaryNotEditable)
                 .then(textFieldModifier),
@@ -254,7 +257,7 @@ fun <T> DropdownChoiceMenuWithSearch(
             val focusRequester = remember { FocusRequester() }
             NoPaddingTextField(
                 text = searchText,
-                placeholder = "Search",
+                placeholder = strings.filterTagsSearch,
                 onTextChange = { searchText = it },
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
@@ -395,22 +398,7 @@ fun TagFiltersDropdownMenu(
     val inputValue = remember(includeGenres, includeTags, excludeGenres, excludeTags) {
         val include = includeGenres + includeTags
         val exclude = excludeGenres + excludeTags
-
-        val value = buildString {
-            if (include.isNotEmpty() && exclude.isNotEmpty()) {
-                append("Include ")
-                append(include.joinToString())
-                append(" and exclude ")
-                append(exclude.joinToString())
-            } else if (include.isNotEmpty()) {
-                append("Include ")
-                append(include.joinToString())
-            } else if (exclude.isNotEmpty()) {
-                append("Exclude ")
-                append(exclude.joinToString())
-            }
-        }
-        value.ifBlank { placeholder ?: strings.anyValue }
+        strings.summary(include, exclude, placeholder ?: strings.anyValue)
     }
 
     BasicTooltipBox(
@@ -554,7 +542,7 @@ private fun TagFilterDropdownContent(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(vertical = 10.dp)
         ) {
-            Text("Other Options")
+            Text(strings.filterTagsOtherOptions)
             HorizontalDivider(Modifier.padding(start = 10.dp))
         }
 
@@ -569,7 +557,7 @@ private fun TagFilterDropdownContent(
                     }
                 },
                 onOptionChange = { onInclusionModeChange(it.value) },
-                label = { Text("Inclusion mode") }
+                label = { Text(strings.filterTagsInclusionModeLabel) }
             )
 
             DropdownChoiceMenu(
@@ -582,7 +570,7 @@ private fun TagFilterDropdownContent(
                     }
                 },
                 onOptionChange = { onExclusionModeChange(it.value) },
-                label = { Text("Exclusion mode") }
+                label = { Text(strings.filterTagsExclusionModeLabel) }
             )
         }
     }

@@ -14,6 +14,9 @@ import snd.komelia.komga.api.KomgaSettingsApi
 import snd.komelia.komga.api.KomgaTaskApi
 import snd.komelia.ui.LoadState
 import snd.komelia.ui.LoadState.Uninitialized
+import snd.komelia.ui.strings.RuntimeAppStrings
+import snd.komelia.ui.strings.ToastStrings
+import snd.komelia.ui.strings.ValidationStrings
 import snd.komga.client.common.PatchValue
 import snd.komga.client.common.patch
 import snd.komga.client.library.KomgaLibrary
@@ -31,6 +34,8 @@ class ServerSettingsViewModel(
     private val libraries: StateFlow<List<KomgaLibrary>>,
     private val taskApi: KomgaTaskApi,
     private val actuatorApi: KomgaActuatorApi,
+    private val toastStrings: ToastStrings = RuntimeAppStrings.strings.value.toasts,
+    private val validationStrings: ValidationStrings = RuntimeAppStrings.strings.value.validation,
 ) : StateScreenModel<LoadState<Unit>>(Uninitialized) {
 
     val currentSettings = MutableStateFlow(
@@ -106,7 +111,7 @@ class ServerSettingsViewModel(
             )
             appNotifications.runCatchingToNotifications {
                 settingsApi.updateSettings(request)
-                appNotifications.add(AppNotification.Success("Updated Server Settings"))
+                appNotifications.add(AppNotification.Success(toastStrings.updatedServerSettings))
                 loadSettings()
             }
         }
@@ -153,7 +158,7 @@ class ServerSettingsViewModel(
 
     fun onRememberMeDurationDaysChange(days: Int?) {
         isChanged.value = true
-        if (days == null) rememberMeDurationDaysValidationMessage.value = "Required"
+        if (days == null) rememberMeDurationDaysValidationMessage.value = validationStrings.required
         else rememberMeDurationDaysValidationMessage.value = null
         this.rememberMeDurationDays.value = days
 
@@ -161,7 +166,7 @@ class ServerSettingsViewModel(
 
     fun onTaskPoolSizeChange(taskPoolSize: Int?) {
         isChanged.value = true
-        if (taskPoolSize == null) taskPoolSizeValidationMessage.value = "Required"
+        if (taskPoolSize == null) taskPoolSizeValidationMessage.value = validationStrings.required
         else taskPoolSizeValidationMessage.value = null
         this.taskPoolSize.value = taskPoolSize
     }
@@ -181,14 +186,14 @@ class ServerSettingsViewModel(
     fun onScanAllLibraries(deep: Boolean) {
         appNotifications.runCatchingToNotifications(screenModelScope) {
             libraries.value.forEach { libraryApi.scan(it.id, deep) }
-            appNotifications.add(AppNotification.Success("Launched scan for all libraries"))
+            appNotifications.add(AppNotification.Success(toastStrings.launchedScanForAllLibraries))
         }
     }
 
     fun onEmptyTrashForAllLibraries() {
         appNotifications.runCatchingToNotifications(screenModelScope) {
             libraries.value.forEach { libraryApi.emptyTrash(it.id) }
-            appNotifications.add(AppNotification.Success("Emptied trash for all libraries"))
+            appNotifications.add(AppNotification.Success(toastStrings.emptiedTrashForAllLibraries))
         }
     }
 
@@ -197,9 +202,9 @@ class ServerSettingsViewModel(
             val cancelledTasks = taskApi.emptyTaskQueue()
 
             if (cancelledTasks == 0)
-                appNotifications.add(AppNotification.Normal("No tasks to cancel"))
+                appNotifications.add(AppNotification.Normal(toastStrings.noTasksToCancel))
             else
-                appNotifications.add(AppNotification.Success("$cancelledTasks tasks cancelled"))
+                appNotifications.add(AppNotification.Success(toastStrings.tasksCancelled(cancelledTasks)))
         }
     }
 
@@ -216,3 +221,4 @@ class ServerSettingsViewModel(
         ALL
     }
 }
+

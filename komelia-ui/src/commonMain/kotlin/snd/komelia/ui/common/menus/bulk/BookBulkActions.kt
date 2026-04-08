@@ -23,12 +23,14 @@ import snd.komelia.komga.api.model.KomeliaBook
 import snd.komelia.offline.tasks.OfflineTaskEmitter
 import snd.komelia.ui.LocalKomgaState
 import snd.komelia.ui.LocalOfflineMode
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.dialogs.ConfirmationDialog
 import snd.komelia.ui.dialogs.book.edit.BookEditDialog
 import snd.komelia.ui.dialogs.book.editbulk.BookBulkEditDialog
 import snd.komelia.ui.dialogs.permissions.DownloadNotificationRequestDialog
 import snd.komelia.ui.dialogs.readlistadd.AddToReadListDialog
+import snd.komelia.ui.strings.RuntimeAppStrings
 import snd.komga.client.book.KomgaBookReadProgressUpdateRequest
 
 @Composable
@@ -44,6 +46,7 @@ fun BooksBulkActionsContent(
 
 @Composable
 fun BookBulkActionDialogs(state: BookBulkActionsState) {
+    val bulkStrings = LocalStrings.current.menus.bulk
     val coroutineScope = rememberCoroutineScope()
 
     if (state.showAddToReadListDialog) {
@@ -61,17 +64,11 @@ fun BookBulkActionDialogs(state: BookBulkActionsState) {
     if (state.showDeleteDownloadedDialog) {
         val booksToDelete = remember(state.books) { state.books.filter { it.downloaded } }
         val textBody = remember(booksToDelete.size) {
-            buildString {
-                if (booksToDelete.size == 1) {
-                    append("Book ${booksToDelete.first().metadata.title} will be removed from this device")
-                } else {
-                    append("${booksToDelete.size} books and their files will be removed from this device")
-                }
-            }
+            bulkStrings.deleteDownloadedBooksBody(booksToDelete.size, booksToDelete.firstOrNull()?.metadata?.title.orEmpty())
         }
 
         ConfirmationDialog(
-            title = "Delete downloaded books",
+            title = bulkStrings.deleteDownloadedBooks,
             body = textBody,
             onDialogConfirm = {
                 coroutineScope.launch {
@@ -89,11 +86,7 @@ fun BookBulkActionDialogs(state: BookBulkActionsState) {
         DownloadNotificationRequestDialog { permissionRequested = true }
 
         val bodyText = remember(state.books) {
-            buildString {
-                append("Download ")
-                if (state.books.size == 1) append("${state.books.first().metadata.title}?")
-                else append("${state.books.size} books?")
-            }
+            bulkStrings.downloadBooksBody(state.books.size, state.books.first().metadata.title)
         }
         if (permissionRequested) {
             ConfirmationDialog(
@@ -109,29 +102,10 @@ fun BookBulkActionDialogs(state: BookBulkActionsState) {
     }
 
     if (state.showDeleteDialog) {
-        val textBody = remember(state.books.size) {
-            buildString {
-                if (state.books.size == 1) {
-                    append("Book ")
-                } else {
-                    append("${state.books.size} books ")
-                }
-                append("will be removed from this server alongside with stored media files. This cannot be undone. Continue?")
-            }
-        }
-
-        val confirmationText = remember(state.books.size) {
-            buildString {
-                append("Yes, delete ")
-                if (state.books.size == 1) {
-                    append("book and its files")
-                } else {
-                    append("${state.books.size} books and their files")
-                }
-            }
-        }
+        val textBody = remember(state.books.size) { bulkStrings.deleteBooksBody(state.books.size) }
+        val confirmationText = remember(state.books.size) { bulkStrings.confirmDeleteBooks(state.books.size) }
         ConfirmationDialog(
-            title = "Delete Books",
+            title = bulkStrings.deleteBooksTitle,
             body = textBody,
             confirmText = confirmationText,
             onDialogConfirm = {
@@ -173,6 +147,7 @@ data class BookBulkActionsState(
     private val isAdmin: Boolean,
     private val coroutineScope: CoroutineScope,
 ) {
+    private val bulkStrings = RuntimeAppStrings.strings.value.menus.bulk
 
     var showAddToReadListDialog by mutableStateOf(false)
     var showEditDialog by mutableStateOf(false)
@@ -183,41 +158,41 @@ data class BookBulkActionsState(
     val buttons = buildList {
         add(
             BulkActionButtonData(
-                description = "Mark read",
+                description = bulkStrings.markAsRead,
                 icon = Icons.Default.BookmarkAdd,
                 onClick = { coroutineScope.launch { actions.markAsRead(books) } }
             ))
 
         add(
             BulkActionButtonData(
-                description = "Mark unread",
+                description = bulkStrings.markAsUnread,
                 icon = Icons.Default.BookmarkRemove,
                 onClick = { coroutineScope.launch { actions.markAsUnread(books) } }
             ))
         if (!isOffline && isAdmin) add(
             BulkActionButtonData(
-                description = "Edit",
+                description = bulkStrings.edit,
                 icon = Icons.Default.Edit,
                 onClick = { showEditDialog = true }
             ))
         if (!isOffline && isAdmin)
             add(
                 BulkActionButtonData(
-                    description = "Add to read list",
+                    description = bulkStrings.addToReadList,
                     icon = Icons.AutoMirrored.Default.PlaylistAdd,
                     onClick = { showAddToReadListDialog = true }
                 ))
         if (books.any { it.downloaded })
             add(
                 BulkActionButtonData(
-                    description = "Deleted downloaded",
+                    description = bulkStrings.deleteDownloaded,
                     icon = Icons.Default.AutoDelete,
                     onClick = { showDeleteDownloadedDialog = true }
                 ))
         if (!isOffline && books.any { !it.downloaded })
             add(
                 BulkActionButtonData(
-                    description = "Download",
+                    description = bulkStrings.download,
                     icon = Icons.Default.Download,
                     onClick = { showDownloadDialog = true }
                 ))
@@ -276,3 +251,4 @@ data class BookBulkActions(
         }
     )
 }
+

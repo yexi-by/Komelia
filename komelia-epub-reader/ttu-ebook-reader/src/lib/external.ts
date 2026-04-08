@@ -42,6 +42,8 @@ export interface ExternalFunctionsWindow extends Window {
   setFullscreen(enabled: boolean): Promise<CallbackResponse<undefined>>
 
   completeBook(): Promise<CallbackResponse<undefined>>
+
+  getUiLanguageTag?: () => Promise<CallbackResponse<string>>
 }
 
 interface CallbackResponse<T> {
@@ -122,6 +124,12 @@ export class ExternalFunctions {
 
   async completeBook(): Promise<undefined> {
     return this.windowFunctions.completeBook().then((result) => result.result)
+  }
+
+  async getUiLanguageTag(): Promise<string | null> {
+    const fn = this.windowFunctions.getUiLanguageTag;
+    if (!fn) return null;
+    return fn().then((result) => result.result).catch(() => null);
   }
 }
 

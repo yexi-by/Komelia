@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.StateHolder
 import snd.komelia.ui.common.components.LockableChipTextField
 import snd.komelia.ui.dialogs.tabs.DialogTab
@@ -25,8 +26,9 @@ internal class SharingTab(
     private val vm: SeriesBulkEditDialogViewModel,
 ) : DialogTab {
 
+    @Composable
     override fun options() = TabItem(
-        title = "SHARING",
+        title = LocalStrings.current.seriesEdit.sharingTab,
         icon = Icons.Default.People
     )
 
@@ -44,6 +46,7 @@ private fun SharingContent(
     labels: StateHolder<List<String>>,
     labelsLock: StateHolder<Boolean>,
 ) {
+    val strings = LocalStrings.current.seriesEdit
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -52,15 +55,18 @@ private fun SharingContent(
         Row(Modifier.border(Dp.Hairline, warningColor).padding(20.dp)) {
             Icon(Icons.Default.PriorityHigh, null, tint = warningColor)
             Text(
-                text = "You are editing tags for multiple series. This will override existing tags of each series.",
+                text = strings.bulkSharingWarning,
                 color = warningColor
             )
         }
 
         LockableChipTextField(
             values = labels,
-            label = "Labels",
+            label = strings.labels,
             lock = labelsLock
         )
     }
 }
+
+
+

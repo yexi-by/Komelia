@@ -28,6 +28,7 @@ import io.github.snd_r.komelia.ui.dialogs.komf.identify.KomfIdentifyDialogViewMo
 import io.github.snd_r.komelia.ui.dialogs.komf.identify.KomfIdentifyDialogViewModel.IdentifyTab.IDENTIFY_SETTINGS
 import io.github.snd_r.komelia.ui.dialogs.komf.identify.KomfIdentifyDialogViewModel.IdentifyTab.SEARCH_RESULTS
 import snd.komelia.LocalKomfViewModelFactory
+import snd.komelia.strings.LocalExtensionStrings
 import snd.komf.api.KomfServerLibraryId
 import snd.komf.api.KomfServerSeriesId
 import snd.komf.api.MediaServer
@@ -40,6 +41,7 @@ fun IdentifyDialog(
     seriesName: String?,
     onDismissRequest: () -> Unit,
 ) {
+    val strings = LocalExtensionStrings.current.content
     val viewModelFactory = LocalKomfViewModelFactory.current
     val vm = remember {
         viewModelFactory.getKomfIdentifyDialogViewModel(
@@ -56,7 +58,7 @@ fun IdentifyDialog(
 
     AppDialog(
         modifier = Modifier.widthIn(max = 840.dp),
-        header = { DialogSimpleHeader("Identify") },
+        header = { DialogSimpleHeader(strings.identifyTitle) },
         content = {
             Box(
                 modifier = Modifier.fillMaxSize().padding(vertical = 10.dp),
@@ -87,6 +89,7 @@ fun LibraryAutoIdentifyDialog(
     libraryId: KomfServerLibraryId,
     onDismissRequest: () -> Unit,
 ) {
+    val strings = LocalExtensionStrings.current.content
     val viewModelFactory = LocalKomfViewModelFactory.current
     val vm = remember {
         viewModelFactory.getKomfLibraryIdentifyViewModel(libraryId = libraryId, mediaServer = mediaServer)
@@ -94,13 +97,13 @@ fun LibraryAutoIdentifyDialog(
 
     AppDialog(
         modifier = Modifier.widthIn(max = 840.dp),
-        header = { DialogSimpleHeader("Auto-Identify") },
+        header = { DialogSimpleHeader(strings.autoIdentifyTitle) },
         content = {
             Box(
                 modifier = Modifier.fillMaxSize().padding(vertical = 10.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text("Launch auto identification job for entire library? This action might take a long time for big libraries\nContinue?")
+                Text(strings.autoIdentifyBody)
             }
         },
         controlButtons = {

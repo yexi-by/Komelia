@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.dp
 import snd.komelia.color.ColorChannel
 import snd.komelia.color.CurvePointType
 import snd.komelia.color.HistogramPaths
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalWindowWidth
 import snd.komelia.ui.color.CurveDrawData
 import snd.komelia.ui.color.CurvePresetsState
@@ -105,6 +106,7 @@ fun ColorCurvesContent(
     curvePointerPosition: Offset,
     presetsState: CurvePresetsState,
 ) {
+    val colorStrings = LocalStrings.current.screens.color
     val width = LocalWindowWidth.current
     val heightModifier = remember(width) {
         when (width) {
@@ -149,7 +151,7 @@ fun ColorCurvesContent(
                     .align(Alignment.CenterVertically)
                     .pointerHoverIcon(PointerIcon.Hand),
             ) {
-                Text("Reset All")
+                Text(LocalStrings.current.common.resetAll)
             }
         }
 
@@ -224,6 +226,7 @@ private fun Curve(
     onCanvasSizeChange: (IntSize) -> Unit,
     onDensityChange: (Density) -> Unit,
 ) {
+    val colorStrings = LocalStrings.current.screens.color
     val colorCurveColor = remember(selectedChannel) {
         if (selectedChannel == ColorChannel.VALUE) Color.Gray else Color.Gray.copy(alpha = 0.5f)
     }
@@ -248,8 +251,7 @@ private fun Curve(
     val textLayout = remember(curvePointerPosition) {
         if (curvePointerPosition.isUnspecified) null
         else {
-            val text = "x: ${curvePointerPosition.x.roundToInt()} y: ${curvePointerPosition.y.roundToInt()}"
-            textMeasurer.measure(text)
+            textMeasurer.measure(colorStrings.curvePointerPosition(curvePointerPosition.x.roundToInt(), curvePointerPosition.y.roundToInt()))
         }
     }
 
@@ -290,9 +292,10 @@ private fun Curve(
         )
         if (textLayout != null) {
             val backgroundTopLeft = 5 * density
+            val textLayoutSize = textLayout.size
             val backgroundSize = Size(
-                textLayout.size.width.toFloat() + 20 * density,
-                textLayout.size.height + 20 * density,
+                width = textLayoutSize.width.toFloat() + 20 * density,
+                height = textLayoutSize.height.toFloat() + 20 * density,
             )
             drawRect(
                 color = textBackgroundColor.copy(alpha = 0.6f),
@@ -377,6 +380,7 @@ fun ChannelSelection(
     onChannelReset: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colorStrings = LocalStrings.current.screens.color
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
@@ -384,12 +388,12 @@ fun ChannelSelection(
         DropdownChoiceMenu(
             selectedOption = remember(selectedChannel) { LabeledEntry(selectedChannel, selectedChannel.name) },
             options = remember { ColorChannel.entries.map { LabeledEntry(it, it.name) } },
-            label = { Text("Channel") },
+            label = { Text(colorStrings.channel) },
             onOptionChange = { onChannelChange(it.value) },
             inputFieldModifier = Modifier.widthIn(min = 150.dp)
 
         )
-        Tooltip("Reset Channel") {
+        Tooltip(colorStrings.resetChannel) {
             IconButton(onClick = onChannelReset) {
                 Icon(Icons.Default.SettingsBackupRestore, null)
             }
@@ -404,11 +408,12 @@ private fun PointTypeSelection(
     onPointTypeChange: (CurvePointType) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colorStrings = LocalStrings.current.screens.color
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        Text("Point Type", style = MaterialTheme.typography.labelMedium)
+        Text(colorStrings.pointType, style = MaterialTheme.typography.labelMedium)
         val primaryColor = MaterialTheme.colorScheme.primary
         val selectColor = MaterialTheme.colorScheme.surfaceVariant
         Row {
@@ -425,7 +430,7 @@ private fun PointTypeSelection(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.padding(8.dp)
                 ) {
-                    Text("Smooth")
+                    Text(colorStrings.smooth)
                     Canvas(Modifier.size(28.dp).padding(6.dp)) { drawCircle(primaryColor) }
                 }
             }
@@ -442,7 +447,7 @@ private fun PointTypeSelection(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.padding(8.dp)
                 ) {
-                    Text("Corner")
+                    Text(colorStrings.corner)
                     Canvas(Modifier.size(28.dp).padding(6.dp)) { rotate(45f) { drawRect(primaryColor) } }
                 }
             }
@@ -458,6 +463,7 @@ private fun ChannelValues(
     onPointChange: (SelectedPoint, newOffset: IntOffset) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val commonStrings = LocalStrings.current.common
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -468,7 +474,7 @@ private fun ChannelValues(
             onvValueChange = { newX ->
                 selectedPoint?.let { onPointChange(selectedPoint, IntOffset(newX.toInt(), currentPointOffset?.y ?: 0)) }
             },
-            label = { Text("Input") },
+            label = { Text(commonStrings.input) },
             stepSize = 1f,
             minValue = 0f,
             maxValue = 255f,
@@ -480,7 +486,7 @@ private fun ChannelValues(
             onvValueChange = { newY ->
                 selectedPoint?.let { onPointChange(selectedPoint, IntOffset(currentPointOffset?.x ?: 0, newY.toInt())) }
             },
-            label = { Text("Output") },
+            label = { Text(commonStrings.output) },
             stepSize = 1f,
             minValue = 0f,
             maxValue = 255f,

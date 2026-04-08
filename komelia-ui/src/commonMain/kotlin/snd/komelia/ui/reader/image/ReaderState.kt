@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
@@ -36,6 +37,7 @@ import snd.komelia.ui.platform.CommonParcelable
 import snd.komelia.ui.platform.CommonParcelize
 import snd.komelia.ui.platform.CommonParcelizeRawValue
 import snd.komelia.ui.series.SeriesScreen
+import snd.komelia.ui.strings.AppStrings
 import snd.komga.client.book.KomgaBookId
 import snd.komga.client.book.KomgaBookReadProgressUpdateRequest
 import snd.komga.client.common.KomgaReadingDirection
@@ -56,6 +58,7 @@ class ReaderState(
     private val bookSiblingsContext: BookSiblingsContext,
     private val colorCorrectionRepository: BookColorCorrectionRepository,
     val pageChangeFlow: SharedFlow<Unit>,
+    private val appStrings: Flow<AppStrings>,
 ) {
     private val previewLoadScope = CoroutineScope(Dispatchers.Default.limitedParallelism(1) + SupervisorJob())
     val state = MutableStateFlow<LoadState<Unit>>(LoadState.Uninitialized)
@@ -225,7 +228,7 @@ class ReaderState(
                 previousBookPages = previousBookPages,
             )
         } else
-            appNotifications.add(AppNotification.Normal("You're at the beginning of the book"))
+            appNotifications.add(AppNotification.Normal(appStrings.first().reader.atBeginningOfBook))
         return
     }
 

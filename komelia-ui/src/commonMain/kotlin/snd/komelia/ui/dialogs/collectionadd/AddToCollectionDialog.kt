@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.dialogs.AppDialog
 import snd.komelia.ui.platform.cursorForHand
@@ -61,12 +62,13 @@ fun AddToCollectionDialog(
 
 @Composable
 private fun Header(onDismissRequest: () -> Unit) {
+    val strings = LocalStrings.current.dialogs.collectionAdd
     Column {
         Row(
             modifier = Modifier.padding(horizontal = 15.dp, vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Add to collection", style = MaterialTheme.typography.titleLarge)
+            Text(strings.title, style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.weight(1f))
             IconButton(onClick = onDismissRequest) { Icon(Icons.Default.Close, null) }
         }
@@ -81,6 +83,9 @@ private fun DialogContent(
     onCreateNewCollection: suspend (name: String) -> Unit,
     onAddToCollection: suspend (KomgaCollection) -> Unit,
 ) {
+    val dialogStrings = LocalStrings.current.dialogs.collectionAdd
+    val commonStrings = LocalStrings.current.common
+    val validationStrings = LocalStrings.current.validation
     val coroutineScope = rememberCoroutineScope()
     Column(Modifier.padding(20.dp)) {
         var query by remember { mutableStateOf("") }
@@ -93,11 +98,11 @@ private fun DialogContent(
             TextField(
                 value = query,
                 onValueChange = { query = it },
-                label = { Text("Search or create collection") },
+                label = { Text(dialogStrings.searchOrCreateCollection) },
                 supportingText = {
                     if (collectionExistsForQuery.value)
                         Text(
-                            "A collection with this name already exists",
+                            validationStrings.collectionAlreadyExists,
                             color = MaterialTheme.colorScheme.error
                         )
                 },
@@ -106,7 +111,7 @@ private fun DialogContent(
             FilledTonalButton(
                 onClick = { coroutineScope.launch { onCreateNewCollection(query) } },
                 enabled = query.isNotBlank() && !collectionExistsForQuery.value,
-                content = { Text("Create") },
+                content = { Text(dialogStrings.create) },
             )
         }
 
@@ -134,6 +139,8 @@ private fun CollectionEntry(
     alreadyContainsSeries: Boolean,
     onClick: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
+    val validationStrings = LocalStrings.current.validation
     Column(
         Modifier
             .clickable(enabled = !alreadyContainsSeries) { onClick() }
@@ -147,9 +154,9 @@ private fun CollectionEntry(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("${collection.seriesIds.size} series", style = MaterialTheme.typography.labelLarge)
+            Text(commonStrings.itemsCount(collection.seriesIds.size, commonStrings.series.lowercase()), style = MaterialTheme.typography.labelLarge)
             if (alreadyContainsSeries) Text(
-                "already contains this series",
+                validationStrings.alreadyContainsSeries,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.tertiary
             )

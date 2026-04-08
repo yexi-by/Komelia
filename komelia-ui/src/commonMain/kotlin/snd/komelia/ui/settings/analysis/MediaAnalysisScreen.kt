@@ -13,25 +13,28 @@ import snd.komelia.ui.LoadState.Error
 import snd.komelia.ui.LoadState.Loading
 import snd.komelia.ui.LoadState.Success
 import snd.komelia.ui.LoadState.Uninitialized
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.MainScreen
 import snd.komelia.ui.book.bookScreen
 import snd.komelia.ui.common.components.LoadingMaxSizeIndicator
+import snd.komelia.ui.error.formatExceptionMessage
 import snd.komelia.ui.settings.SettingsScreenContainer
 
 class MediaAnalysisScreen : Screen {
     @Composable
     @OptIn(InternalVoyagerApi::class)
     override fun Content() {
+        val strings = LocalStrings.current.screens.settings
         val rootNavigator = LocalNavigator.currentOrThrow.parent ?: LocalNavigator.currentOrThrow
         val viewModelFactory = LocalViewModelFactory.current
         val vm = rememberScreenModel { viewModelFactory.getMediaAnalysisViewModel() }
         LaunchedEffect(Unit) { vm.initialize() }
 
-        SettingsScreenContainer("Media Analysis") {
+        SettingsScreenContainer(strings.mediaAnalysis) {
             when (val state = vm.state.collectAsState().value) {
                 Uninitialized, Loading -> LoadingMaxSizeIndicator()
-                is Error -> Text(state.exception.message ?: "Error")
+                is Error -> Text(formatExceptionMessage(state.exception))
                 is Success -> MediaAnalysisContent(
                     books = vm.books,
                     onBookClick = {

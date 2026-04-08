@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import snd.komelia.color.ColorChannel
 import snd.komelia.color.HistogramPaths
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalWindowWidth
 import snd.komelia.ui.color.LevelsState
 import snd.komelia.ui.common.components.NumberFieldWithIncrements
@@ -50,6 +51,7 @@ import snd.komelia.ui.platform.WindowSizeClass.MEDIUM
 fun ColorLevelContent(
     state: LevelsState,
 ) {
+    val colorStrings = LocalStrings.current.screens.color
     val width = LocalWindowWidth.current
     val heightModifier = remember(width) {
         when (width) {
@@ -86,7 +88,7 @@ fun ColorLevelContent(
                     .align(Alignment.CenterVertically)
                     .pointerHoverIcon(PointerIcon.Hand),
             ) {
-                Text("Reset All")
+                Text(LocalStrings.current.common.resetAll)
             }
         }
 
@@ -107,7 +109,7 @@ fun ColorLevelContent(
                 gammaValue = state.gammaInputValue.collectAsState(1f).value,
                 onGammaValueChange = state::onGammaInputChange
             )
-            Text("Output Levels", modifier = Modifier.padding(vertical = 10.dp))
+            Text(colorStrings.outputLevels, modifier = Modifier.padding(vertical = 10.dp))
             HorizontalGradient()
             HandleBar(state.outputHandleBarState)
             OutputFields(
@@ -180,13 +182,14 @@ private fun InputFields(
     gammaValue: Float,
     onGammaValueChange: (Float) -> Unit,
 ) {
+    val colorStrings = LocalStrings.current.screens.color
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         NumberFieldWithIncrements(
             value = lowValue.toFloat(),
             onvValueChange = { onLowValueChange(it.toInt()) },
-            label = { Text("Black") },
+            label = { Text(colorStrings.black) },
             stepSize = 1f,
             minValue = 0f,
             maxValue = 255f,
@@ -198,7 +201,7 @@ private fun InputFields(
         NumberFieldWithIncrements(
             value = gammaValue,
             onvValueChange = onGammaValueChange,
-            label = { Text("Gamma") },
+            label = { Text(colorStrings.gamma) },
             stepSize = 0.01f,
             minValue = 0.1f,
             maxValue = 10f,
@@ -209,7 +212,7 @@ private fun InputFields(
         NumberFieldWithIncrements(
             value = highValue.toFloat(),
             onvValueChange = { onHighValueChange(it.toInt()) },
-            label = { Text("White") },
+            label = { Text(colorStrings.white) },
             stepSize = 1f,
             minValue = 0f,
             maxValue = 255f,
@@ -226,6 +229,7 @@ private fun OutputFields(
     highValue: Int,
     onHighValueChange: (Int) -> Unit,
 ) {
+    val colorStrings = LocalStrings.current.screens.color
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(20.dp)
@@ -233,7 +237,7 @@ private fun OutputFields(
         NumberFieldWithIncrements(
             value = lowValue.toFloat(),
             onvValueChange = { onLowValueChange(it.toInt()) },
-            label = { Text("Black") },
+            label = { Text(colorStrings.black) },
             stepSize = 1f,
             minValue = 0f,
             maxValue = 255f,
@@ -244,7 +248,7 @@ private fun OutputFields(
         NumberFieldWithIncrements(
             value = highValue.toFloat(),
             onvValueChange = { onHighValueChange(it.toInt()) },
-            label = { Text("White") },
+            label = { Text(colorStrings.white) },
             stepSize = 1f,
             minValue = 0f,
             maxValue = 255f,

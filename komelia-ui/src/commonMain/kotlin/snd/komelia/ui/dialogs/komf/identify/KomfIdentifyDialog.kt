@@ -70,11 +70,12 @@ fun KomfIdentifyDialog(
     val vm = remember { viewModelFactory.getKomfIdentifyDialogViewModel(series, onDismissRequest) }
     val state = vm.state.collectAsState().value
     val isLoading = derivedStateOf { state == LoadState.Loading }
+    val dialogStrings = LocalStrings.current.dialogs.komf
     DisposableEffect(Unit) { onDispose { vm.onDispose() } }
 
     AppDialog(
         modifier = Modifier.widthIn(max = 840.dp),
-        header = { DialogSimpleHeader("Identify") },
+        header = { DialogSimpleHeader(dialogStrings.identifyTitle) },
         content = {
             Box(
                 modifier = Modifier.fillMaxSize().padding(vertical = 10.dp),
@@ -115,7 +116,7 @@ fun IdentifyConfigContent(state: ConfigState) {
             TextField(
                 value = state.searchName,
                 onValueChange = state::searchName::set,
-                label = { Text("Title") },
+                label = { Text(LocalStrings.current.common.title) },
                 modifier = Modifier.weight(1f)
             )
 
@@ -131,7 +132,7 @@ fun IdentifyConfigContent(state: ConfigState) {
                 enabled = !isLoading.value,
             ) {
                 if (isLoading.value && searchInProgress) CircularProgressIndicator(Modifier.size(25.dp))
-                else Text("Search")
+                else Text(LocalStrings.current.common.search)
             }
         }
     }
@@ -142,8 +143,9 @@ fun IdentifyConfigContent(state: ConfigState) {
 fun IdentifyResultsContent(
     state: SearchResultsState,
 ) {
+    val dialogStrings = LocalStrings.current.dialogs.komf
     if (state.searchResults.isEmpty()) {
-        Text("No results")
+        Text(dialogStrings.noResults)
         return
     }
     FlowRow(
@@ -207,7 +209,7 @@ private fun ProviderProgressCard(progress: ProviderProgressStatus) {
 
             when (progress.status) {
                 ProgressStatus.COMPLETED -> {
-                    Text("Completed")
+                    Text(LocalStrings.current.common.completed)
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = null,
@@ -252,7 +254,7 @@ private fun ProcessingProgressCard() {
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text("Processing")
+            Text(LocalStrings.current.common.processing)
             Spacer(Modifier.weight(1f))
         }
         LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
@@ -272,7 +274,7 @@ fun IdentifyConfigButtons(state: ConfigState) {
             onClick = state.onDismiss,
             modifier = Modifier.cursorForHand()
         ) {
-            Text("Cancel")
+            Text(LocalStrings.current.common.cancel)
         }
 
         FilledTonalButton(
@@ -287,7 +289,7 @@ fun IdentifyConfigButtons(state: ConfigState) {
             modifier = Modifier.cursorForHand()
         ) {
             if (isLoading.value && autoIdentifyProgress) CircularProgressIndicator(Modifier.size(25.dp))
-            else Text("Auto-Identify")
+            else Text(LocalStrings.current.dialogs.komf.autoIdentifyTitle)
         }
     }
 }
@@ -295,7 +297,7 @@ fun IdentifyConfigButtons(state: ConfigState) {
 @Composable
 fun IdentifySearchResultsButtons(state: SearchResultsState) {
     ControlButtons(
-        confirmationText = "Confirm",
+        confirmationText = LocalStrings.current.common.confirm,
         onConfirm = { state.onResultConfirm() },
         onDismissRequest = state.onDismiss
     )
@@ -306,12 +308,14 @@ fun IdentificationProgressButtons(
     state: IdentificationState,
     isLoading: Boolean
 ) {
+    val commonStrings = LocalStrings.current.common
+    val dialogStrings = LocalStrings.current.dialogs.komf
     FilledTonalButton(
         onClick = state.onDismiss,
         modifier = Modifier.cursorForHand()
     ) {
-        if (isLoading) Text("Run in background")
-        else Text("Confirm")
+        if (isLoading) Text(dialogStrings.runInBackground)
+        else Text(commonStrings.confirm)
     }
 }
 
@@ -331,7 +335,7 @@ private fun ControlButtons(
             onClick = onDismissRequest,
             modifier = Modifier.cursorForHand()
         ) {
-            Text("Cancel")
+            Text(LocalStrings.current.common.cancel)
         }
 
         FilledTonalButton(

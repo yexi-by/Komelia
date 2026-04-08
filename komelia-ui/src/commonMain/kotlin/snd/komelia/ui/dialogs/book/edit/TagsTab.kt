@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.LocalOffer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.StateHolder
 import snd.komelia.ui.common.components.LabeledEntry.Companion.stringEntry
 import snd.komelia.ui.common.components.LockableChipTextFieldWithSuggestions
@@ -14,8 +15,9 @@ import snd.komelia.ui.dialogs.tabs.TabItem
 class TagsTab(
     private val vm: BookEditMetadataState
 ) : DialogTab {
+    @Composable
     override fun options() = TabItem(
-        title = "TAGS",
+        title = LocalStrings.current.common.tags.uppercase(),
         icon = Icons.Default.LocalOffer
     )
 
@@ -35,12 +37,17 @@ private fun TagsTabContent(
     tagsLock: StateHolder<Boolean>,
     allTags: List<String>,
 ) {
+    val commonStrings = LocalStrings.current.common
     LockableChipTextFieldWithSuggestions(
         values = tags.value,
         onValuesChange = { tags.setValue(it) },
-        label = "Tags",
+        label = commonStrings.tags,
         suggestions = remember(allTags) { allTags.map { stringEntry(it) } },
         locked = tagsLock.value,
         onLockChange = { tagsLock.setValue(it) }
     )
 }
+
+
+
+

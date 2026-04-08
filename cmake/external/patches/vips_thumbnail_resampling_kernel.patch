@@ -1,14 +1,8 @@
-Subject: [PATCH] vips_thumbnail resampling kernel
----
-Index: libvips/resample/thumbnail.c
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
 diff --git a/libvips/resample/thumbnail.c b/libvips/resample/thumbnail.c
---- a/libvips/resample/thumbnail.c	(revision 0b3a70c94e2530b79b8a14daa09079454c4d771d)
-+++ b/libvips/resample/thumbnail.c	(date 1759172814248)
-@@ -152,6 +152,7 @@
+index c34c3f7b..d36ed331 100644
+--- a/libvips/resample/thumbnail.c
++++ b/libvips/resample/thumbnail.c
+@@ -154,6 +154,7 @@ typedef struct _VipsThumbnail {
  	/* Pyramids are stored in pages.
  	 */
  	gboolean page_pyramid;
@@ -16,34 +10,68 @@ diff --git a/libvips/resample/thumbnail.c b/libvips/resample/thumbnail.c
  
  } VipsThumbnail;
  
-@@ -811,7 +812,7 @@
+@@ -836,7 +837,8 @@ vips_thumbnail_build(VipsObject *object)
  		in = t[4];
  	}
  
 -	if (vips_resize(in, &t[5], 1.0 / hshrink, "vscale", 1.0 / vshrink, NULL))
-+	if (vips_resize(in, &t[5], 1.0 / hshrink, "vscale", 1.0 / vshrink, "kernel", thumbnail->kernel, NULL))
++	if (vips_resize(in, &t[5], 1.0 / hshrink, "vscale", 1.0 / vshrink,
++			"kernel", thumbnail->kernel, NULL))
  		return -1;
  	in = t[5];
  
-@@ -1070,6 +1071,13 @@
- 		VIPS_ARGUMENT_OPTIONAL_INPUT | VIPS_ARGUMENT_DEPRECATED,
+@@ -1105,6 +1107,13 @@ vips_thumbnail_class_init(VipsThumbnailClass *class)
  		G_STRUCT_OFFSET(VipsThumbnail, output_profile),
  		NULL);
-+
+ 
 +	VIPS_ARG_ENUM(class, "kernel", 999,
 +		_("Kernel"),
 +		_("Resampling kernel"),
 +		VIPS_ARGUMENT_OPTIONAL_INPUT,
 +		G_STRUCT_OFFSET(VipsThumbnail, kernel),
 +		VIPS_TYPE_KERNEL, VIPS_KERNEL_LANCZOS3);
- }
- 
- static void
-@@ -1080,6 +1088,7 @@
++
+ 	VIPS_ARG_ENUM(class, "intent", 120,
+ 		_("Intent"),
+ 		_("Rendering intent"),
+@@ -1158,6 +1167,7 @@ vips_thumbnail_init(VipsThumbnail *thumbnail)
+ 	thumbnail->height = 1;
  	thumbnail->auto_rotate = TRUE;
  	thumbnail->intent = VIPS_INTENT_RELATIVE;
- 	thumbnail->fail_on = VIPS_FAIL_ON_NONE;
 +	thumbnail->kernel = VIPS_KERNEL_LANCZOS3;
+ 	thumbnail->fail_on = VIPS_FAIL_ON_NONE;
  }
  
- typedef struct _VipsThumbnailFile {
+diff --git a/meson.build b/meson.build
+index 7b3705a3..0136b25a 100644
+--- a/meson.build
++++ b/meson.build
+@@ -472,21 +472,23 @@ endif
+ # simd package we use
+ simd_package = disabler()
+ 
+-# Require 1.0.5 to support the `ReorderDemote2To(u8, i16, i16)` operation
+-# See: https://github.com/google/highway/pull/1247
+-libhwy_dep = dependency('libhwy', version: '>=1.0.5', required: get_option('highway'))
++# Require 1.0.5 to support the `ReorderDemote2To(u8, i16, i16)` operation.
++# Android cross builds can produce a valid libhwy.pc without a Version field,
++# so we accept an empty version string and treat it as sufficiently new.
++libhwy_dep = dependency('libhwy', required: get_option('highway'))
++libhwy_version = libhwy_dep.version()
+ if libhwy_dep.found()
+     external_deps += libhwy_dep
+     cfg_var.set('HAVE_HWY', true)
+     # 1.1.0 adds `InterleaveWhole{Lower,Upper}` and `Dup128VecFromValues`
+-    cfg_var.set('HAVE_HWY_1_1_0', libhwy_dep.version().version_compare('>=1.1.0'))
++    cfg_var.set('HAVE_HWY_1_1_0', libhwy_version == '' or libhwy_version.version_compare('>=1.1.0'))
+     # Always disable SSSE3 since it is rare to have SSSE3 but not SSE4
+     disabled_targets = ['HWY_SSSE3']
+     # Avoid disabling the AVX3_DL target, see: https://github.com/google/highway/pull/1356
+     #disabled_targets += ['HWY_AVX3_DL']
+     # Always disable special AVX512 targets since the FP16/BF16 ops they introduce are unused.
+     disabled_targets += ['HWY_AVX3_ZEN4', 'HWY_AVX3_SPR']
+-    if libhwy_dep.version().version_compare('>=1.3.0')
++    if libhwy_version == '' or libhwy_version.version_compare('>=1.3.0')
+         disabled_targets += ['HWY_AVX10_2']
+     endif
+     # Optionally, build without AVX512 support (helps to reduce binary size at the cost of performance)

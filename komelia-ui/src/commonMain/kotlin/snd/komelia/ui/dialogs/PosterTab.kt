@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.FileKitMode
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
+import snd.komelia.ui.LocalStrings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import snd.komelia.ui.common.cards.ThumbnailEditCard
@@ -56,8 +57,9 @@ import kotlin.math.roundToInt
 
 class PosterTab(private val state: PosterEditState) : DialogTab {
 
+    @Composable
     override fun options() = TabItem(
-        title = "POSTER",
+        title = LocalStrings.current.common.poster,
         icon = Icons.Default.Image,
     )
 
@@ -236,7 +238,7 @@ fun PosterEditContent(
     val coroutineScope = rememberCoroutineScope()
     val launcher = rememberFilePickerLauncher(
         mode = FileKitMode.Multiple(),
-        title = "Choose a file",
+        title = LocalStrings.current.common.poster,
     ) { files ->
         files?.let { posterState.onThumbnailUpload(it) }
     }
@@ -260,7 +262,7 @@ fun PosterEditContent(
                     .clip(RectangleShape)
             )
             Text(
-                "Choose an image - drag and drop",
+                LocalStrings.current.common.chooseImageDragDrop,
                 textDecoration = TextDecoration.Underline,
                 color = MaterialTheme.colorScheme.tertiary,
                 fontWeight = FontWeight.Bold
@@ -319,3 +321,7 @@ private fun StripedBar(modifier: Modifier) {
         }
     }
 }
+
+
+
+

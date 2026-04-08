@@ -17,6 +17,8 @@ import snd.komelia.image.processing.ColorCorrectionStep
 import snd.komelia.komga.api.KomgaApi
 import snd.komelia.offline.OfflineDependencies
 import snd.komelia.onnxruntime.OnnxRuntime
+import snd.komelia.settings.model.AppLanguageMode
+import snd.komelia.ui.strings.AppLanguage
 import snd.komelia.ui.strings.AppStrings
 import snd.komelia.updates.AppUpdater
 import snd.komelia.updates.OnnxModelDownloader
@@ -25,6 +27,8 @@ import snd.komf.client.KomfClientFactory
 
 data class DependencyContainer(
     val appStrings: StateFlow<AppStrings>,
+    val appLanguage: StateFlow<AppLanguage>,
+    val appLanguageMode: StateFlow<AppLanguageMode>,
     val appRepositories: AppRepositories,
     val komgaApi: StateFlow<KomgaApi>,
 

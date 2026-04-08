@@ -80,6 +80,7 @@ import snd.komelia.ui.platform.cursorForHand
 import snd.komelia.ui.series.SeriesBooksState.BooksData
 import snd.komelia.ui.series.SeriesFilterState.TagExclusionMode
 import snd.komelia.ui.series.SeriesFilterState.TagInclusionMode
+import snd.komelia.ui.strings.SeriesScreenStrings
 import snd.komga.client.book.KomgaReadStatus
 import snd.komga.client.common.KomgaAuthor
 import snd.komga.client.series.KomgaSeries
@@ -96,6 +97,7 @@ fun LazyGridScope.SeriesBooksContent(
     booksFilterState: BooksFilterState,
     bookContextMenuActions: BookMenuActions,
     scrollState: LazyGridState,
+    seriesStrings: SeriesScreenStrings,
 ) {
     if (booksLoadState is LoadState.Success<BooksData>) {
         val booksState = booksLoadState.value
@@ -122,6 +124,7 @@ fun LazyGridScope.SeriesBooksContent(
             selectedBooks = booksState.selectedBooks,
             onBookSelect = onBookSelect,
             layout = booksState.layout,
+            seriesStrings = seriesStrings,
         )
 
         if (!booksState.selectionMode) {
@@ -178,10 +181,11 @@ private fun LazyGridScope.BooksContent(
     selectedBooks: List<KomeliaBook>,
     onBookSelect: (KomeliaBook) -> Unit,
     layout: BooksLayout,
+    seriesStrings: SeriesScreenStrings,
 ) {
     if (books.isEmpty()) {
         item(span = { GridItemSpan(maxLineSpan) }) {
-            Text("No books", modifier = Modifier.fillMaxWidth())
+            Text(seriesStrings.noBooks, modifier = Modifier.fillMaxWidth())
         }
     } else
         when (layout) {
@@ -224,6 +228,7 @@ private fun BooksToolBar(
     currentBookPage: Int,
     onPageChange: (Int) -> Unit,
 ) {
+    val seriesStrings = LocalStrings.current.screens.series
     val width = LocalWindowWidth.current
     var showFilters by remember { mutableStateOf(false) }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -233,12 +238,7 @@ private fun BooksToolBar(
         ) {
             val booksLabel = remember(series) {
                 if (series == null) null
-                else buildString {
-                    append(series.booksCount)
-                    if (series.metadata.totalBookCount != null) append(" / ${series.metadata.totalBookCount}")
-                    if (series.booksCount > 1) append(" books")
-                    else append(" book")
-                }
+                else seriesStrings.booksCount(series.booksCount, series.metadata.totalBookCount)
             }
 
             booksLabel?.let {
@@ -336,6 +336,7 @@ fun BooksBulkActionsToolbar(
     selectedBooks: List<KomeliaBook>,
     onBookSelect: (KomeliaBook) -> Unit,
 ) {
+    val seriesStrings = LocalStrings.current.screens.series
     BulkActionsContainer(
         onCancel = onCancel,
         selectedCount = selectedBooks.size,
@@ -348,7 +349,7 @@ fun BooksBulkActionsToolbar(
         when (LocalWindowWidth.current) {
             FULL, EXPANDED -> {
                 if (selectedBooks.isEmpty()) {
-                    Text("Click on items to select or deselect them")
+                    Text(seriesStrings.selectionHint)
                 } else {
                     Spacer(Modifier.weight(1f))
                     BooksBulkActionsContent(
@@ -427,6 +428,7 @@ fun BookFilterDialog(
     filterState: BooksFilterState,
     onDismiss: () -> Unit,
 ) {
+    val seriesStrings = LocalStrings.current.screens.series
     val currentFilter = filterState.state.collectAsState().value
     AppDialog(
         modifier = Modifier.fillMaxWidth(.8f),
@@ -474,7 +476,7 @@ fun BookFilterDialog(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Book Filters", modifier = Modifier.padding(start = 10.dp))
+                Text(seriesStrings.bookFilters, modifier = Modifier.padding(start = 10.dp))
                 Spacer(Modifier.weight(1f))
                 IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, null) }
             }

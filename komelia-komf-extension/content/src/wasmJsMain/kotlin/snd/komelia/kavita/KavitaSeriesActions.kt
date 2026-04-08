@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import snd.komelia.KomfActiveDialog
+import snd.komelia.strings.RuntimeExtensionStrings
 import snd.komf.api.KomfServerLibraryId
 import snd.komf.api.KomfServerSeriesId
 
@@ -15,8 +16,8 @@ class KavitaSeriesActions(
     val element: HTMLDivElement
     private val dropdown = KavitaDropdown(
         listOf(
-            KavitaDropdown.DropdownItem("Identify", this::onIdentifyClick),
-            KavitaDropdown.DropdownItem("Reset Metadata", this::onResetMetadataClick),
+            KavitaDropdown.DropdownItem(RuntimeExtensionStrings.strings.value.content.identifyTitle, this::onIdentifyClick),
+            KavitaDropdown.DropdownItem(RuntimeExtensionStrings.strings.value.content.resetMetadataTitle, this::onResetMetadataClick),
         )
     )
 
@@ -24,7 +25,7 @@ class KavitaSeriesActions(
         element = document.createElement("div") as HTMLDivElement
         element.classList.value = "col-auto ms-2"
         element.innerHTML =
-            """<button title="Komf Identify" class="btn btn-actions"><span><i aria-hidden="true" class="fa fa-pen-to-square"></i></span></button>"""
+            """<button title="${RuntimeExtensionStrings.strings.value.content.kavitaIdentifyTitle}" class="btn btn-actions"><span><i aria-hidden="true" class="fa fa-pen-to-square"></i></span></button>"""
         element.addEventListener("focus") { event -> (event.target as HTMLElement).blur() }
 
         element.addEventListener("click") { event ->
@@ -55,9 +56,15 @@ class KavitaSeriesActions(
         val libraryId = getLibraryId()
         val seriesTitle = getSeriesTitle()
         when {
-            seriesId == null -> currentDialog.value = KomfActiveDialog.ErrorDialog("Failed to fine seriesId")
-            libraryId == null -> currentDialog.value = KomfActiveDialog.ErrorDialog("Failed to find libraryId")
-            seriesTitle == null -> currentDialog.value = KomfActiveDialog.ErrorDialog("Failed to find series title")
+            seriesId == null -> currentDialog.value = KomfActiveDialog.ErrorDialog(
+                RuntimeExtensionStrings.strings.value.content.seriesIdNotFound
+            )
+            libraryId == null -> currentDialog.value = KomfActiveDialog.ErrorDialog(
+                RuntimeExtensionStrings.strings.value.content.libraryIdNotFound
+            )
+            seriesTitle == null -> currentDialog.value = KomfActiveDialog.ErrorDialog(
+                RuntimeExtensionStrings.strings.value.content.seriesTitleNotFound
+            )
             else -> currentDialog.value = KomfActiveDialog.SeriesIdentify(
                 seriesId = seriesId,
                 libraryId = libraryId,
@@ -70,8 +77,12 @@ class KavitaSeriesActions(
         val seriesId = getSeriesId()
         val libraryId = getLibraryId()
         when {
-            seriesId == null -> currentDialog.value = KomfActiveDialog.ErrorDialog("Failed to fine seriesId")
-            libraryId == null -> currentDialog.value = KomfActiveDialog.ErrorDialog("Failed to find libraryId")
+            seriesId == null -> currentDialog.value = KomfActiveDialog.ErrorDialog(
+                RuntimeExtensionStrings.strings.value.content.seriesIdNotFound
+            )
+            libraryId == null -> currentDialog.value = KomfActiveDialog.ErrorDialog(
+                RuntimeExtensionStrings.strings.value.content.libraryIdNotFound
+            )
             else -> currentDialog.value = KomfActiveDialog.SeriesReset(
                 seriesId = seriesId,
                 libraryId = libraryId,

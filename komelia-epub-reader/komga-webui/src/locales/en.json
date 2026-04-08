@@ -123,6 +123,10 @@
     "set_current_page_as_readlist_poster": "Set page as poster for read list",
     "set_current_page_as_series_poster": "Set page as poster for series",
     "settings": {
+      "app_language": "App language",
+      "app_language_english": "English",
+      "app_language_simplified_chinese": "Simplified Chinese",
+      "app_language_system": "System",
       "always_fullscreen": "Always Full Screen",
       "animate_page_transitions": "Animate page transitions",
       "background_color": "Background color",

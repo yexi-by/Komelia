@@ -95,7 +95,7 @@ private fun LogsContent(
 private fun LogMessage(log: ILoggingEvent) {
     val timestamp = timestampFormatter.format(log.instant)
     val text = "$timestamp ${log.level} ${log.loggerName}".padEnd(70)
-    val message = "$text  ${log.message}"
+    val message = text + "  " + log.message
 
     Text(
         text = message,

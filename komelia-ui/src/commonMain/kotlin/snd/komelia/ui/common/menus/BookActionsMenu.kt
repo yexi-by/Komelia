@@ -25,10 +25,13 @@ import snd.komelia.komga.api.model.KomeliaBook
 import snd.komelia.offline.tasks.OfflineTaskEmitter
 import snd.komelia.ui.LocalKomgaState
 import snd.komelia.ui.LocalOfflineMode
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.dialogs.ConfirmationDialog
 import snd.komelia.ui.dialogs.book.edit.BookEditDialog
 import snd.komelia.ui.dialogs.permissions.DownloadNotificationRequestDialog
 import snd.komelia.ui.dialogs.readlistadd.AddToReadListDialog
+import snd.komelia.ui.strings.RuntimeAppStrings
+import snd.komelia.ui.strings.ToastStrings
 import snd.komga.client.book.KomgaBookReadProgressUpdateRequest
 
 @Composable
@@ -40,15 +43,16 @@ fun BookActionsMenu(
     showDownloadOption: Boolean,
     onDismissRequest: () -> Unit,
 ) {
+    val menuStrings = LocalStrings.current.menus.book
     val isAdmin = LocalKomgaState.current.authenticatedUser.collectAsState().value?.roleAdmin() ?: true
     val isOffline = LocalOfflineMode.current.collectAsState().value
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showDeleteDownloadedDialog by remember { mutableStateOf(false) }
     if (showDeleteDialog) {
         ConfirmationDialog(
-            title = "Delete Book",
-            body = "The Book ${book.metadata.title} will be removed from this server alongside with stored media files. This cannot be undone. Continue?",
-            confirmText = "Yes, delete book \"${book.metadata.title}\"",
+            title = menuStrings.deleteBookTitle,
+            body = menuStrings.deleteBookBody(book.metadata.title),
+            confirmText = menuStrings.confirmDeleteBook(book.metadata.title),
             onDialogConfirm = {
                 actions.delete(book)
                 onDismissRequest()
@@ -64,8 +68,8 @@ fun BookActionsMenu(
 
     if (showDeleteDownloadedDialog) {
         ConfirmationDialog(
-            title = "Delete downloaded Book",
-            body = "Book ${book.metadata.title} will be removed from this device",
+            title = menuStrings.deleteDownloadedBookTitle,
+            body = menuStrings.deleteDownloadedBookBody(book.metadata.title, deviceOnly = false),
             onDialogConfirm = {
                 actions.deleteDownloaded(book)
                 onDismissRequest()
@@ -102,7 +106,7 @@ fun BookActionsMenu(
 
         if (permissionRequested) {
             ConfirmationDialog(
-                "Download book \"${book.metadata.title}\"?",
+                menuStrings.downloadTitle(book.metadata.title),
                 onDialogConfirm = { actions.download(book) },
                 onDialogDismiss = { showDownloadDialog = false }
             )
@@ -116,7 +120,7 @@ fun BookActionsMenu(
     ) {
         if (isAdmin && !isOffline) {
             DropdownMenuItem(
-                text = { Text("Analyze") },
+                text = { Text(LocalStrings.current.common.analyze) },
                 onClick = {
                     actions.analyze(book)
                     onDismissRequest()
@@ -124,7 +128,7 @@ fun BookActionsMenu(
             )
 
             DropdownMenuItem(
-                text = { Text("Refresh metadata") },
+                text = { Text(LocalStrings.current.common.refreshMetadata) },
                 onClick = {
                     actions.refreshMetadata(book)
                     onDismissRequest()
@@ -132,7 +136,7 @@ fun BookActionsMenu(
             )
 
             DropdownMenuItem(
-                text = { Text("Add to read list") },
+                text = { Text(menuStrings.addToReadList) },
                 onClick = { showAddToReadListDialog = true },
             )
         }
@@ -142,7 +146,7 @@ fun BookActionsMenu(
 
         if (!isRead) {
             DropdownMenuItem(
-                text = { Text("Mark as read") },
+                text = { Text(menuStrings.markAsRead) },
                 onClick = {
                     actions.markAsRead(book)
                     onDismissRequest()
@@ -152,7 +156,7 @@ fun BookActionsMenu(
 
         if (!isUnread) {
             DropdownMenuItem(
-                text = { Text("Mark as unread") },
+                text = { Text(menuStrings.markAsUnread) },
                 onClick = {
                     actions.markAsUnread(book)
                     onDismissRequest()
@@ -162,13 +166,13 @@ fun BookActionsMenu(
 
         if (isAdmin && !isOffline && showEditOption) {
             DropdownMenuItem(
-                text = { Text("Edit") },
+                text = { Text(LocalStrings.current.common.edit) },
                 onClick = { showEditDialog = true },
             )
         }
         if (!isOffline && showDownloadOption) {
             DropdownMenuItem(
-                text = { Text("Download") },
+                text = { Text(menuStrings.downloadLabel) },
                 onClick = { showDownloadDialog = true },
             )
         }
@@ -180,7 +184,7 @@ fun BookActionsMenu(
                 if (deleteIsHovered.value) Modifier.background(MaterialTheme.colorScheme.errorContainer)
                 else Modifier
             DropdownMenuItem(
-                text = { Text("Delete downloaded") },
+                text = { Text(menuStrings.deleteDownloadedLabel) },
                 onClick = { showDeleteDownloadedDialog = true },
                 modifier = Modifier
                     .hoverable(deleteInteractionSource)
@@ -196,7 +200,6 @@ fun BookActionsMenu(
 //                if (deleteIsHovered.value) Modifier.background(MaterialTheme.colorScheme.errorContainer)
 //                else Modifier
 //            DropdownMenuItem(
-//                text = { Text("Delete from server") },
 //                onClick = { showDeleteDialog = true },
 //                modifier = Modifier
 //                    .hoverable(deleteInteractionSource)
@@ -219,18 +222,19 @@ data class BookMenuActions(
         bookApi: KomgaBookApi,
         notifications: AppNotifications,
         scope: CoroutineScope,
-        taskEmitter: OfflineTaskEmitter
+        taskEmitter: OfflineTaskEmitter,
+        toastStrings: ToastStrings = RuntimeAppStrings.strings.value.toasts,
     ) : this(
         analyze = {
             notifications.runCatchingToNotifications(scope) {
                 bookApi.analyze(it.id)
-                notifications.add(AppNotification.Normal("Launched book analysis"))
+                notifications.add(AppNotification.Normal(toastStrings.launchedBookAnalysis))
             }
         },
         refreshMetadata = {
             notifications.runCatchingToNotifications(scope) {
                 bookApi.refreshMetadata(it.id)
-                notifications.add(AppNotification.Normal("Launched book metadata refresh"))
+                notifications.add(AppNotification.Normal(toastStrings.launchedBookMetadataRefresh))
             }
         },
         markAsRead = { book ->
@@ -251,3 +255,4 @@ data class BookMenuActions(
         deleteDownloaded = { scope.launch { taskEmitter.deleteBook(it.id) } }
     )
 }
+

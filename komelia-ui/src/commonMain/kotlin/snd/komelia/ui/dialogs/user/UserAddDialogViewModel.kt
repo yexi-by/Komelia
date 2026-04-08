@@ -9,6 +9,8 @@ import snd.komelia.AppNotifications
 import snd.komelia.komga.api.KomgaUserApi
 import snd.komelia.ui.LoadState
 import snd.komelia.ui.LoadState.Uninitialized
+import snd.komelia.ui.strings.RuntimeAppStrings
+import snd.komelia.ui.strings.ValidationStrings
 import snd.komga.client.user.KomgaUserCreateRequest
 import snd.komga.client.user.ROLE_ADMIN
 import snd.komga.client.user.ROLE_FILE_DOWNLOAD
@@ -17,6 +19,7 @@ import snd.komga.client.user.ROLE_PAGE_STREAMING
 class UserAddDialogViewModel(
     private val appNotifications: AppNotifications,
     private val userApi: KomgaUserApi,
+    private val validationStrings: ValidationStrings = RuntimeAppStrings.strings.value.validation,
 ) : StateScreenModel<LoadState<Unit>>(Uninitialized) {
 
     var email by mutableStateOf("")
@@ -42,7 +45,7 @@ class UserAddDialogViewModel(
     }
 
     fun onPasswordChange(password: String) {
-        passwordValidationError = if (password.isBlank()) "Required" else null
+        passwordValidationError = if (password.isBlank()) validationStrings.required else null
         this.password = password
     }
 
@@ -65,3 +68,4 @@ class UserAddDialogViewModel(
         }.onFailure { mutableState.value = LoadState.Error(it) }
     }
 }
+

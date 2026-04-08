@@ -12,6 +12,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.components.CheckboxWithLabel
 import snd.komelia.ui.dialogs.tabs.DialogTab
 import snd.komelia.ui.dialogs.tabs.TabItem
@@ -20,20 +21,23 @@ internal class GeneralTab(
     private val vm: CollectionEditDialogViewModel,
 ) : DialogTab {
 
+    @Composable
     override fun options() = TabItem(
-        title = "GENERAL",
+        title = LocalStrings.current.common.general,
         icon = Icons.Default.FormatAlignCenter
     )
 
     @Composable
     override fun Content() {
+        val strings = LocalStrings.current.dialogs.collectionEdit
+        val commonStrings = LocalStrings.current.common
         Column(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             TextField(
                 value = vm.name,
                 onValueChange = vm::name::set,
-                label = { Text("Name") },
+                label = { Text(commonStrings.name) },
                 supportingText = {
                     vm.nameValidationError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                 },
@@ -45,13 +49,13 @@ internal class GeneralTab(
             HorizontalDivider()
             Column {
                 Text(
-                    "By default, series in a collection will be ordered by name. You can enable manual ordering to define your own order.",
+                    strings.manualOrderingDescription,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 CheckboxWithLabel(
                     checked = vm.manualOrdering,
                     onCheckedChange = vm::manualOrdering::set,
-                    label = { Text("Manual ordering") }
+                    label = { Text(strings.manualOrdering) }
                 )
 
             }
@@ -59,3 +63,6 @@ internal class GeneralTab(
     }
 
 }
+
+
+

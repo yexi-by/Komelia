@@ -92,6 +92,18 @@ val androidVariant = runCatching {
     )
 }.getOrDefault(AndroidVariant.STANDALONE)
 
+val releaseStoreFile = providers.environmentVariable("KOMELIA_RELEASE_STORE_FILE")
+val releaseStorePassword = providers.environmentVariable("KOMELIA_RELEASE_STORE_PASSWORD")
+val releaseKeyAlias = providers.environmentVariable("KOMELIA_RELEASE_KEY_ALIAS")
+val releaseKeyPassword = providers.environmentVariable("KOMELIA_RELEASE_KEY_PASSWORD")
+val hasReleaseSigning = listOf(
+    releaseStoreFile,
+    releaseStorePassword,
+    releaseKeyAlias,
+    releaseKeyPassword,
+).all { it.isPresent }
+val requestedAndroidAbi = providers.gradleProperty("komelia.android.abi").orNull
+
 android {
     namespace = "io.github.snd_r.komelia"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -114,6 +126,11 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 18
         versionName = libs.versions.app.version.get()
+        if (requestedAndroidAbi != null) {
+            ndk {
+                abiFilters += requestedAndroidAbi
+            }
+        }
 
         val enableSelfUpdates = when (androidVariant) {
             AndroidVariant.STANDALONE -> "true"
@@ -134,6 +151,16 @@ android {
             includeInBundle = false
         }
     }
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(releaseStoreFile.get())
+                storePassword = releaseStorePassword.get()
+                keyAlias = releaseKeyAlias.get()
+                keyPassword = releaseKeyPassword.get()
+            }
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -142,6 +169,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "android.pro"
             )
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
     compileOptions {

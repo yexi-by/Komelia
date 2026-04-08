@@ -20,6 +20,7 @@ import snd.komelia.komga.api.model.KomeliaBook
 import snd.komelia.ui.LocalKomfIntegration
 import snd.komelia.ui.LocalKomgaState
 import snd.komelia.ui.LocalOfflineMode
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.dialogs.ConfirmationDialog
 import snd.komelia.ui.dialogs.collectionadd.AddToCollectionDialog
 import snd.komelia.ui.dialogs.komf.identify.KomfIdentifyDialog
@@ -35,15 +36,17 @@ fun OneshotActionsMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
 ) {
+    val bookMenuStrings = LocalStrings.current.menus.book
+    val oneshotStrings = LocalStrings.current.menus.oneshot
     val isAdmin = LocalKomgaState.current.authenticatedUser.collectAsState().value?.roleAdmin() ?: true
     val isOffline = LocalOfflineMode.current.collectAsState().value
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showDeleteDownloadedDialog by remember { mutableStateOf(false) }
     if (showDeleteDialog) {
         ConfirmationDialog(
-            title = "Delete Book",
-            body = "The Book ${book.metadata.title} will be removed from this server alongside with stored media files. This cannot be undone. Continue?",
-            confirmText = "Yes, delete book \"${book.metadata.title}\"",
+            title = bookMenuStrings.deleteBookTitle,
+            body = bookMenuStrings.deleteBookBody(book.metadata.title),
+            confirmText = bookMenuStrings.confirmDeleteBook(book.metadata.title),
             onDialogConfirm = {
                 actions.delete(book)
                 onDismissRequest()
@@ -58,8 +61,8 @@ fun OneshotActionsMenu(
     }
     if (showDeleteDownloadedDialog) {
         ConfirmationDialog(
-            title = "Delete downloaded Book",
-            body = "The Book ${book.metadata.title} will be removed from this device only",
+            title = bookMenuStrings.deleteDownloadedBookTitle,
+            body = bookMenuStrings.deleteDownloadedBookBody(book.metadata.title, deviceOnly = true),
             onDialogConfirm = {
                 actions.deleteDownloaded(book)
                 onDismissRequest()
@@ -126,7 +129,7 @@ fun OneshotActionsMenu(
     ) {
         if (isAdmin && !isOffline) {
             DropdownMenuItem(
-                text = { Text("Analyze") },
+                text = { Text(LocalStrings.current.common.analyze) },
                 onClick = {
                     actions.analyze(book)
                     onDismissRequest()
@@ -134,7 +137,7 @@ fun OneshotActionsMenu(
             )
 
             DropdownMenuItem(
-                text = { Text("Refresh metadata") },
+                text = { Text(LocalStrings.current.common.refreshMetadata) },
                 onClick = {
                     actions.refreshMetadata(book)
                     onDismissRequest()
@@ -142,11 +145,11 @@ fun OneshotActionsMenu(
             )
 
             DropdownMenuItem(
-                text = { Text("Add to read list") },
+                text = { Text(oneshotStrings.addToReadList) },
                 onClick = { showAddToReadListDialog = true },
             )
             DropdownMenuItem(
-                text = { Text("Add to collection") },
+                text = { Text(oneshotStrings.addToCollection) },
                 onClick = { showAddToCollectionDialog = true },
             )
         }
@@ -156,7 +159,7 @@ fun OneshotActionsMenu(
 
         if (!isRead) {
             DropdownMenuItem(
-                text = { Text("Mark as read") },
+                text = { Text(bookMenuStrings.markAsRead) },
                 onClick = {
                     actions.markAsRead(book)
                     onDismissRequest()
@@ -166,7 +169,7 @@ fun OneshotActionsMenu(
 
         if (!isUnread) {
             DropdownMenuItem(
-                text = { Text("Mark as unread") },
+                text = { Text(bookMenuStrings.markAsUnread) },
                 onClick = {
                     actions.markAsUnread(book)
                     onDismissRequest()
@@ -177,12 +180,12 @@ fun OneshotActionsMenu(
         val komfIntegration = LocalKomfIntegration.current.collectAsState(false)
         if (komfIntegration.value) {
             DropdownMenuItem(
-                text = { Text("Identify (Komf)") },
+                text = { Text(LocalStrings.current.common.identifyKomf) },
                 onClick = { showKomfDialog = true },
             )
 
             DropdownMenuItem(
-                text = { Text("Reset Metadata (Komf)") },
+                text = { Text(LocalStrings.current.common.resetMetadataKomf) },
                 onClick = { showKomfResetDialog = true },
             )
         }
@@ -194,7 +197,7 @@ fun OneshotActionsMenu(
             else Modifier
         if (isAdmin && !isOffline) {
             DropdownMenuItem(
-                text = { Text("Delete") },
+                text = { Text(oneshotStrings.deleteLabel) },
                 onClick = {
                     showDeleteDialog = true
                 },
@@ -206,7 +209,7 @@ fun OneshotActionsMenu(
 
         if (isOffline) {
             DropdownMenuItem(
-                text = { Text("Delete downloaded") },
+                text = { Text(oneshotStrings.deleteDownloadedLabel) },
                 onClick = { showDeleteDownloadedDialog = true },
                 modifier = Modifier
                     .hoverable(deleteInteractionSource)

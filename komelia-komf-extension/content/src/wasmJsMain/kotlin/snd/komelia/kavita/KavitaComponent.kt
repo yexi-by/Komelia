@@ -10,6 +10,7 @@ import org.w3c.dom.asList
 import org.w3c.dom.get
 import snd.komelia.KomfActiveDialog
 import snd.komelia.MediaServerComponent
+import snd.komelia.strings.RuntimeExtensionStrings
 
 private val logger = KotlinLogging.logger { }
 
@@ -23,9 +24,9 @@ class KavitaComponent(
 
     init {
         settingsButton.className = "nav-item"
-        settingsButton.title = "Komf Settings"
+        settingsButton.title = RuntimeExtensionStrings.strings.value.content.kavitaSettingsTitle
         settingsButton.innerHTML = """
-<button type="button" placement="bottom" class="btn btn-icon" title="Komf Settings">
+<button type="button" placement="bottom" class="btn btn-icon" title="${RuntimeExtensionStrings.strings.value.content.kavitaSettingsTitle}">
     <i aria-hidden="true" class="fa fa-puzzle-piece nav"></i>
 </button>
 """
@@ -69,3 +70,4 @@ class KavitaComponent(
         return mounted
     }
 }
+

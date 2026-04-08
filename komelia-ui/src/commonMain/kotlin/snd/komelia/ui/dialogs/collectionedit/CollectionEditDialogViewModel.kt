@@ -13,6 +13,8 @@ import snd.komelia.ui.LoadState
 import snd.komelia.ui.dialogs.PosterEditState
 import snd.komelia.ui.dialogs.PosterTab
 import snd.komelia.ui.dialogs.tabs.DialogTab
+import snd.komelia.ui.strings.RuntimeAppStrings
+import snd.komelia.ui.strings.ValidationStrings
 import snd.komga.client.collection.KomgaCollection
 import snd.komga.client.collection.KomgaCollectionUpdateRequest
 import snd.komga.client.common.KomgaPageRequest
@@ -24,14 +26,15 @@ class CollectionEditDialogViewModel(
     private val collectionApi: KomgaCollectionsApi,
     private val notifications: AppNotifications,
     cardWidth: Flow<Dp>,
+    private val validationStrings: ValidationStrings = RuntimeAppStrings.strings.value.validation,
 ) {
     private var state by mutableStateOf<LoadState<Unit>>(LoadState.Uninitialized)
     var name by mutableStateOf(collection.name)
     private var collections by mutableStateOf<List<KomgaCollection>>(emptyList())
     val nameValidationError by derivedStateOf {
         when {
-            name.isBlank() -> "Required"
-            name != collection.name && collections.any { it.name == this.name } -> "A collection with this name already exists"
+            name.isBlank() -> validationStrings.required
+            name != collection.name && collections.any { it.name == this.name } -> validationStrings.collectionAlreadyExists
             else -> null
         }
     }
@@ -90,3 +93,4 @@ class CollectionEditDialogViewModel(
             .forEach { thumb -> collectionApi.deleteThumbnail(collection.id, thumb.id) }
     }
 }
+

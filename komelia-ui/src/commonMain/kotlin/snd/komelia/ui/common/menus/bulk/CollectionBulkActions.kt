@@ -14,8 +14,10 @@ import snd.komelia.AppNotifications
 import snd.komelia.komga.api.KomgaCollectionsApi
 import snd.komelia.ui.LocalKomgaState
 import snd.komelia.ui.LocalOfflineMode
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.dialogs.ConfirmationDialog
+import snd.komelia.ui.strings.RuntimeAppStrings
 import snd.komga.client.collection.KomgaCollection
 import snd.komga.client.collection.KomgaCollectionUpdateRequest
 import snd.komga.client.common.PatchValue
@@ -39,11 +41,12 @@ fun CollectionBulkActionsContent(
 fun CollectionBulkActionsDialogs(
     state: CollectionBulkActionsState
 ) {
+    val bulkStrings = LocalStrings.current.menus.bulk
     val coroutineScope = rememberCoroutineScope()
 
     if (state.showDeleteDialog) {
         ConfirmationDialog(
-            body = "Remove selected series from this collection?",
+            body = bulkStrings.removeFromCollectionBody,
             onDialogConfirm = {
                 coroutineScope.launch { state.actions.removeFromCollection(state.collection, state.series) }
                 state.showDeleteDialog = false
@@ -105,13 +108,14 @@ data class CollectionBulkActionsState(
     private val isOffline: Boolean,
     private val isAdmin: Boolean,
 ) {
+    private val bulkStrings = RuntimeAppStrings.strings.value.menus.bulk
     var showDeleteDialog by mutableStateOf(false)
 
     val buttons = buildList {
         if (!isOffline && isAdmin) {
             add(
                 BulkActionButtonData(
-                    description = "Remove from collection",
+                    description = bulkStrings.removeFromCollection,
                     icon = Icons.Default.LayersClear,
                     onClick = { showDeleteDialog = true }
                 )
@@ -119,3 +123,4 @@ data class CollectionBulkActionsState(
         }
     }
 }
+

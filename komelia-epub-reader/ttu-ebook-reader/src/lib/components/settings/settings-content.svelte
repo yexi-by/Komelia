@@ -48,6 +48,12 @@
   import type {WritingMode} from '$lib/data/writing-mode';
   import {dummyFn} from '$lib/functions/utils';
   import {defaultSansFont, defaultSerifFont} from "$lib/data/fonts";
+  import {
+    type EpubLanguageMode,
+    epubLanguageManagedByHost$,
+    epubLanguageMode$,
+    epubStrings$
+  } from '$lib/i18n/strings';
   import Fa from "svelte-fa";
   import {faFolderOpen} from "@fortawesome/free-regular-svg-icons";
 
@@ -67,90 +73,110 @@
     }))
   })
 
-  const optionsForFuriganaStyle: ToggleOption<FuriganaStyle>[] = [
+  const optionsForLanguageMode = $derived.by((): ToggleOption<EpubLanguageMode>[] => [
+    {
+      id: 'SYSTEM',
+      text: $epubStrings$.settings.appLanguageSystem
+    },
+    {
+      id: 'ENGLISH',
+      text: $epubStrings$.settings.appLanguageEnglish
+    },
+    {
+      id: 'SIMPLIFIED_CHINESE',
+      text: $epubStrings$.settings.appLanguageSimplifiedChinese
+    }
+  ]);
+
+  const optionsForFuriganaStyle = $derived.by((): ToggleOption<FuriganaStyle>[] => [
     {
       id: FuriganaStyle.Hide,
-      text: 'Hide'
+      text: $epubStrings$.settings.furiganaStyleHide
     },
     {
       id: FuriganaStyle.Partial,
-      text: 'Partial'
+      text: $epubStrings$.settings.furiganaStylePartial
     },
     {
       id: FuriganaStyle.Toggle,
-      text: 'Toggle'
+      text: $epubStrings$.settings.furiganaStyleToggle
     },
     {
       id: FuriganaStyle.Full,
-      text: 'Full'
+      text: $epubStrings$.settings.furiganaStyleFull
     }
-  ];
+  ]);
 
-  const optionsForWritingMode: ToggleOption<WritingMode>[] = [
+  const optionsForWritingMode = $derived.by((): ToggleOption<WritingMode>[] => [
     {
       id: 'horizontal-tb',
-      text: 'Horizontal'
+      text: $epubStrings$.settings.writingModeHorizontal
     },
     {
       id: 'vertical-rl',
-      text: 'Vertical'
+      text: $epubStrings$.settings.writingModeVertical
     }
-  ];
+  ]);
 
-  const optionsForViewMode: ToggleOption<ViewMode>[] = [
+  const optionsForViewMode = $derived.by((): ToggleOption<ViewMode>[] => [
     {
       id: ViewMode.Continuous,
-      text: 'Continuous'
+      text: $epubStrings$.settings.viewModeContinuous
     },
     {
       id: ViewMode.Paginated,
-      text: 'Paginated'
+      text: $epubStrings$.settings.viewModePaginated
     }
-  ];
+  ]);
 
-  const optionsForBlurMode: ToggleOption<BlurMode>[] = [
+  const optionsForBlurMode = $derived.by((): ToggleOption<BlurMode>[] => [
     {
       id: BlurMode.ALL,
-      text: 'All'
+      text: $epubStrings$.settings.blurModeAll
     },
     {
       id: BlurMode.AFTER_TOC,
-      text: 'After ToC'
+      text: $epubStrings$.settings.blurModeAfterTableOfContents
     }
-  ];
+  ]);
 
   let showSpinner = false;
   let furiganaStyleTooltip = $state('');
 
-  let autoBookmarkTooltip = $derived(`If enabled sets a bookmark after ${$autoBookmarkTime$} seconds without scrolling/page change`);
+  let autoBookmarkTooltip = $derived($epubStrings$.settings.autoBookmarkStatusTooltip($autoBookmarkTime$));
   let wakeLockSupported = $derived('wakeLock' in navigator);
   let verticalMode = $derived($writingMode$ === 'vertical-rl');
   let avoidPageBreakTooltip = $derived(
     $avoidPageBreak$
-      ? 'Avoids breaking words/sentences into different pages'
-      : 'Allow words/sentences to break into different pages'
+      ? $epubStrings$.settings.avoidPageBreakEnabledTooltip
+      : $epubStrings$.settings.avoidPageBreakDisabledTooltip
   );
   $effect(() => {
     switch ($furiganaStyle$) {
       case FuriganaStyle.Hide:
-        furiganaStyleTooltip = 'Always hidden';
+        furiganaStyleTooltip = $epubStrings$.settings.furiganaStyleHideTooltip;
         break;
       case FuriganaStyle.Toggle:
-        furiganaStyleTooltip = 'Hidden by default, can be toggled on click';
+        furiganaStyleTooltip = $epubStrings$.settings.furiganaStyleToggleTooltip;
         break;
       case FuriganaStyle.Full:
-        furiganaStyleTooltip = 'Hidden by default, show on hover or click';
+        furiganaStyleTooltip = $epubStrings$.settings.furiganaStyleFullTooltip;
         break;
       default:
-        furiganaStyleTooltip = 'Display furigana as grayed out text';
+        furiganaStyleTooltip = $epubStrings$.settings.furiganaStylePartialTooltip;
         break;
     }
   })
 </script>
 
 <div class="grid grid-cols-1 items-center sm:grid-cols-2 sm:gap-6 lg:md:gap-8 lg:grid-cols-3">
+  {#if !$epubLanguageManagedByHost$}
+    <SettingsItemGroup title={$epubStrings$.settings.appLanguage}>
+      <ButtonToggleGroup options={optionsForLanguageMode} bind:selectedOptionId={$epubLanguageMode$}/>
+    </SettingsItemGroup>
+  {/if}
   <div class="lg:col-span-2">
-    <SettingsItemGroup title="Theme">
+    <SettingsItemGroup title={$epubStrings$.settings.theme}>
       <ButtonToggleGroup
           options={optionsForTheme}
           bind:selectedOptionId={$theme$}
@@ -184,16 +210,16 @@
     </SettingsItemGroup>
   </div>
   <div class="h-full">
-    <SettingsItemGroup title="View mode">
+    <SettingsItemGroup title={$epubStrings$.settings.viewMode}>
       <ButtonToggleGroup options={optionsForViewMode} bind:selectedOptionId={$viewMode$}/>
     </SettingsItemGroup>
   </div>
-  <SettingsItemGroup title="Serif Font family">
+  <SettingsItemGroup title={$epubStrings$.settings.serifFontFamily}>
     <div slot="header" class="flex items-center mx-2">
       <div
           tabindex="0"
           role="button"
-          title="Open Custom Font Dialog"
+          title={$epubStrings$.settings.clickToSelectFont}
           onclick={() =>
               dialogManager.dialogs$.next([
                 {
@@ -211,12 +237,12 @@
     </div>
     <SettingsFontSelector bind:fontValue={$serifFontFamily$} defaultFont={defaultSerifFont} family="Serif"/>
   </SettingsItemGroup>
-  <SettingsItemGroup title="Sans Font family">
+  <SettingsItemGroup title={$epubStrings$.settings.sansFontFamily}>
     <div slot="header" class="flex items-center mx-2">
       <div
           tabindex="0"
           role="button"
-          title="Open Custom Font Dialog"
+          title={$epubStrings$.settings.clickToSelectFont}
           onclick={() =>
               dialogManager.dialogs$.next([
                 {
@@ -234,14 +260,14 @@
     </div>
     <SettingsFontSelector bind:fontValue={$sansFontFamily$} defaultFont={defaultSansFont} family="Sans-Serif"/>
   </SettingsItemGroup>
-  <SettingsItemGroup title="Font size">
+  <SettingsItemGroup title={$epubStrings$.settings.fontSize}>
     <input type="number"
            class={inputClasses}
            step="1"
            min="1"
            bind:value={$fontSize$}/>
   </SettingsItemGroup>
-  <SettingsItemGroup title="Line Height">
+  <SettingsItemGroup title={$epubStrings$.settings.lineHeight}>
     <input
         type="number"
         class={inputClasses}
@@ -256,7 +282,7 @@
     />
   </SettingsItemGroup>
   <SettingsItemGroup
-      title={verticalMode ? 'Reader Left/right margin' : 'Reader Top/bottom margin'}
+      title={verticalMode ? $epubStrings$.settings.readerMarginHorizontal : $epubStrings$.settings.readerMarginVertical}
   >
     <SettingsDimensionPopover
         slot="header"
@@ -272,7 +298,7 @@
         bind:value={$firstDimensionMargin$}
     />
   </SettingsItemGroup>
-  <SettingsItemGroup title={verticalMode ? 'Reader Max height' : 'Reader Max width'}>
+  <SettingsItemGroup title={verticalMode ? $epubStrings$.settings.readerMaxHeight : $epubStrings$.settings.readerMaxWidth}>
     <SettingsDimensionPopover
         slot="header"
         isVertical={verticalMode}
@@ -287,8 +313,8 @@
     />
   </SettingsItemGroup>
   <SettingsItemGroup
-      title="Swipe Threshold"
-      tooltip={'Distance which you need to swipe in order trigger a navigation'}
+      title={$epubStrings$.settings.swipeThreshold}
+      tooltip={$epubStrings$.settings.swipeThresholdTooltip}
   >
     <input
         type="number"
@@ -304,7 +330,7 @@
     />
   </SettingsItemGroup>
   {#if $autoBookmark$}
-    <SettingsItemGroup title="Auto Bookmark Time" tooltip={'Time in s for Auto Bookmark'}>
+    <SettingsItemGroup title={$epubStrings$.settings.autoBookmarkTime} tooltip={$epubStrings$.settings.autoBookmarkTimeTooltip}>
       <input
           type="number"
           step="1"
@@ -319,13 +345,13 @@
       />
     </SettingsItemGroup>
   {/if}
-  <SettingsItemGroup title="Writing mode">
+  <SettingsItemGroup title={$epubStrings$.settings.writingMode}>
     <ButtonToggleGroup options={optionsForWritingMode} bind:selectedOptionId={$writingMode$}/>
   </SettingsItemGroup>
   {#if wakeLockSupported}
     <SettingsItemGroup
-        title="Enable Screen Lock"
-        tooltip={'When enabled the reader site attempts to request a WakeLock that prevents device screens from dimming or locking'}
+        title={$epubStrings$.settings.enableScreenLock}
+        tooltip={$epubStrings$.settings.enableScreenLockTooltip}
     >
       <ButtonToggleGroup
           options={optionsForToggle}
@@ -333,46 +359,46 @@
       />
     </SettingsItemGroup>
   {/if}
-  <SettingsItemGroup title="Show Character Counter">
+  <SettingsItemGroup title={$epubStrings$.settings.showCharacterCounter}>
     <ButtonToggleGroup options={optionsForToggle} bind:selectedOptionId={$showCharacterCounter$}/>
   </SettingsItemGroup>
-  <SettingsItemGroup title="Disable Wheel Navigation">
+  <SettingsItemGroup title={$epubStrings$.settings.disableWheelNavigation}>
     <ButtonToggleGroup
         options={optionsForToggle}
         bind:selectedOptionId={$disableWheelNavigation$}
     />
   </SettingsItemGroup>
   <SettingsItemGroup
-      title="Close Confirmation"
-      tooltip={`When enabled asks for confirmation on closing/reloading a reader tab and unsaved changes were detected`}
+      title={$epubStrings$.settings.closeConfirmation}
+      tooltip={$epubStrings$.settings.closeConfirmationTooltip}
   >
     <ButtonToggleGroup options={optionsForToggle} bind:selectedOptionId={$confirmClose$}/>
   </SettingsItemGroup>
   <SettingsItemGroup
-      title="Manual Bookmark"
-      tooltip={'If enabled current position will not be bookmarked when leaving the reader via menu elements'}
+      title={$epubStrings$.settings.manualBookmark}
+      tooltip={$epubStrings$.settings.manualBookmarkTooltip}
   >
     <ButtonToggleGroup options={optionsForToggle} bind:selectedOptionId={$manualBookmark$}/>
   </SettingsItemGroup>
-  <SettingsItemGroup title="Auto Bookmark" tooltip={autoBookmarkTooltip}>
+  <SettingsItemGroup title={$epubStrings$.settings.autoBookmark} tooltip={autoBookmarkTooltip}>
     <ButtonToggleGroup options={optionsForToggle} bind:selectedOptionId={$autoBookmark$}/>
   </SettingsItemGroup>
-  <SettingsItemGroup title="Blur image">
+  <SettingsItemGroup title={$epubStrings$.settings.blurImage}>
     <ButtonToggleGroup options={optionsForToggle} bind:selectedOptionId={$hideSpoilerImage$}/>
   </SettingsItemGroup>
   {#if $hideSpoilerImage$}
     <SettingsItemGroup
-        title="Blur Mode"
-        tooltip="Determines if all or only images after the table of contents will be blurred"
+        title={$epubStrings$.settings.blurMode}
+        tooltip={$epubStrings$.settings.blurModeTooltip}
     >
       <ButtonToggleGroup options={optionsForBlurMode} bind:selectedOptionId={$hideSpoilerImageMode$}/>
     </SettingsItemGroup>
   {/if}
-  <SettingsItemGroup title="Hide furigana">
+  <SettingsItemGroup title={$epubStrings$.settings.hideFurigana}>
     <ButtonToggleGroup options={optionsForToggle} bind:selectedOptionId={$hideFurigana$}/>
   </SettingsItemGroup>
   {#if $hideFurigana$}
-    <SettingsItemGroup title="Hide furigana style" tooltip={furiganaStyleTooltip}>
+    <SettingsItemGroup title={$epubStrings$.settings.hideFuriganaStyle} tooltip={furiganaStyleTooltip}>
       <ButtonToggleGroup
           options={optionsForFuriganaStyle}
           bind:selectedOptionId={$furiganaStyle$}
@@ -381,8 +407,8 @@
   {/if}
   {#if $viewMode$ === ViewMode.Continuous}
     <SettingsItemGroup
-        title="Custom Reading Point"
-        tooltip={'Allows to set a persistent custom point in the reader from which the current progress and bookmark is calculated when enabled'}
+        title={$epubStrings$.settings.customReadingPoint}
+        tooltip={$epubStrings$.settings.customReadingPointTooltip}
     >
       <div class="flex items-center">
         <ButtonToggleGroup
@@ -400,24 +426,24 @@
                   }}
               onkeyup={dummyFn}
           >
-            Reset Points
+            {$epubStrings$.reader.identifyPointReset}
           </div>
         {/if}
       </div>
     </SettingsItemGroup>
-    <SettingsItemGroup title="Auto position on resize">
+    <SettingsItemGroup title={$epubStrings$.settings.autoPositionOnResize}>
       <ButtonToggleGroup
           options={optionsForToggle}
           bind:selectedOptionId={$autoPositionOnResize$}
       />
     </SettingsItemGroup>
   {:else}
-    <SettingsItemGroup title="Avoid Page Break" tooltip={avoidPageBreakTooltip}>
+    <SettingsItemGroup title={$epubStrings$.settings.avoidPageBreak} tooltip={avoidPageBreakTooltip}>
       <ButtonToggleGroup options={optionsForToggle} bind:selectedOptionId={$avoidPageBreak$}/>
     </SettingsItemGroup>
     <SettingsItemGroup
-        title="Selection to Bookmark"
-        tooltip={'When enabled bookmarks will be placed to a near paragraph of current/previous selected text instead of page start'}
+        title={$epubStrings$.settings.selectionToBookmark}
+        tooltip={$epubStrings$.settings.selectionToBookmarkTooltip}
     >
       <ButtonToggleGroup
           options={optionsForToggle}
@@ -425,7 +451,7 @@
       />
     </SettingsItemGroup>
     {#if !verticalMode}
-      <SettingsItemGroup title="Page Columns">
+      <SettingsItemGroup title={$epubStrings$.settings.pageColumns}>
         <input type="number"
                class={inputClasses}
                step="1" min="0"

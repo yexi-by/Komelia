@@ -30,6 +30,7 @@ import snd.komelia.settings.model.PageDisplayLayout.SINGLE_PAGE
 import snd.komelia.settings.model.PagedReadingDirection
 import snd.komelia.settings.model.PagedReadingDirection.LEFT_TO_RIGHT
 import snd.komelia.settings.model.PagedReadingDirection.RIGHT_TO_LEFT
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.reader.image.ScreenScaleState
 import snd.komelia.ui.reader.image.common.PagedReaderHelpDialog
 import snd.komelia.ui.reader.image.common.ReaderControlsOverlay
@@ -107,6 +108,7 @@ fun BoxScope.PagedReaderContent(
 
 @Composable
 private fun TransitionPage(page: TransitionPage) {
+    val readerStrings = LocalStrings.current.reader
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -115,7 +117,7 @@ private fun TransitionPage(page: TransitionPage) {
         when (page) {
             is BookEnd -> {
                 Column {
-                    Text("Finished:", style = MaterialTheme.typography.bodyMedium)
+                    Text(readerStrings.finished, style = MaterialTheme.typography.bodyMedium)
                     Text(
                         page.currentBook.metadata.title,
                         style = MaterialTheme.typography.titleLarge
@@ -125,14 +127,14 @@ private fun TransitionPage(page: TransitionPage) {
 
                 if (page.nextBook != null) {
                     Column {
-                        Text("Next:", style = MaterialTheme.typography.bodyMedium)
+                        Text(readerStrings.next, style = MaterialTheme.typography.bodyMedium)
                         Text(
                             page.nextBook.metadata.title,
                             style = MaterialTheme.typography.titleLarge
                         )
                     }
                 } else {
-                    Text("There's no next book")
+                    Text(readerStrings.noNextBook)
                 }
 
             }
@@ -140,19 +142,19 @@ private fun TransitionPage(page: TransitionPage) {
             is BookStart -> {
                 if (page.previousBook != null) {
                     Column {
-                        Text("Previous:", style = MaterialTheme.typography.bodyMedium)
+                        Text(readerStrings.previous, style = MaterialTheme.typography.bodyMedium)
                         Text(
                             page.previousBook.metadata.title,
                             style = MaterialTheme.typography.titleLarge
                         )
                     }
                 } else {
-                    Text("There's no previous book")
+                    Text(readerStrings.noPreviousBook)
 
                 }
                 Spacer(Modifier.size(50.dp))
                 Column {
-                    Text("Current:", style = MaterialTheme.typography.bodyMedium)
+                    Text(readerStrings.current, style = MaterialTheme.typography.bodyMedium)
                     Text(
                         page.currentBook.metadata.title,
                         style = MaterialTheme.typography.titleLarge

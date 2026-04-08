@@ -19,6 +19,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.dialogs.ConfirmationDialog
 
 @Composable
@@ -28,50 +29,52 @@ fun ServerManagementContent(
     onCancelAllTasks: () -> Unit,
     onShutdown: () -> Unit
 ) {
+    val commonStrings = LocalStrings.current.common
+    val settingsStrings = LocalStrings.current.screens.settings
 
     var showEmptyTrashDialog by remember { mutableStateOf(false) }
     var showShutdownDialog by remember { mutableStateOf(false) }
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Text("Server Management", style = MaterialTheme.typography.titleLarge)
+        Text(settingsStrings.serverManagement, style = MaterialTheme.typography.titleLarge)
         HorizontalDivider()
         Button(
-            title = "Scan all libraries",
-            description = "Check folders for new or removed books.\nUses the last modified time of parent folders",
-            buttonText = "Scan",
+            title = settingsStrings.scanAllLibraries,
+            description = settingsStrings.scanAllLibrariesDescription,
+            buttonText = commonStrings.scan,
             level = WarningLevel.NORMAL,
             onClick = { onScanAllLibraries(false) }
         )
         HorizontalDivider()
         Button(
-            title = "Deep scan all libraries",
-            description = "Force the scanner to compare all scanned books with the ones stored in the database",
-            buttonText = "Deep Scan",
+            title = settingsStrings.deepScanAllLibraries,
+            description = settingsStrings.deepScanAllLibrariesDescription,
+            buttonText = commonStrings.deepScan,
             level = WarningLevel.NORMAL,
             onClick = { onScanAllLibraries(true) }
         )
         HorizontalDivider()
         Button(
-            title = "Empty trash for all libraries",
-            description = "Delete items marked as unavailable",
-            buttonText = "Empty",
+            title = settingsStrings.emptyTrashAllLibraries,
+            description = settingsStrings.emptyTrashAllLibrariesDescription,
+            buttonText = commonStrings.empty,
             level = WarningLevel.NORMAL,
             onClick = { showEmptyTrashDialog = true }
         )
         HorizontalDivider()
         Button(
-            title = "Cancel all tasks",
-            description = "Cancel all currently running tasks",
-            buttonText = "Cancel",
+            title = settingsStrings.cancelAllTasks,
+            description = settingsStrings.cancelAllTasksDescription,
+            buttonText = commonStrings.cancel,
             level = WarningLevel.WARNING,
             onClick = { onCancelAllTasks() }
         )
         HorizontalDivider()
         Button(
-            title = "Shutdown",
-            description = "Stop Komga application process",
-            buttonText = "Shutdown",
+            title = settingsStrings.shutDownServer,
+            description = settingsStrings.shutDownServerDescription,
+            buttonText = settingsStrings.shutDownServer,
             level = WarningLevel.DANGER,
             onClick = { showShutdownDialog = true }
         )
@@ -79,10 +82,10 @@ fun ServerManagementContent(
 
         if (showEmptyTrashDialog) {
             ConfirmationDialog(
-                title = "Empty trash for library",
-                body = "By default the media server doesn't remove information for media right away. This helps if a drive is temporarily disconnected. When you empty the trash for a library, all information about missing media is deleted.",
-                buttonConfirm = "Empty",
-                buttonCancel = "Cancel",
+                title = settingsStrings.emptyTrashAllLibraries,
+                body = LocalStrings.current.menus.library.emptyTrashBody,
+                buttonConfirm = commonStrings.empty,
+                buttonCancel = commonStrings.cancel,
                 onDialogConfirm = onEmptyTrash,
                 onDialogDismiss = { showEmptyTrashDialog = false }
             )
@@ -90,10 +93,10 @@ fun ServerManagementContent(
 
         if (showShutdownDialog) {
             ConfirmationDialog(
-                title = "Shut down server",
-                body = "Are you sure you want to stop Komga?",
-                buttonConfirm = "Stop",
-                buttonCancel = "Cancel",
+                title = settingsStrings.shutDownServer,
+                body = settingsStrings.shutDownServerBody,
+                buttonConfirm = commonStrings.stop,
+                buttonCancel = commonStrings.cancel,
                 buttonConfirmColor = MaterialTheme.colorScheme.errorContainer,
                 onDialogConfirm = onShutdown,
                 onDialogDismiss = { showShutdownDialog = false }

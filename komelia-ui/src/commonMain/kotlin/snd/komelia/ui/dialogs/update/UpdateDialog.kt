@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichText
 import snd.komelia.ui.dialogs.AppDialog
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.platform.cursorForHand
 import snd.komelia.updates.AppRelease
 
@@ -42,12 +43,13 @@ fun UpdateDialog(
 
 @Composable
 private fun HeaderContent() {
+    val updateStrings = LocalStrings.current.dialogs.update
 
     Column(
         modifier = Modifier.padding(10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Text("New version is available", style = MaterialTheme.typography.headlineSmall)
+        Text(updateStrings.newVersionAvailable, style = MaterialTheme.typography.headlineSmall)
         HorizontalDivider()
     }
 }
@@ -78,6 +80,8 @@ private fun ControlButtons(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
 ) {
+    val updateStrings = LocalStrings.current.dialogs.update
+    val commonStrings = LocalStrings.current.common
     Row(
         modifier = Modifier.padding(10.dp),
         horizontalArrangement = Arrangement.spacedBy(20.dp),
@@ -85,14 +89,14 @@ private fun ControlButtons(
         TextButton(
             onClick = onDismiss,
             modifier = Modifier.cursorForHand(),
-            content = { Text("Dismiss") }
+            content = { Text(updateStrings.dismiss) }
         )
 
         FilledTonalButton(
             onClick = onConfirm,
             modifier = Modifier.cursorForHand(),
         ) {
-            Text("Update")
+            Text(commonStrings.update)
         }
     }
 }

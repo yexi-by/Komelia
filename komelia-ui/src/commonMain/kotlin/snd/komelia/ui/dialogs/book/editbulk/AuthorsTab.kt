@@ -31,6 +31,7 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import snd.komelia.ui.common.components.LockableChipTextField
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.dialogs.tabs.DialogTab
 import snd.komelia.ui.dialogs.tabs.TabItem
 import snd.komga.client.common.KomgaAuthor
@@ -38,8 +39,9 @@ import snd.komga.client.common.KomgaAuthor
 class AuthorsTab(
     private val vm: BookBulkEditDialogViewModel
 ) : DialogTab {
+    @Composable
     override fun options() = TabItem(
-        title = "AUTHORS",
+        title = LocalStrings.current.common.authors.uppercase(),
         icon = Icons.Default.People
     )
 
@@ -61,6 +63,7 @@ private fun AuthorsTabContent(
     authorsLock: Boolean,
     onLockChange: (Boolean) -> Unit,
 ) {
+    val strings = LocalStrings.current.bookEdit
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
@@ -74,7 +77,7 @@ private fun AuthorsTabContent(
         ) {
             Icon(Icons.Default.PriorityHigh, null, tint = warningColor)
             Text(
-                text = "You are editing authors for multiple books. This will override existing authors of each book.",
+                text = strings.bulkAuthorsWarning,
                 color = warningColor
             )
         }
@@ -97,7 +100,7 @@ private fun AuthorsTabContent(
         TextField(
             value = newCustomRole,
             onValueChange = { newCustomRole = it },
-            label = { Text("Add custom role") },
+            label = { Text(strings.addCustomRole) },
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
@@ -129,4 +132,9 @@ private fun AuthorsTabContent(
         )
     }
 }
+
+
+
+
+
 

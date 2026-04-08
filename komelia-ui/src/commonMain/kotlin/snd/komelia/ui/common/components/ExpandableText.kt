@@ -23,6 +23,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun ExpandableText(
@@ -32,6 +33,7 @@ fun ExpandableText(
 ) {
     if (text.isBlank()) return
 
+    val commonStrings = LocalStrings.current.common
     var isExpanded by remember { mutableStateOf(false) }
     var isExpandable by remember { mutableStateOf(false) }
     val isButtonShown by remember { derivedStateOf { isExpandable || isExpanded } }
@@ -60,7 +62,7 @@ fun ExpandableText(
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
             ) {
                 Text(
-                    text = (if (isExpanded) "Collapse" else "Expand").uppercase()
+                    text = (if (isExpanded) commonStrings.collapse else commonStrings.expand).uppercase()
                 )
             }
         }

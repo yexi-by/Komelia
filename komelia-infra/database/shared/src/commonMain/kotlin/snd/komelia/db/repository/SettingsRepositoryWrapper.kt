@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.map
 import snd.komelia.db.AppSettings
 import snd.komelia.db.SettingsStateWrapper
 import snd.komelia.settings.CommonSettingsRepository
+import snd.komelia.settings.model.AppLanguageMode
 import snd.komelia.settings.model.AppTheme
 import snd.komelia.settings.model.BooksLayout
 import snd.komelia.updates.AppVersion
@@ -61,6 +62,14 @@ class SettingsRepositoryWrapper(
 
     override suspend fun putBookListLayout(layout: BooksLayout) {
         wrapper.transform { it.copy(bookListLayout = layout) }
+    }
+
+    override fun getAppLanguageMode(): Flow<AppLanguageMode> {
+        return wrapper.state.map { it.languageMode }.distinctUntilChanged()
+    }
+
+    override suspend fun putAppLanguageMode(mode: AppLanguageMode) {
+        wrapper.transform { it.copy(languageMode = mode) }
     }
 
     override fun getCheckForUpdatesOnStartup(): Flow<Boolean> {

@@ -45,6 +45,7 @@ import snd.komelia.image.coil.BookThumbnailRequest
 import snd.komelia.image.coil.CollectionThumbnailRequest
 import snd.komelia.image.coil.ReadListThumbnailRequest
 import snd.komelia.image.coil.SeriesThumbnailRequest
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.images.ThumbnailImage
 import snd.komelia.ui.dialogs.PosterEditState.KomgaThumbnail
 import snd.komelia.ui.dialogs.PosterEditState.KomgaThumbnail.ThumbnailToBeUploaded
@@ -60,6 +61,7 @@ fun ThumbnailEditCard(
     onSelect: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val commonStrings = LocalStrings.current.common
     val thumbRequest = remember(thumbnail) {
         when (thumbnail) {
             is KomgaThumbnail.BookThumbnail -> BookThumbnailRequest(
@@ -95,9 +97,9 @@ fun ThumbnailEditCard(
         }
     ) {
         val (icon, tooltip) = when (thumbnail.type) {
-            USER_UPLOADED -> Icons.Default.CloudDone to "User uploaded"
-            SIDECAR -> Icons.Default.Folder to "Local artwork"
-            GENERATED -> Icons.AutoMirrored.Filled.InsertDriveFile to "Generated artwork"
+            USER_UPLOADED -> Icons.Default.CloudDone to commonStrings.userUploaded
+            SIDECAR -> Icons.Default.Folder to commonStrings.localArtwork
+            GENERATED -> Icons.AutoMirrored.Filled.InsertDriveFile to commonStrings.generatedArtwork
             UNKNOWN -> Icons.Default.Folder to ""
         }
 
@@ -123,6 +125,7 @@ fun ThumbnailUploadCard(
     onSelect: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val commonStrings = LocalStrings.current.common
     ItemCard(
         modifier,
         image = { AsyncImage(model = thumbnail.file, contentDescription = null, contentScale = ContentScale.Crop) }
@@ -135,7 +138,7 @@ fun ThumbnailUploadCard(
             isDeleted = false,
             filesize = thumbnail.file.size(),
             typeIcon = Icons.Default.CloudUpload,
-            typeTooltip = "To be uploaded",
+            typeTooltip = commonStrings.toBeUploaded,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .fillMaxWidth()
@@ -158,14 +161,15 @@ private fun ThumbnailCardContent(
     typeTooltip: String,
     modifier: Modifier = Modifier,
 ) {
+    val commonStrings = LocalStrings.current.common
 
     Column(
         modifier = modifier.padding(start = 5.dp, end = 5.dp, top = 5.dp).height(110.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val sizeInKb = remember(filesize) { (filesize.toFloat() / 1024).formatDecimal(1) }
-        Text("${sizeInKb}kB")
-        size?.let { Text("w: ${it.width}, h: ${it.height}") }
+        Text(commonStrings.thumbnailFileSize(sizeInKb))
+        size?.let { Text(commonStrings.thumbnailDimensions(it.width, it.height)) }
         mediaType?.let { Text(it) }
 
 
@@ -179,7 +183,7 @@ private fun ThumbnailCardContent(
                     Icon(typeIcon, null)
                 }
             }
-            IconWithTooltip(tooltip = "Mark as selected") {
+            IconWithTooltip(tooltip = commonStrings.markAsSelected) {
                 IconButton(onClick = onSelect) {
                     Icon(
                         Icons.Default.Check,
@@ -191,7 +195,7 @@ private fun ThumbnailCardContent(
             }
 
             if (onDelete != null)
-                IconWithTooltip(tooltip = "Delete") {
+                IconWithTooltip(tooltip = commonStrings.delete) {
                     IconButton(onClick = onDelete) {
                         Icon(
                             Icons.Default.Delete,

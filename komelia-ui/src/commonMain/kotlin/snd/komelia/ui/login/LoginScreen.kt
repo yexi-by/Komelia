@@ -23,6 +23,7 @@ import snd.komelia.ui.LoadState.Success
 import snd.komelia.ui.LoadState.Uninitialized
 import snd.komelia.ui.LocalOfflineMode
 import snd.komelia.ui.LocalPlatform
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.MainScreen
 import snd.komelia.ui.login.offline.OfflineLoginScreen
@@ -36,6 +37,7 @@ class LoginScreen : Screen {
 
     @Composable
     override fun Content() {
+        val loginStrings = LocalStrings.current.screens.login
         val rootNavigator = LocalNavigator.currentOrThrow.parent ?: LocalNavigator.currentOrThrow
         val platform = LocalPlatform.current
         val viewModelFactory = LocalViewModelFactory.current
@@ -52,7 +54,7 @@ class LoginScreen : Screen {
                         contentAlignment = Alignment.Center
                     ) { ScreenContent(vm, rootNavigator) }
 
-                WEB_KOMF -> SettingsScreenContainer(title = "Komga Login") {
+                WEB_KOMF -> SettingsScreenContainer(title = loginStrings.komgaLogin) {
                     ScreenContent(vm, rootNavigator)
                 }
             }

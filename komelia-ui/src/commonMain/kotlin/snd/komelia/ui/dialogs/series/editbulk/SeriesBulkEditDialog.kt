@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.dialogs.tabs.TabDialog
 import snd.komga.client.series.KomgaSeries
@@ -19,11 +20,12 @@ fun SeriesBulkEditDialog(
     LaunchedEffect(series) { vm.initialize() }
 
     val coroutineScope = rememberCoroutineScope()
+    val commonStrings = LocalStrings.current.common
     TabDialog(
-        title = "Edit ${series.size} series",
+        title = commonStrings.editCountItems(series.size, commonStrings.series.lowercase()),
         currentTab = vm.currentTab,
         tabs = vm.tabs(),
-        confirmationText = "Save Changes",
+        confirmationText = commonStrings.saveChanges,
         onConfirm = { coroutineScope.launch { vm.saveChanges() } },
         onTabChange = { vm.currentTab = it },
         onDismissRequest = { onDismissRequest() }

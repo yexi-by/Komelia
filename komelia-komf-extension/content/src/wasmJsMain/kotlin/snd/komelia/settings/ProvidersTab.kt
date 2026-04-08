@@ -14,11 +14,13 @@ import io.github.snd_r.komelia.ui.dialogs.tabs.TabItem
 import io.github.snd_r.komelia.ui.error.formatExceptionMessage
 import io.github.snd_r.komelia.ui.settings.komf.providers.KomfProvidersSettingsContent
 import snd.komelia.LocalKomfViewModelFactory
+import snd.komelia.strings.LocalExtensionStrings
 
 class ProvidersTab : DialogTab {
 
+    @Composable
     override fun options() = TabItem(
-        title = "Providers",
+        title = LocalExtensionStrings.current.content.providersTab,
         icon = Icons.AutoMirrored.Filled.FormatListBulleted
     )
 
@@ -57,3 +59,6 @@ class ProvidersTab : DialogTab {
 
     }
 }
+
+
+

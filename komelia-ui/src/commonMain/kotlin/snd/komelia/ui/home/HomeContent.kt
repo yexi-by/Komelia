@@ -48,7 +48,9 @@ import snd.komelia.ui.common.cards.SeriesImageCard
 import snd.komelia.ui.common.menus.BookMenuActions
 import snd.komelia.ui.common.menus.SeriesMenuActions
 import snd.komelia.ui.platform.PlatformType
+import snd.komelia.ui.strings.HomeScreenStrings
 import snd.komga.client.series.KomgaSeries
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun HomeContent(
@@ -65,11 +67,13 @@ fun HomeContent(
     onBookClick: (KomeliaBook) -> Unit,
     onBookReadClick: (KomeliaBook, Boolean) -> Unit,
 ) {
+    val homeStrings = LocalStrings.current.screens.home
     val gridState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
     Column {
         Toolbar(
             filters = filters,
+            homeStrings = homeStrings,
             currentFilterNumber = activeFilterNumber,
             onEditStart = onEditStart,
             onFilterChange = {
@@ -79,6 +83,7 @@ fun HomeContent(
         )
         DisplayContent(
             filters = filters,
+            homeStrings = homeStrings,
             activeFilterNumber = activeFilterNumber,
 
             gridState = gridState,
@@ -95,6 +100,7 @@ fun HomeContent(
 @Composable
 private fun Toolbar(
     filters: List<HomeFilterData>,
+    homeStrings: HomeScreenStrings,
     currentFilterNumber: Int,
     onFilterChange: (Int) -> Unit,
     onEditStart: () -> Unit
@@ -143,7 +149,7 @@ private fun Toolbar(
                     FilterChip(
                         onClick = { onFilterChange(0) },
                         selected = currentFilterNumber == 0,
-                        label = { Text("All") },
+                        label = { Text(LocalStrings.current.common.all) },
                         colors = chipColors,
                         border = null,
                     )
@@ -160,7 +166,7 @@ private fun Toolbar(
                     FilterChip(
                         onClick = { onFilterChange(data.filter.order) },
                         selected = currentFilterNumber == data.filter.order || filters.size == 1,
-                        label = { Text(data.filter.label) },
+                        label = { Text(data.filter.localizedLabel(homeStrings)) },
                         colors = chipColors,
                         border = null,
                     )
@@ -198,6 +204,7 @@ private fun Toolbar(
 @Composable
 private fun DisplayContent(
     filters: List<HomeFilterData>,
+    homeStrings: HomeScreenStrings,
     activeFilterNumber: Int,
     gridState: LazyGridState,
     cardWidth: Dp,
@@ -219,7 +226,7 @@ private fun DisplayContent(
             if (activeFilterNumber == 0 || data.filter.order == activeFilterNumber) {
                 when (data) {
                     is BookFilterData -> BookFilterEntry(
-                        label = data.filter.label,
+                        label = data.filter.localizedLabel(homeStrings),
                         books = data.books,
                         bookMenuActions = bookMenuActions,
                         onBookClick = onBookClick,
@@ -227,7 +234,7 @@ private fun DisplayContent(
                     )
 
                     is SeriesFilterData -> SeriesFilterEntries(
-                        label = data.filter.label,
+                        label = data.filter.localizedLabel(homeStrings),
                         series = data.series,
                         onSeriesClick = onSeriesClick,
                         seriesMenuActions = seriesMenuActions,

@@ -1,3 +1,3 @@
 package snd.komelia.http
 
-const val komeliaUserAgent = "Snd-R/Komelia (https://github.com/Snd-R/Komelia)"
+const val komeliaUserAgent = "yexi-by/Komelia (https://github.com/yexi-by/Komelia)"

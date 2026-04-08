@@ -3,6 +3,7 @@ package snd.komelia.ui.dialogs.series.edit
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.People
 import androidx.compose.runtime.Composable
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.StateHolder
 import snd.komelia.ui.common.components.LockableChipTextField
 import snd.komelia.ui.dialogs.tabs.DialogTab
@@ -12,8 +13,9 @@ internal class SharingTab(
     private val vm: SeriesEditMetadataState,
 ) : DialogTab {
 
+    @Composable
     override fun options() = TabItem(
-        title = "SHARING",
+        title = LocalStrings.current.seriesEdit.sharingTab,
         icon = Icons.Default.People
     )
 
@@ -31,9 +33,13 @@ private fun SharingContent(
     labels: StateHolder<List<String>>,
     labelsLock: StateHolder<Boolean>,
 ) {
+    val strings = LocalStrings.current.seriesEdit
     LockableChipTextField(
         values = labels,
-        label = "Labels",
+        label = strings.labels,
         lock = labelsLock
     )
 }
+
+
+

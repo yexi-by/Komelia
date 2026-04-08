@@ -25,6 +25,7 @@ import snd.komelia.settings.model.ContinuousReadingDirection.LEFT_TO_RIGHT
 import snd.komelia.settings.model.ContinuousReadingDirection.RIGHT_TO_LEFT
 import snd.komelia.settings.model.ContinuousReadingDirection.TOP_TO_BOTTOM
 import snd.komelia.ui.LocalPlatform
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalWindowWidth
 import snd.komelia.ui.dialogs.AppDialog
 import snd.komelia.ui.platform.PlatformType
@@ -79,43 +80,45 @@ private fun PagedDialogContent(
     elementsModifier: Modifier = Modifier,
 ) {
     val platform = LocalPlatform.current
+    val strings = LocalStrings.current.reader
+    val pagedStrings = LocalStrings.current.pagedReader
     KeyDescriptionColumn(
-        "Reader Navigation",
+        strings.helpReaderNavigationTitle,
         mapOf(
-            listOf("←") to "Previous page",
-            listOf("→") to "Next page",
-            listOf("Home") to "First page",
-            listOf("End") to "Last page",
+            listOf("←") to strings.helpPreviousPage,
+            listOf("→") to strings.helpNextPage,
+            listOf("Home") to strings.helpFirstPage,
+            listOf("End") to strings.helpLastPage,
             if (platform == PlatformType.WEB_KOMF) {
-                listOf("Shift", "Scroll Wheel") to "Zoom"
+                listOf("Shift", "Scroll Wheel") to strings.zoom
             } else {
-                listOf("Ctrl", "Scroll Wheel") to "Zoom"
+                listOf("Ctrl", "Scroll Wheel") to strings.zoom
             }
         ),
         elementsModifier
     )
 
     KeyDescriptionColumn(
-        "Settings",
+        strings.helpSettingsTitle,
         mapOf(
-            listOf("L") to "Left to right",
-            listOf("R") to "Right to left",
-            listOf("C") to "Cycle scale",
-            listOf("D") to "Cycle page layout",
-            listOf("O") to "Toggle double page offset",
-            listOf("U") to "Toggle image stretch to fit",
-            listOf("Alt", "C") to "Disable color correction",
-            listOf("F11") to "Enter/exit full screen"
+            listOf("L") to pagedStrings.readingDirectionLeftToRight,
+            listOf("R") to pagedStrings.readingDirectionRightToLeft,
+            listOf("C") to strings.helpCycleScale,
+            listOf("D") to strings.helpCyclePageLayout,
+            listOf("O") to strings.helpToggleDoublePageOffset,
+            listOf("U") to strings.helpToggleImageStretchToFit,
+            listOf("Alt", "C") to strings.helpDisableColorCorrection,
+            listOf("F11") to strings.helpEnterExitFullScreen
         ),
         elementsModifier
     )
 
     KeyDescriptionColumn(
-        "Menus",
+        strings.helpMenusTitle,
         mapOf(
-            listOf("M") to "Show/hide menu",
-            listOf("H") to "Show/hide help",
-            listOf("ALT", "←") to "Return to series screen"
+            listOf("M") to strings.helpShowHideMenu,
+            listOf("H") to strings.helpShowHideHelp,
+            listOf("ALT", "←") to strings.helpReturnToSeriesScreen
         ),
         elementsModifier
     )
@@ -127,50 +130,52 @@ private fun ContinuousDialogContent(
     elementsModifier: Modifier = Modifier,
 ) {
     val platform = LocalPlatform.current
+    val strings = LocalStrings.current.reader
+    val continuousStrings = LocalStrings.current.continuousReader
     val scrollDirection = when (orientation) {
         Vertical -> mapOf(
-            listOf("↑") to "Scroll up",
-            listOf("↓") to "Scroll down",
+            listOf("↑") to strings.helpScrollUp,
+            listOf("↓") to strings.helpScrollDown,
         )
 
         Horizontal -> mapOf(
-            listOf("←") to "Scroll left",
-            listOf("→") to "Scroll right",
+            listOf("←") to strings.helpScrollLeft,
+            listOf("→") to strings.helpScrollRight,
         )
     }
     KeyDescriptionColumn(
-        "Reader Navigation",
+        strings.helpReaderNavigationTitle,
         scrollDirection + mapOf(
-            listOf("Home") to "First page",
-            listOf("End") to "Last page",
+            listOf("Home") to strings.helpFirstPage,
+            listOf("End") to strings.helpLastPage,
             if (platform == PlatformType.WEB_KOMF) {
-                listOf("Shift", "Scroll Wheel") to "Zoom"
+                listOf("Shift", "Scroll Wheel") to strings.zoom
             } else {
-                listOf("Ctrl", "Scroll Wheel") to "Zoom"
+                listOf("Ctrl", "Scroll Wheel") to strings.zoom
             }
         ),
         elementsModifier
     )
 
     KeyDescriptionColumn(
-        "Settings",
+        strings.helpSettingsTitle,
         mapOf(
-            listOf("V") to "Top to bottom",
-            listOf("L") to "Left to right",
-            listOf("R") to "Right to left",
-            listOf("U") to "Toggle image stretch to fit",
-            listOf("Alt", "C") to "Disable color correction",
-            listOf("F11") to "Enter/exit full screen"
+            listOf("V") to continuousStrings.readingDirectionTopToBottom,
+            listOf("L") to continuousStrings.readingDirectionLeftToRight,
+            listOf("R") to continuousStrings.readingDirectionRightToLeft,
+            listOf("U") to strings.helpToggleImageStretchToFit,
+            listOf("Alt", "C") to strings.helpDisableColorCorrection,
+            listOf("F11") to strings.helpEnterExitFullScreen
         ),
         elementsModifier
     )
 
     KeyDescriptionColumn(
-        "Menus",
+        strings.helpMenusTitle,
         mapOf(
-            listOf("M") to "Show/hide menu",
-            listOf("H") to "Show/hide help",
-            listOf("ALT", "←") to "Return to series screen"
+            listOf("M") to strings.helpShowHideMenu,
+            listOf("H") to strings.helpShowHideHelp,
+            listOf("ALT", "←") to strings.helpReturnToSeriesScreen
         ),
         elementsModifier
     )
@@ -182,6 +187,7 @@ private fun KeyDescriptionColumn(
     keyToDescription: Map<List<String>, String>,
     modifier: Modifier
 ) {
+    val strings = LocalStrings.current.reader
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         modifier = modifier.padding(20.dp),
@@ -189,11 +195,11 @@ private fun KeyDescriptionColumn(
         Text(title, style = MaterialTheme.typography.titleLarge)
         Row {
             Text(
-                text = "Key",
+                text = strings.helpKeyHeader,
                 modifier = Modifier.weight(1f)
             )
             Text(
-                text = "Description",
+                text = LocalStrings.current.common.description,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -212,10 +218,11 @@ private fun KeyDescriptionColumn(
 
 @Composable
 private fun ShortcutKeys(keys: List<String>, modifier: Modifier) {
+    val commonStrings = LocalStrings.current.common
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         ShortcutKey(keys.first())
         keys.drop(1).forEach { key ->
-            Text(" + ")
+            Text(commonStrings.shortcutSeparator)
             ShortcutKey(key)
         }
     }

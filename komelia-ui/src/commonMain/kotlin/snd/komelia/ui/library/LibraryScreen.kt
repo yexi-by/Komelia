@@ -57,6 +57,7 @@ import snd.komga.client.library.KomgaLibrary
 import snd.komga.client.library.KomgaLibraryId
 import snd.komga.client.series.KomgaSeriesStatus
 import kotlin.jvm.Transient
+import snd.komelia.ui.LocalStrings
 
 class LibraryScreen(
     val libraryId: KomgaLibraryId? = null,
@@ -68,6 +69,7 @@ class LibraryScreen(
 
     @Composable
     override fun Content() {
+        val strings = LocalStrings.current
         val navigator = LocalNavigator.currentOrThrow
         val viewModelFactory = LocalViewModelFactory.current
         val vm = rememberScreenModel(libraryId?.value) { viewModelFactory.getLibraryViewModel(libraryId) }
@@ -84,7 +86,7 @@ class LibraryScreen(
 
         ScreenPullToRefreshBox(screenState = vm.state, onRefresh = vm::reload) {
             when (val state = vm.state.collectAsState().value) {
-                is Error -> ErrorContent(message = state.exception.message ?: "Unknown Error", onReload = vm::reload)
+                is Error -> ErrorContent(message = state.exception.message ?: strings.screens.error.error, onReload = vm::reload)
                 Uninitialized, Loading, is Success -> {
                     Column {
                         if (vm.showToolbar.collectAsState().value) {
@@ -123,7 +125,7 @@ class LibraryScreen(
 
         when (val state = seriesTabState.state.collectAsState().value) {
             is Error -> ErrorContent(
-                message = state.exception.message ?: "Unknown Error",
+                exception = state.exception,
                 onReload = seriesTabState::reload
             )
 
@@ -167,7 +169,7 @@ class LibraryScreen(
         when (val state = collectionsTabState.state.collectAsState().value) {
             Uninitialized -> LoadingMaxSizeIndicator()
             is Error -> ErrorContent(
-                message = state.exception.message ?: "Unknown Error",
+                message = state.exception.message ?: LocalStrings.current.screens.error.error,
                 onReload = collectionsTabState::reload
             )
 
@@ -205,7 +207,7 @@ class LibraryScreen(
 
         when (val state = readListTabState.state.collectAsState().value) {
             Uninitialized -> LoadingMaxSizeIndicator()
-            is Error -> Text("Error")
+            is Error -> Text(LocalStrings.current.screens.library.error)
             else -> {
                 val loading = state is Loading
                 LibraryReadListsContent(
@@ -240,7 +242,7 @@ fun LibraryToolBar(
     onCollectionsClick: () -> Unit,
     onReadListsClick: () -> Unit,
 ) {
-
+    val strings = LocalStrings.current
     val chipColors = AppFilterChipDefaults.filterChipColors()
     var showOptionsMenu by remember { mutableStateOf(false) }
     val isAdmin = LocalKomgaState.current.authenticatedUser.collectAsState().value?.roleAdmin() ?: true
@@ -270,7 +272,7 @@ fun LibraryToolBar(
                     )
                 }
             }
-            Text(library?.let { library.name } ?: "All Libraries")
+            Text(library?.let { library.name } ?: strings.screens.library.allLibraries)
 
             Spacer(Modifier.width(5.dp))
         }
@@ -281,7 +283,7 @@ fun LibraryToolBar(
                 FilterChip(
                     onClick = onBrowseClick,
                     selected = currentTab == SERIES,
-                    label = { Text("Series") },
+                    label = { Text(LocalStrings.current.common.series) },
                     colors = chipColors,
                     border = null,
                 )
@@ -292,7 +294,7 @@ fun LibraryToolBar(
                 FilterChip(
                     onClick = onCollectionsClick,
                     selected = currentTab == COLLECTIONS,
-                    label = { Text("Collections") },
+                    label = { Text(LocalStrings.current.common.collections) },
                     colors = chipColors,
                     border = null,
                 )
@@ -303,7 +305,7 @@ fun LibraryToolBar(
                 FilterChip(
                     onClick = onReadListsClick,
                     selected = currentTab == READ_LISTS,
-                    label = { Text("Read Lists") },
+                    label = { Text(strings.common.readLists) },
                     colors = chipColors,
                     border = null,
                 )

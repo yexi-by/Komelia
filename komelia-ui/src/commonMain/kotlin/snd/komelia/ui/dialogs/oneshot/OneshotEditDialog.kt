@@ -11,6 +11,7 @@ import snd.komelia.ui.LoadState.Error
 import snd.komelia.ui.LoadState.Loading
 import snd.komelia.ui.LoadState.Success
 import snd.komelia.ui.LoadState.Uninitialized
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.dialogs.DialogLoadIndicator
 import snd.komelia.ui.dialogs.tabs.TabDialog
@@ -30,13 +31,14 @@ fun OneshotEditDialog(
         viewModelFactory.getOneshotEditDialogViewModel(seriesId, series, book, onDismissRequest)
     }
     LaunchedEffect(book) { vm.initialize() }
+    val commonStrings = LocalStrings.current.common
     when (val loadState = vm.loadState.collectAsState().value) {
         Uninitialized, Loading -> DialogLoadIndicator(onDismissRequest)
         is Success -> TabDialog(
-            title = "Edit ${loadState.value.seriesMetadataState.series.metadata.title}",
+            title = commonStrings.editItem(loadState.value.seriesMetadataState.series.metadata.title),
             currentTab = loadState.value.currentTab,
             tabs = loadState.value.tabs,
-            confirmationText = "Save",
+            confirmationText = commonStrings.save,
             onConfirm = { coroutineScope.launch { vm.saveChanges() } },
             onTabChange = { loadState.value.currentTab = it },
             onDismissRequest = onDismissRequest

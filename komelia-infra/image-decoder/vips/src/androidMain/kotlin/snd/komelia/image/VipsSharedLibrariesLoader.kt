@@ -28,7 +28,7 @@ object VipsSharedLibrariesLoader {
         "jxl_cms",
         "jxl_threads",
         "jxl",
-        "png",
+        "png16",
         "tiff",
         "heif",
         "vips",

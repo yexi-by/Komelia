@@ -12,6 +12,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.components.CheckboxWithLabel
 import snd.komelia.ui.dialogs.tabs.DialogTab
 import snd.komelia.ui.dialogs.tabs.TabItem
@@ -20,20 +21,23 @@ internal class GeneralTab(
     private val vm: ReadListEditDialogViewModel,
 ) : DialogTab {
 
+    @Composable
     override fun options() = TabItem(
-        title = "GENERAL",
+        title = LocalStrings.current.common.general,
         icon = Icons.Default.FormatAlignCenter
     )
 
     @Composable
     override fun Content() {
+        val dialogStrings = LocalStrings.current.dialogs.readListEdit
+        val commonStrings = LocalStrings.current.common
         Column(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             TextField(
                 value = vm.name,
                 onValueChange = vm::name::set,
-                label = { Text("Name") },
+                label = { Text(commonStrings.name) },
                 supportingText = {
                     vm.nameValidationError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                 },
@@ -45,7 +49,7 @@ internal class GeneralTab(
             TextField(
                 value = vm.summary,
                 onValueChange = vm::summary::set,
-                label = { Text("Summary") },
+                label = { Text(commonStrings.summary) },
                 minLines = 6,
                 maxLines = 12,
                 modifier = Modifier.fillMaxWidth()
@@ -54,13 +58,13 @@ internal class GeneralTab(
             HorizontalDivider()
             Column {
                 Text(
-                    "By default, books in a read list are ordered manually. You can disable manual ordering to sort books by release date.",
+                    dialogStrings.manualOrderingDescription,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 CheckboxWithLabel(
                     checked = vm.manualOrdering,
                     onCheckedChange = vm::manualOrdering::set,
-                    label = { Text("Manual ordering") }
+                    label = { Text(dialogStrings.manualOrdering) }
                 )
 
             }
@@ -68,3 +72,6 @@ internal class GeneralTab(
     }
 
 }
+
+
+

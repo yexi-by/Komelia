@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import snd.komelia.ui.error.formatExceptionMessage
 import snd.komelia.ui.settings.komf.KomfSharedState
+import snd.komelia.ui.strings.RuntimeAppStrings
 import snd.komf.api.KomfErrorResponse
 import snd.komf.api.PatchValue.Some
 import snd.komf.api.config.EventListenerConfigUpdateRequest
@@ -72,9 +73,10 @@ class KavitaConnectionState(
                     connectionError.value = null
                     komfSharedState.loadKavitaLibraries()
                 } else {
-                    connectionError.value = response.errorMessage
-                        ?.let { "Connection Error: $it" }
-                        ?: "Connection Error"
+                    connectionError.value = RuntimeAppStrings.strings.value
+                        .komf
+                        .general
+                        .formatConnectionError(response.errorMessage)
                 }
             } catch (e: ResponseException) {
                 val errorResponse = runCatching { e.response.body<KomfErrorResponse>().message }

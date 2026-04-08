@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.datetime.TimeZone.Companion.currentSystemDefault
 import kotlinx.datetime.toLocalDateTime
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.components.Pagination
 import snd.komga.client.user.KomgaAuthenticationActivity
 
@@ -39,6 +40,7 @@ fun AuthenticationActivityContent(
     currentPage: Int,
     onPageChange: (Int) -> Unit,
 ) {
+    val settingsStrings = LocalStrings.current.screens.settings
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         activity.forEach {
             AuthenticationInfoCard(
@@ -66,6 +68,8 @@ private fun AuthenticationInfoCard(
     showEmail: Boolean = true,
     modifier: Modifier = Modifier
 ) {
+    val commonStrings = LocalStrings.current.common
+    val settingsStrings = LocalStrings.current.screens.settings
     Card(modifier) {
         Column(Modifier.padding(10.dp)) {
             Row {
@@ -74,7 +78,7 @@ private fun AuthenticationInfoCard(
                 }
                 Text(formattedDate)
                 Spacer(Modifier.weight(1f))
-                Text("Source: ${activity.source}")
+                Text(settingsStrings.sourcePrefix + activity.source)
             }
 
             val email = activity.email
@@ -91,14 +95,14 @@ private fun AuthenticationInfoCard(
                 Text(
                     buildAnnotatedString {
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("IP: ")
+                            append(commonStrings.labelWithColon(commonStrings.ip))
                         }
                         append(activity.ip)
                     },
                 )
                 Spacer(Modifier.weight(1f))
                 if (activity.success) {
-                    Text("Successful")
+                    Text(settingsStrings.successful)
                     Icon(
                         Icons.Default.Done,
                         null,
@@ -119,7 +123,9 @@ private fun AuthenticationInfoCard(
             HorizontalDivider(Modifier.padding(vertical = 5.dp))
             Text(
                 buildAnnotatedString {
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("User Agent: ") }
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append(commonStrings.labelWithColon(commonStrings.userAgent))
+                    }
                     withStyle(SpanStyle(fontSize = 14.sp)) {
                         append(activity.userAgent)
                     }

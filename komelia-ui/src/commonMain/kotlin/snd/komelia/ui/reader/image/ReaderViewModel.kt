@@ -92,6 +92,7 @@ class ReaderViewModel(
         bookSiblingsContext = bookSiblingsContext,
         colorCorrectionRepository = colorCorrectionRepository,
         pageChangeFlow = pageChangeFlow,
+        appStrings = appStrings,
     )
 
     val pagedReaderState = PagedReaderState(

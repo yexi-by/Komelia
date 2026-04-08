@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 import snd.komelia.ui.common.components.DropdownMultiChoiceMenu
 import snd.komelia.ui.common.components.LabeledEntry
 import snd.komelia.ui.common.components.SwitchWithLabel
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.platform.cursorForHand
 import snd.komelia.ui.settings.komf.SavableHttpTextField
 import snd.komelia.ui.settings.komf.SavableTextField
@@ -52,6 +53,8 @@ fun KomfSettingsContent(
     komgaState: KomgaConnectionState?,
     kavitaState: KavitaConnectionState?,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val komfStrings = LocalStrings.current.komf.general
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
@@ -68,9 +71,9 @@ fun KomfSettingsContent(
                             komfEnabledConfirmed = true
                         }
                     },
-                    label = { Text("Enable Komf Integration") },
+                    label = { Text(komfStrings.enableIntegration) },
                     supportingText = {
-                        Text("Adds features aimed at metadata updates and editing")
+                        Text(komfStrings.integrationDescription)
                     }
                 )
 
@@ -79,7 +82,7 @@ fun KomfSettingsContent(
                     ElevatedButton(
                         onClick = { uriHandler.openUri("https://github.com/Snd-R/komf") },
                     ) {
-                        Text("Project Link")
+                        Text(komfStrings.projectLink)
                     }
                 }
             }
@@ -117,6 +120,7 @@ private fun KomgaAndKavitaConnectionSettings(
     komgaState: KomgaConnectionState,
     kavitaState: KavitaConnectionState,
 ) {
+    val komfStrings = LocalStrings.current.komf.general
     var selectedTab by remember { mutableStateOf(0) }
     SecondaryTabRow(selectedTabIndex = selectedTab) {
         Tab(
@@ -124,14 +128,14 @@ private fun KomgaAndKavitaConnectionSettings(
             onClick = { selectedTab = 0 },
             modifier = Modifier.heightIn(min = 40.dp).cursorForHand(),
         ) {
-            Text("Komga")
+            Text(komfStrings.komgaTab)
         }
         Tab(
             selected = selectedTab == 1,
             onClick = { selectedTab = 1 },
             modifier = Modifier.heightIn(min = 40.dp).cursorForHand(),
         ) {
-            Text("Kavita")
+            Text(komfStrings.kavitaTab)
         }
     }
 
@@ -148,11 +152,13 @@ private fun KomfConnectionDetails(
     onKomfUrlChange: (String) -> Unit,
     komfConnectionError: String?,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val komfStrings = LocalStrings.current.komf.general
     SavableHttpTextField(
-        label = "Komf Url",
+        label = komfStrings.komfUrl,
         currentValue = komfUrl,
         onValueSave = onKomfUrlChange,
-        confirmationText = "Connect",
+        confirmationText = komfStrings.connect,
         isError = komfConnectionError != null,
         supportingText = {
             if (komfConnectionError != null) {
@@ -162,7 +168,7 @@ private fun KomfConnectionDetails(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Connected", color = MaterialTheme.colorScheme.secondary)
+                    Text(commonStrings.connected, color = MaterialTheme.colorScheme.secondary)
                     Icon(Icons.Default.Check, null)
                 }
             }
@@ -174,6 +180,8 @@ private fun KomfConnectionDetails(
 private fun KomgaConnectionDetails(
     state: KomgaConnectionState,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val komfStrings = LocalStrings.current.komf.general
     val baseUrl = state.baseUrl.collectAsState().value
     val onBaseUrlChange = state::onKomgaBaseUrlChange
     val username = state.username.collectAsState().value
@@ -194,8 +202,8 @@ private fun KomgaConnectionDetails(
         }
 
         SavableHttpTextField(
-            label = "Komga Url",
-            confirmationText = "Save",
+            label = komfStrings.komgaUrl,
+            confirmationText = commonStrings.save,
             currentValue = baseUrl,
             onValueSave = onBaseUrlChange,
         )
@@ -203,13 +211,13 @@ private fun KomgaConnectionDetails(
         SavableTextField(
             currentValue = username,
             onValueSave = onUsernameChange,
-            label = { Text("Komga Username") },
+            label = { Text(komfStrings.komgaUsername) },
         )
 
         SavableTextField(
             currentValue = "",
             onValueSave = onPasswordChange,
-            label = { Text("Komga Password") },
+            label = { Text(komfStrings.komgaPassword) },
             useEditButton = true,
             isPassword = true
         )
@@ -229,6 +237,8 @@ private fun KomgaConnectionDetails(
 private fun KavitaConnectionDetails(
     state: KavitaConnectionState,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val komfStrings = LocalStrings.current.komf.general
     val baseUrl = state.baseUrl.collectAsState().value
     val onBaseUrlChange = state::onBaseUrlChange
     val onPasswordChange = state::onApiKeyUpdate
@@ -247,8 +257,8 @@ private fun KavitaConnectionDetails(
         }
 
         SavableHttpTextField(
-            label = "Kavita Url",
-            confirmationText = "Save",
+            label = komfStrings.kavitaUrl,
+            confirmationText = commonStrings.save,
             currentValue = baseUrl,
             onValueSave = onBaseUrlChange,
         )
@@ -256,7 +266,7 @@ private fun KavitaConnectionDetails(
         SavableTextField(
             currentValue = "",
             onValueSave = onPasswordChange,
-            label = { Text("Kavita API Key") },
+            label = { Text(komfStrings.kavitaApiKey) },
             useEditButton = true,
             isPassword = true
         )
@@ -285,14 +295,15 @@ private fun MediaServerEventListenerSettings(
     onNotificationsLibraryFilterSelect: (KomfMediaServerLibraryId) -> Unit,
     libraries: List<KomfMediaServerLibrary>
 ) {
+    val komfStrings = LocalStrings.current.komf.general
     Column {
         SwitchWithLabel(
             checked = enableEventListener,
             onCheckedChange = onEnableEventListenerChange,
-            label = { Text("Event Listener") },
+            label = { Text(komfStrings.eventListener) },
             supportingText = {
                 Text(
-                    "Launch processing jobs when new series or book is added",
+                    komfStrings.eventListenerDescription,
                     style = MaterialTheme.typography.labelLarge,
                 )
             }
@@ -321,10 +332,11 @@ private fun EventListenerContent(
     onNotificationsLibraryFilterSelect: (KomfMediaServerLibraryId) -> Unit,
     libraries: List<KomfMediaServerLibrary>,
 ) {
+    val komfStrings = LocalStrings.current.komf.general
     val libraryOptions = remember(libraries) {
         val ids = libraries.map { it.id }
         val unknown = metadataLibrariesFilter.filter { it !in ids }
-            .map { LabeledEntry(it, "Unknown library: ${it.value}") }
+            .map { LabeledEntry(it, komfStrings.unknownLibrary(it.value)) }
         libraries.map { LabeledEntry(it.id, it.name) }.plus(unknown)
     }
     val metadataSelectedOptions = remember(metadataLibrariesFilter, libraries) {
@@ -332,7 +344,7 @@ private fun EventListenerContent(
             LabeledEntry(
                 value = libraryId,
                 label = libraries.find { it.id == libraryId }?.name
-                    ?: "Unknown library: ${libraryId.value}"
+                    ?: komfStrings.unknownLibrary(libraryId.value)
             )
         }
     }
@@ -341,7 +353,7 @@ private fun EventListenerContent(
             selectedOptions = metadataSelectedOptions,
             options = libraryOptions,
             onOptionSelect = { onMetadataLibraryFilterSelect(it.value) },
-            label = { Text("Enable metadata update jobs for libraries") },
+            label = { Text(komfStrings.enableMetadataJobsForLibraries) },
             inputFieldModifier = Modifier.fillMaxWidth(),
             inputFieldColor = MaterialTheme.colorScheme.surfaceVariant
         )
@@ -351,7 +363,7 @@ private fun EventListenerContent(
                 LabeledEntry(
                     value = libraryId,
                     label = libraries.find { it.id == libraryId }?.name
-                        ?: "Unknown library: id(${libraryId.value})"
+                        ?: komfStrings.unknownLibrary(libraryId.value)
                 )
             }
         }
@@ -359,7 +371,7 @@ private fun EventListenerContent(
             selectedOptions = notificationsSelectedOptions,
             options = libraryOptions,
             onOptionSelect = { onNotificationsLibraryFilterSelect(it.value) },
-            label = { Text("Enable notification jobs for libraries") },
+            label = { Text(komfStrings.enableNotificationJobsForLibraries) },
             inputFieldModifier = Modifier.fillMaxWidth(),
             inputFieldColor = MaterialTheme.colorScheme.surfaceVariant
         )

@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import snd.komelia.settings.model.AppLanguageMode
 import snd.komelia.settings.model.AppTheme
 import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.components.AppSliderDefaults
@@ -31,6 +32,8 @@ fun AppearanceSettingsContent(
     onCardWidthChange: (Dp) -> Unit,
     currentTheme: AppTheme,
     onThemeChange: (AppTheme) -> Unit,
+    currentLanguageMode: AppLanguageMode,
+    onLanguageModeChange: (AppLanguageMode) -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -42,6 +45,14 @@ fun AppearanceSettingsContent(
             selectedOption = LabeledEntry(currentTheme, strings.forAppTheme(currentTheme)),
             options = AppTheme.entries.map { LabeledEntry(it, strings.forAppTheme(it)) },
             onOptionChange = { onThemeChange(it.value) },
+            inputFieldModifier = Modifier.widthIn(min = 250.dp)
+        )
+
+        DropdownChoiceMenu(
+            label = { Text(strings.appLanguage) },
+            selectedOption = LabeledEntry(currentLanguageMode, strings.forAppLanguageMode(currentLanguageMode)),
+            options = AppLanguageMode.entries.map { LabeledEntry(it, strings.forAppLanguageMode(it)) },
+            onOptionChange = { onLanguageModeChange(it.value) },
             inputFieldModifier = Modifier.widthIn(min = 250.dp)
         )
 
@@ -63,7 +74,7 @@ fun AppearanceSettingsContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            Text("${cardWidth.value}")
+            Text(cardWidth.value.toString())
 
             Card(
                 Modifier

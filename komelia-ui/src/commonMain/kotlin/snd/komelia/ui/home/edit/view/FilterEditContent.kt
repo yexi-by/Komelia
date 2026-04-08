@@ -69,6 +69,7 @@ import snd.komelia.ui.home.edit.BookFilterEditState
 import snd.komelia.ui.home.edit.BookOnDeckFilterState
 import snd.komelia.ui.home.edit.FilterEditState
 import snd.komelia.ui.home.edit.FilterEditViewModel
+import snd.komelia.ui.home.edit.localizedLabel
 import snd.komelia.ui.home.edit.SeriesCustomFilterState
 import snd.komelia.ui.home.edit.SeriesFilterEditState
 import snd.komelia.ui.home.edit.SeriesRecentlyAddedFilterState
@@ -76,6 +77,7 @@ import snd.komelia.ui.home.edit.SeriesRecentlyUpdatedFilterState
 import snd.komelia.ui.platform.PlatformType.MOBILE
 import snd.komelia.ui.platform.cursorForHand
 import snd.komelia.ui.platform.cursorForMove
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun FilterEditContent(
@@ -102,6 +104,8 @@ private fun Toolbar(
     onEditEnd: () -> Unit,
     onReset: () -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val homeStrings = LocalStrings.current.screens.home
     Row(
         modifier = Modifier.animateContentSize(),
         horizontalArrangement = Arrangement.spacedBy(5.dp),
@@ -126,7 +130,7 @@ private fun Toolbar(
             onClick = { onEditEnd() },
             modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
         ) {
-            Text("Done")
+            Text(commonStrings.done)
             Icon(Icons.Default.Check, null)
         }
 
@@ -135,12 +139,12 @@ private fun Toolbar(
             onClick = { showResetDialog = true },
             modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
         ) {
-            Text("Reset to default")
+            Text(commonStrings.resetToDefault)
             Icon(Icons.Default.Restore, null)
         }
         if (showResetDialog) {
             ConfirmationDialog(
-                body = "Reset homescreen filters to default?",
+                body = homeStrings.resetHomescreenFiltersBody,
                 onDialogConfirm = onReset,
                 onDialogDismiss = { showResetDialog = false }
             )
@@ -186,6 +190,8 @@ fun AddConditionButton(
     onConditionAdd: (FilterEditViewModel.FilterType) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val commonStrings = LocalStrings.current.common
+    val strings = LocalStrings.current
     var dropDownExpanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(
         expanded = dropDownExpanded,
@@ -198,7 +204,7 @@ fun AddConditionButton(
                 .cursorForHand()
                 .menuAnchor(PrimaryNotEditable)
         ) {
-            Text("Add Filter")
+            Text(commonStrings.addFilter)
         }
 
         ExposedDropdownMenu(
@@ -208,7 +214,7 @@ fun AddConditionButton(
         ) {
             FilterEditViewModel.FilterType.entries.forEach {
                 DropdownMenuItem(
-                    text = { Text(it.name) },
+                    text = { Text(it.localizedLabel(strings)) },
                     onClick = {
                         dropDownExpanded = false
                         onConditionAdd(it)
@@ -226,6 +232,7 @@ private fun ReorderableCollectionItemScope.FilterContent(
     isDragging: Boolean,
     onFilterRemove: () -> Unit,
 ) {
+    val homeStrings = LocalStrings.current.screens.home
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     var showEdit by remember { mutableStateOf(false) }
     val label = filterState.label.collectAsState().value
@@ -273,7 +280,7 @@ private fun ReorderableCollectionItemScope.FilterContent(
                 if (showEdit) {
                     OutlinedTextField(
                         value = labelText,
-                        label = { Text("Label") },
+                        label = { Text(LocalStrings.current.common.label) },
                         onValueChange = {
                             labelText = it
                             filterState.label.value = it
@@ -295,7 +302,7 @@ private fun ReorderableCollectionItemScope.FilterContent(
                 onClick = { showEdit = !showEdit },
                 modifier = Modifier.cursorForHand()
             ) {
-                Text("Edit")
+                Text(LocalStrings.current.common.edit)
                 Icon(
                     imageVector = if (showEdit) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
                     contentDescription = null,
@@ -308,7 +315,7 @@ private fun ReorderableCollectionItemScope.FilterContent(
                 },
                 modifier = Modifier.cursorForHand()
             ) {
-                Text("Delete")
+                Text(LocalStrings.current.common.delete)
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = null,
@@ -327,7 +334,7 @@ private fun ReorderableCollectionItemScope.FilterContent(
 
     if (showDeleteConfirmation) {
         ConfirmationDialog(
-            body = "Delete ${label}?",
+            body = homeStrings.deleteNamedItem(label),
             onDialogConfirm = onFilterRemove,
             onDialogDismiss = { showDeleteConfirmation = false })
     }
@@ -335,12 +342,15 @@ private fun ReorderableCollectionItemScope.FilterContent(
 
 @Composable
 private fun BookFilterEditContent(state: BookFilterEditState) {
+    val strings = LocalStrings.current
     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
         val filter = state.filter.collectAsState().value
         val type = state.type.collectAsState().value
         DropdownChoiceMenu(
-            selectedOption = LabeledEntry(type, type.name),
-            options = remember { BookFilterEditState.FilterType.entries.map { LabeledEntry(it, it.name) } },
+            selectedOption = LabeledEntry(type, type.localizedLabel(strings)),
+            options = remember(strings) {
+                BookFilterEditState.FilterType.entries.map { LabeledEntry(it, it.localizedLabel(strings)) }
+            },
             onOptionChange = { state.onTypeChange(it.value) },
         )
 
@@ -367,12 +377,15 @@ private fun BookFilterEditContent(state: BookFilterEditState) {
 
 @Composable
 private fun SeriesFilterEditContent(state: SeriesFilterEditState) {
+    val strings = LocalStrings.current
     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
         val filter = state.filter.collectAsState().value
         val type = state.type.collectAsState().value
         DropdownChoiceMenu(
-            selectedOption = LabeledEntry(type, type.name),
-            options = remember { SeriesFilterEditState.FilterType.entries.map { LabeledEntry(it, it.name) } },
+            selectedOption = LabeledEntry(type, type.localizedLabel(strings)),
+            options = remember(strings) {
+                SeriesFilterEditState.FilterType.entries.map { LabeledEntry(it, it.localizedLabel(strings)) }
+            },
             onOptionChange = { state.onTypeChange(it.value) },
         )
 

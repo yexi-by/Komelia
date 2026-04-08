@@ -12,6 +12,7 @@ import io.ktor.utils.io.*
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -34,8 +35,10 @@ import snd.komelia.ui.platform.PlatformType
 import snd.komelia.ui.platform.PlatformType.DESKTOP
 import snd.komelia.ui.platform.PlatformType.MOBILE
 import snd.komelia.ui.platform.PlatformType.WEB_KOMF
+import snd.komelia.ui.strings.AppStrings
 
 class LoginViewModel(
+    private val appStrings: StateFlow<AppStrings>,
     private val settingsRepository: CommonSettingsRepository,
     private val secretsRepository: SecretsRepository,
     private val komgaUserApi: Flow<KomgaUserApi>,
@@ -94,9 +97,10 @@ class LoginViewModel(
     }
 
     fun cancel() {
+        val loginStrings = appStrings.value.screens.login
         screenModelScope.coroutineContext.cancelChildren()
-        mutableState.value = LoadState.Error(RuntimeException("Cancelled login attempt"))
-        userLoginError = "Cancelled login attempt"
+        mutableState.value = LoadState.Error(RuntimeException(loginStrings.cancelledLoginAttempt))
+        userLoginError = loginStrings.cancelledLoginAttempt
     }
 
     fun loginWithCredentials() {
@@ -119,12 +123,13 @@ class LoginViewModel(
     }
 
     private suspend fun tryAutologin() {
+        val loginStrings = appStrings.value.screens.login
         try {
             tryLogin()
         } catch (e: CancellationException) {
             throw e
         } catch (e: NoTransformationFoundException) {
-            val message = "Unexpected response for url $url"
+            val message = loginStrings.unexpectedResponseForUrl(url)
             autoLoginError = message
             notifications.add(AppNotification.Error(message))
             mutableState.value = LoadState.Error(e)
@@ -132,16 +137,16 @@ class LoginViewModel(
             if (e.response.status == Unauthorized) {
                 autoLoginError = null
             } else {
-                autoLoginError = "Login error: ${e::class.simpleName} ${e.message}"
-                notifications.add(AppNotification.Error(e.message))
+                autoLoginError = formatExceptionMessage(e)
+                notifications.add(AppNotification.Error(formatExceptionMessage(e)))
             }
             mutableState.value = LoadState.Error(e)
         } catch (e: Error) { // wasm fetch error
-            val errorMessage = "Login error: ${e::class.simpleName} ${e.message}"
+            val errorMessage = formatExceptionMessage(e)
             mutableState.value = LoadState.Error(e)
             notifications.add(AppNotification.Error(errorMessage))
         } catch (e: Throwable) {
-            val errorMessage = "Login error: ${e::class.simpleName} ${e.message}"
+            val errorMessage = formatExceptionMessage(e)
             autoLoginError = errorMessage
             mutableState.value = LoadState.Error(e)
             notifications.add(AppNotification.Error(errorMessage))
@@ -149,17 +154,18 @@ class LoginViewModel(
     }
 
     private suspend fun tryUserLogin(username: String, password: String) {
+        val loginStrings = appStrings.value.screens.login
         try {
             tryLogin(username, password)
         } catch (e: CancellationException) {
             throw e
         } catch (e: NoTransformationFoundException) {
-            val message = "Unexpected response for url $url"
+            val message = loginStrings.unexpectedResponseForUrl(url)
             userLoginError = message
             mutableState.value = LoadState.Error(e)
         } catch (e: ClientRequestException) {
-            userLoginError = if (e.response.status == Unauthorized) "Invalid credentials"
-            else "Login error ${e::class.simpleName}: ${e.message}"
+            userLoginError = if (e.response.status == Unauthorized) loginStrings.invalidCredentials
+            else formatExceptionMessage(e)
             mutableState.value = LoadState.Error(e)
         } catch (e: Throwable) {
             userLoginError = formatExceptionMessage(e)

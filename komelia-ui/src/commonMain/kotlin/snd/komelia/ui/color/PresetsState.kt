@@ -14,10 +14,15 @@ import snd.komelia.color.ColorLevelsPreset
 import snd.komelia.color.Preset
 import snd.komelia.color.repository.ColorCurvePresetRepository
 import snd.komelia.color.repository.ColorLevelsPresetRepository
+import snd.komelia.ui.strings.RuntimeAppStrings
+import snd.komelia.ui.strings.ToastStrings
+import snd.komelia.ui.strings.ValidationStrings
 
 sealed class PresetsState<T : Preset>(
     protected val appNotifications: AppNotifications,
     protected val coroutineScope: CoroutineScope,
+    private val toastStrings: ToastStrings = RuntimeAppStrings.strings.value.toasts,
+    private val validationStrings: ValidationStrings = RuntimeAppStrings.strings.value.validation,
 ) {
     val selectedPreset = MutableStateFlow<T?>(null)
     val presets = MutableStateFlow<List<T>>(emptyList())
@@ -29,7 +34,7 @@ sealed class PresetsState<T : Preset>(
     fun onPresetSelect(preset: T) {
         val selectedPreset = presets.value.firstOrNull { it.name == preset.name }
         if (selectedPreset == null) {
-            appNotifications.add(AppNotification.Error("preset with $selectedPreset does not exist"))
+            appNotifications.add(AppNotification.Error(toastStrings.presetDoesNotExist(preset.name)))
             return
         }
         this.selectedPreset.value = selectedPreset
@@ -39,7 +44,7 @@ sealed class PresetsState<T : Preset>(
     fun onPresetDelete(preset: T) {
         val deletePreset = presets.value.firstOrNull { it.name == preset.name }
         if (deletePreset == null) {
-            appNotifications.add(AppNotification.Error("preset with $preset does not exist"))
+            appNotifications.add(AppNotification.Error(toastStrings.presetDoesNotExist(preset.name)))
             return
         }
         presets.update { it.minus(preset) }
@@ -51,7 +56,7 @@ sealed class PresetsState<T : Preset>(
     fun onPresetAdd(presetName: String, override: Boolean = false) {
         val existingPreset = presets.value.firstOrNull { it.name == presetName }
         if (existingPreset != null && !override) {
-            appNotifications.add(AppNotification.Error("Preset with that name already exists"))
+            appNotifications.add(AppNotification.Error(validationStrings.presetAlreadyExists))
             return
         }
 
@@ -162,3 +167,4 @@ class LevelsPresetsState(
     }
 
 }
+

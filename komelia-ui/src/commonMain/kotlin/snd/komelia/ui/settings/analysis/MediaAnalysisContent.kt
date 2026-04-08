@@ -30,6 +30,7 @@ fun MediaAnalysisContent(
     totalPages: Int,
     onPageChange: (Int) -> Unit
 ) {
+    val settingsStrings = LocalStrings.current.screens.settings
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -42,7 +43,7 @@ fun MediaAnalysisContent(
         )
 
         if (books.isEmpty()) {
-            Text("Nothing to show")
+            Text(settingsStrings.nothingToShow)
         } else {
             books.forEach {
                 BookAnalysisCard(
@@ -68,6 +69,7 @@ private fun BookAnalysisCard(
     modifier: Modifier
 ) {
     val strings = LocalStrings.current
+    val settingsStrings = strings.settings
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
         shape = RoundedCornerShape(5.dp),
@@ -93,7 +95,7 @@ private fun BookAnalysisCard(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Text(book.url, style = MaterialTheme.typography.bodyMedium)
-                    Text("${book.media.mediaType} ${book.size}")
+                    Text(settingsStrings.mediaAnalysisMedia(book.media.mediaType.orEmpty(), book.size))
                     val text =
                         "${book.media.status.name}: ${strings.errorCodes.getMessageForCode(book.media.comment)}"
                     Text(text, color = MaterialTheme.colorScheme.tertiary)

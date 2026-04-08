@@ -25,6 +25,7 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.dp
 import snd.komelia.ui.common.components.LockableChipTextField
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.dialogs.tabs.DialogTab
 import snd.komelia.ui.dialogs.tabs.TabItem
 import snd.komga.client.common.KomgaAuthor
@@ -32,8 +33,9 @@ import snd.komga.client.common.KomgaAuthor
 class AuthorsTab(
     private val vm: BookEditMetadataState
 ) : DialogTab {
+    @Composable
     override fun options() = TabItem(
-        title = "AUTHORS",
+        title = LocalStrings.current.common.authors.uppercase(),
         icon = Icons.Default.People
     )
 
@@ -55,6 +57,7 @@ private fun AuthorsTabContent(
     authorsLock: Boolean,
     onLockChange: (Boolean) -> Unit,
 ) {
+    val strings = LocalStrings.current.bookEdit
     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
 
         authors.forEach { (role, authors) ->
@@ -75,7 +78,7 @@ private fun AuthorsTabContent(
         TextField(
             value = newCustomRole,
             onValueChange = { newCustomRole = it },
-            label = { Text("Add custom role") },
+            label = { Text(strings.addCustomRole) },
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
@@ -107,4 +110,9 @@ private fun AuthorsTabContent(
         )
     }
 }
+
+
+
+
+
 

@@ -50,12 +50,13 @@ fun UserEditDialog(
     val viewModelFactory = LocalViewModelFactory.current
     val vm = remember { viewModelFactory.getUserEditDialogViewModel(user) }
     val coroutineScope = rememberCoroutineScope()
+    val commonStrings = LocalStrings.current.common
 
     TabDialog(
-        title = "Edit User",
+        title = commonStrings.editItem(commonStrings.user),
         currentTab = vm.currentTab,
         tabs = vm.tabs(),
-        confirmationText = "Save Changes",
+        confirmationText = commonStrings.saveChanges,
         onConfirm = {
             coroutineScope.launch {
                 vm.saveChanges()
@@ -69,8 +70,9 @@ fun UserEditDialog(
 }
 
 class UserRolesTab(private val vm: UserEditDialogViewModel) : DialogTab {
+    @Composable
     override fun options() = TabItem(
-        title = "Roles",
+        title = LocalStrings.current.common.roles,
         icon = Icons.Default.RecentActors
     )
 
@@ -91,23 +93,24 @@ class UserRolesTab(private val vm: UserEditDialogViewModel) : DialogTab {
         pageStreaming: StateHolder<Boolean>,
         fileDownload: StateHolder<Boolean>
     ) {
+        val commonStrings = LocalStrings.current.common
         Column {
-            Text("Roles for ${user.email}")
+            Text(commonStrings.rolesFor(user.email))
             Spacer(Modifier.height(20.dp))
             CheckboxWithLabel(
                 checked = administrator.value,
                 onCheckedChange = { administrator.setValue(it) },
-                label = { Text("Administrator") }
+                label = { Text(LocalStrings.current.dialogs.user.administrator) }
             )
             CheckboxWithLabel(
                 checked = pageStreaming.value,
                 onCheckedChange = { pageStreaming.setValue(it) },
-                label = { Text("Page Streaming") }
+                label = { Text(commonStrings.pageStreaming) }
             )
             CheckboxWithLabel(
                 checked = fileDownload.value,
                 onCheckedChange = { fileDownload.setValue(it) },
-                label = { Text("File Download") }
+                label = { Text(commonStrings.fileDownload) }
             )
         }
     }
@@ -115,8 +118,9 @@ class UserRolesTab(private val vm: UserEditDialogViewModel) : DialogTab {
 
 class UserSharedLibrariesTab(private val vm: UserEditDialogViewModel) : DialogTab {
 
+    @Composable
     override fun options() = TabItem(
-        title = "Shared Libraries",
+        title = LocalStrings.current.common.sharedLibraries,
         icon = Icons.Default.Share
     )
 
@@ -141,13 +145,14 @@ class UserSharedLibrariesTab(private val vm: UserEditDialogViewModel) : DialogTa
         onLibraryCheck: (KomgaLibraryId) -> Unit,
         onLibraryUncheck: (KomgaLibraryId) -> Unit,
     ) {
+        val commonStrings = LocalStrings.current.common
         Column {
-            Text("Share Libraries")
+            Text(commonStrings.shareLibraries)
             Spacer(Modifier.height(20.dp))
             CheckboxWithLabel(
                 checked = shareAll,
                 onCheckedChange = onShareAllChange,
-                label = { Text("All Libraries") }
+                label = { Text(commonStrings.allLibraries) }
             )
 
             HorizontalDivider()
@@ -178,8 +183,9 @@ class UserSharedLibrariesTab(private val vm: UserEditDialogViewModel) : DialogTa
 
 class UserContentRestrictionTab(private val vm: UserEditDialogViewModel) : DialogTab {
 
+    @Composable
     override fun options() = TabItem(
-        title = "Content Restriction",
+        title = LocalStrings.current.userEdit.contentRestrictions,
         icon = Icons.Default.LockPerson
     )
 
@@ -256,4 +262,7 @@ class UserContentRestrictionTab(private val vm: UserEditDialogViewModel) : Dialo
         }
     }
 }
+
+
+
 

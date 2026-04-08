@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.StateHolder
 import snd.komelia.ui.common.components.LabeledEntry.Companion.stringEntry
 import snd.komelia.ui.common.components.LockableChipTextFieldWithSuggestions
@@ -26,8 +27,9 @@ import snd.komelia.ui.dialogs.tabs.TabItem
 class TagsTab(
     private val vm: BookBulkEditDialogViewModel
 ) : DialogTab {
+    @Composable
     override fun options() = TabItem(
-        title = "TAGS",
+        title = LocalStrings.current.common.tags.uppercase(),
         icon = Icons.Default.LocalOffer
     )
 
@@ -47,6 +49,8 @@ private fun TagsTabContent(
     tagsLock: StateHolder<Boolean>,
     allTags: List<String>,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val bookEditStrings = LocalStrings.current.bookEdit
 
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -56,17 +60,21 @@ private fun TagsTabContent(
         Row(Modifier.border(Dp.Hairline, warningColor).padding(20.dp)) {
             Icon(Icons.Default.PriorityHigh, null, tint = warningColor)
             Text(
-                text = "You are editing tags for multiple books. This will override existing tags of each book.",
+                text = bookEditStrings.bulkTagsWarning,
                 color = warningColor
             )
         }
         LockableChipTextFieldWithSuggestions(
             values = tags.value,
             onValuesChange = { tags.setValue(it) },
-            label = "Tags",
+            label = commonStrings.tags,
             suggestions = remember(allTags) { allTags.map { stringEntry(it) } },
             locked = tagsLock.value,
             onLockChange = { tagsLock.setValue(it) }
         )
     }
 }
+
+
+
+

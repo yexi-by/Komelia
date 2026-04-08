@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.common.components.CheckboxWithLabel
 import snd.komelia.ui.platform.cursorForHand
 
@@ -30,14 +31,15 @@ fun ConfirmationDialog(
     body: String,
     title: String? = null,
     confirmText: String? = null,
-    buttonCancel: String = "Cancel",
-    buttonConfirm: String = "Confirm",
+    buttonCancel: String? = null,
+    buttonConfirm: String? = null,
     buttonAlternate: String? = null,
     buttonConfirmColor: Color = MaterialTheme.colorScheme.secondaryContainer,
     onDialogConfirm: () -> Unit,
     onDialogConfirmAlternate: () -> Unit = {},
     onDialogDismiss: () -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
     var confirmed by remember { mutableStateOf(false) }
     AppDialog(
         onDismissRequest = onDialogDismiss,
@@ -62,7 +64,7 @@ fun ConfirmationDialog(
                     onClick = onDialogDismiss,
                     modifier = Modifier.cursorForHand(),
                 ) {
-                    Text(buttonCancel)
+                    Text(buttonCancel ?: commonStrings.cancel)
                 }
                 Spacer(Modifier.size(10.dp))
 
@@ -91,7 +93,7 @@ fun ConfirmationDialog(
                     ),
                     modifier = Modifier.cursorForHand(),
                 ) {
-                    Text(buttonConfirm)
+                    Text(buttonConfirm ?: commonStrings.confirm)
                 }
             }
         }

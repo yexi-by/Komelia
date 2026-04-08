@@ -54,6 +54,7 @@ import snd.komelia.ui.platform.PlatformType.DESKTOP
 import snd.komelia.ui.platform.PlatformType.MOBILE
 import snd.komelia.ui.platform.PlatformType.WEB_KOMF
 import snd.komelia.ui.platform.WindowSizeClass
+import snd.komelia.ui.strings.RuntimeAppStrings
 import snd.komelia.updates.AppRelease
 import snd.komelia.updates.StartupUpdateChecker
 
@@ -98,6 +99,10 @@ fun MainView(
             if (viewModelFactory == null) return@Surface
 
             val notificationToaster = rememberToasterState()
+            val appStrings = dependencies.appStrings.collectAsState().value
+            LaunchedEffect(appStrings) {
+                RuntimeAppStrings.update(appStrings)
+            }
 
             CompositionLocalProvider(
                 LocalViewModelFactory provides viewModelFactory,
@@ -114,7 +119,8 @@ fun MainView(
                 LocalReloadEvents provides viewModelFactory.screenReloadEvents,
                 LocalBookDownloadEvents provides dependencies.offlineDependencies.bookDownloadEvents,
                 LocalOfflineMode provides dependencies.isOffline,
-                LocalKomgaState provides dependencies.komgaSharedState
+                LocalKomgaState provides dependencies.komgaSharedState,
+                LocalStrings provides appStrings,
             ) {
                 MainContent(platformType, dependencies.komgaSharedState)
 

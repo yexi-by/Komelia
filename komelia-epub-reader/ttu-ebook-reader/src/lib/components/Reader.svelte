@@ -84,6 +84,7 @@
   import {logger} from '$lib/data/logger';
   import {availableThemes} from '$lib/data/theme-option';
   import {ViewMode} from '$lib/data/view-mode';
+  import {epubStrings$} from '$lib/i18n/strings';
   import loadBookData from '$lib/functions/book-data-loader/load-book-data';
   import {reduceToEmptyString} from '$lib/functions/rxjs/reduce-to-empty-string';
   import {tapDom} from '$lib/functions/rxjs/tap-dom';
@@ -155,7 +156,7 @@
         {
           component: MessageDialog,
           props: {
-            title: 'Load Error',
+            title: $epubStrings$.reader.loadErrorTitle,
             message
           }
         }
@@ -888,7 +889,7 @@
       <div
           tabindex="0"
           role="button"
-          title="Click to copy Progress"
+          title={$epubStrings$.reader.clickToCopyProgress}
           class="writing-horizontal-tb fixed bottom-2 right-2 z-10 text-xs leading-none select-none"
           class:invisible={!$showCharacterCounter$}
           style:color={$themeOption$?.tooltipTextFontColor}

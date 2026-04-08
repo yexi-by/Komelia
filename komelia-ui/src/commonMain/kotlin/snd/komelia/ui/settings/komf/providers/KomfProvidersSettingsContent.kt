@@ -196,7 +196,8 @@ private fun AddNewProviderButton(
     onNewProviderAdd: (KomfProviders) -> Unit,
     enabledProviders: List<KomfProviders>,
 ) {
-    val strings = LocalStrings.current.komf.providerSettings
+    val providerNameStrings = LocalStrings.current.komf.providerSettings
+    val providerStrings = LocalStrings.current.komf.providers
     var addProviderExpanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(
         expanded = addProviderExpanded,
@@ -208,7 +209,7 @@ private fun AddNewProviderButton(
                 .cursorForHand()
                 .menuAnchor(PrimaryNotEditable)
         ) {
-            Text("Add provider")
+            Text(providerStrings.addProvider)
         }
 
         val scrollState = rememberScrollState()
@@ -222,7 +223,7 @@ private fun AddNewProviderButton(
         ) {
             KomfCoreProviders.entries.filter { it !in enabledProviders }.forEach {
                 DropdownMenuItem(
-                    text = { Text(strings.forProvider(it)) },
+                    text = { Text(providerNameStrings.forProvider(it)) },
                     onClick = {
                         addProviderExpanded = false
                         onNewProviderAdd(it)
@@ -249,6 +250,8 @@ private fun CommonSettingsContent(
     mangaBakaDbMetadata: MangaBakaDatabaseDto?,
     onMangaBakaUpdate: () -> Flow<MangaBakaDownloadProgress>
 ) {
+    val providerStrings = LocalStrings.current.komf.providers
+    val commonStrings = LocalStrings.current.common
     var showMangaBakaDownloadProgress by remember { mutableStateOf(false) }
 
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -261,7 +264,7 @@ private fun CommonSettingsContent(
             },
             options = remember { KomfNameMatchingMode.entries.map { LabeledEntry(it, it.name) } },
             onOptionChange = { onNameMatchingModeChange(it.value) },
-            label = { Text("Name matching mode") },
+            label = { Text(providerStrings.nameMatchingMode) },
             inputFieldModifier = Modifier.fillMaxWidth()
         )
 
@@ -269,31 +272,31 @@ private fun CommonSettingsContent(
             currentValue = comicVineClientId ?: "",
             onValueSave = onComicVineClientIdSave,
             useEditButton = true,
-            label = { Text("ComicVine client id") }
+            label = { Text(providerStrings.comicVineClientId) }
         )
         SavableTextField(
             currentValue = malClientId ?: "",
             onValueSave = onMalClientIdSave,
             useEditButton = true,
-            label = { Text("MyAnimeList client id") }
+            label = { Text(providerStrings.myAnimeListClientId) }
         )
 
         HorizontalDivider()
-        Text("MangaBaka Offline Database", style = MaterialTheme.typography.titleLarge)
+        Text(providerStrings.mangaBakaOfflineDatabase, style = MaterialTheme.typography.titleLarge)
         Column {
             if (mangaBakaDbMetadata != null) {
                 val downloadDate = remember(mangaBakaDbMetadata) {
                     mangaBakaDbMetadata.downloadTimestamp.toLocalDateTime(TimeZone.currentSystemDefault())
                         .format(localDateFormat)
                 }
-                Text("Download date $downloadDate")
-                Text("Checksum ${mangaBakaDbMetadata.checksum}")
+                Text(providerStrings.downloadDate(downloadDate))
+                Text(providerStrings.checksum(mangaBakaDbMetadata.checksum))
             }
             FilledTonalButton(
                 onClick = { showMangaBakaDownloadProgress = true },
                 modifier = Modifier.cursorForHand()
             ) {
-                Text(if (mangaBakaDbMetadata != null) "Update MangaBaka database" else "Download MangaBaka database")
+                Text(if (mangaBakaDbMetadata != null) providerStrings.updateMangaBakaDatabase else providerStrings.downloadMangaBakaDatabase)
             }
         }
         if (showMangaBakaDownloadProgress) {
@@ -309,6 +312,8 @@ private fun MangaBakaDbDownloadContent(
     onDownloadRequest: () -> Flow<MangaBakaDownloadProgress>,
     onDismiss: () -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
+    val providerStrings = LocalStrings.current.komf.providers
     var progress by remember { mutableStateOf(UpdateProgress(0, 0)) }
     var error by remember { mutableStateOf<String?>(null) }
     var completed by remember { mutableStateOf(false) }
@@ -336,7 +341,7 @@ private fun MangaBakaDbDownloadContent(
         modifier = Modifier.widthIn(max = 600.dp),
         header = {
             Column(modifier = Modifier.padding(10.dp)) {
-                Text("Downloading MangaBaka database", style = MaterialTheme.typography.titleLarge)
+                Text(providerStrings.downloadingMangaBakaDatabase, style = MaterialTheme.typography.titleLarge)
                 HorizontalDivider(Modifier.padding(top = 10.dp))
             }
         },
@@ -344,7 +349,7 @@ private fun MangaBakaDbDownloadContent(
             val errorText = error
             when {
                 errorText != null -> Text(errorText, Modifier.padding(20.dp))
-                completed -> Text("Done", Modifier.padding(20.dp))
+                completed -> Text(commonStrings.done, Modifier.padding(20.dp))
                 else -> UpdateProgressContent(
                     progress.total,
                     progress.completed,
@@ -359,7 +364,7 @@ private fun MangaBakaDbDownloadContent(
                         onClick = onDismiss,
                         modifier = Modifier.cursorForHand(),
                         content = {
-                            Text("Close")
+                            Text(LocalStrings.current.common.close)
                         }
                     )
 
@@ -368,7 +373,7 @@ private fun MangaBakaDbDownloadContent(
                         onClick = onDismiss,
                         modifier = Modifier.cursorForHand(),
                         content = {
-                            Text("Close")
+                            Text(LocalStrings.current.common.close)
                         }
                     )
                 }
@@ -383,14 +388,16 @@ private fun ProviderCard(
     state: ProviderConfigState,
     onProviderRemove: (ProviderConfigState) -> Unit
 ) {
-    val strings = LocalStrings.current.komf.providerSettings
+    val commonStrings = LocalStrings.current.common
+    val providerNameStrings = LocalStrings.current.komf.providerSettings
+    val providerStrings = LocalStrings.current.komf.providers
     var showEditDialog by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Text(
-            "${state.priority}. ${strings.forProvider(state.provider)}",
+            "${state.priority}. ${providerNameStrings.forProvider(state.provider)}",
         )
 
         IconButton(
@@ -410,9 +417,9 @@ private fun ProviderCard(
 
     val tabs = remember(state) {
         listOfNotNull(
-            SeriesMetadataTab(state),
-            if (state.isBookMetadataAvailable) BookMetadataTab(state) else null,
-            ProviderSettingsTab(state)
+            SeriesMetadataTab(state, providerStrings.seriesMetadataTab),
+            if (state.isBookMetadataAvailable) BookMetadataTab(state, providerStrings.bookMetadataTab) else null,
+            ProviderSettingsTab(state, providerStrings.providerSettingsTab)
         )
     }
     var currentTab by remember { mutableStateOf(tabs.first()) }
@@ -423,69 +430,76 @@ private fun ProviderCard(
                 WindowSizeClass.COMPACT, WindowSizeClass.MEDIUM -> Modifier
                 else -> Modifier.widthIn(max = 700.dp)
             },
-            title = "Edit ${strings.forProvider(state.provider)}",
+            title = providerStrings.editProvider(providerNameStrings.forProvider(state.provider)),
             currentTab = currentTab,
             tabs = tabs,
             onTabChange = { currentTab = it },
             showCancelButton = false,
             onConfirm = { showEditDialog = false },
-            confirmationText = "Close",
+            confirmationText = commonStrings.close,
             onDismissRequest = { showEditDialog = false },
         )
     }
 }
 
-private class SeriesMetadataTab(private val state: ProviderConfigState) : DialogTab {
-    override fun options() = TabItem(title = "SERIES METADATA")
+private class SeriesMetadataTab(
+    private val state: ProviderConfigState,
+    private val title: String,
+) : DialogTab {
+    @Composable
+    override fun options() = TabItem(title = title)
 
     @Composable
     override fun Content() {
+        val commonStrings = LocalStrings.current.common
+        val providerStrings = LocalStrings.current.komf.providers
+        val seriesEditStrings = LocalStrings.current.seriesEdit
         Column {
             SwitchWithLabel(
                 checked = state.seriesAgeRating,
                 onCheckedChange = state::onSeriesAgeRatingChange,
-                label = { Text("Age Rating") }
+                label = { Text(seriesEditStrings.ageRating) }
             )
             HorizontalDivider()
 
             SwitchWithLabel(
                 checked = state.seriesAuthors,
                 onCheckedChange = state::onSeriesAuthorsChange,
-                label = { Text("Authors") }
+                label = { Text(LocalStrings.current.common.authors) }
             )
             HorizontalDivider()
 
             SwitchWithLabel(
                 checked = state.seriesBookCount,
                 onCheckedChange = state::onSeriesBookCountChange,
-                label = { Text("Book Count") }
+                label = { Text(commonStrings.bookCount) }
             )
             HorizontalDivider()
             SwitchWithLabel(
                 checked = state.seriesCover,
                 onCheckedChange = state::onSeriesCoverChange,
-                label = { Text("Cover") }
+                label = { Text(commonStrings.cover) }
             )
             HorizontalDivider()
 
             SwitchWithLabel(
                 checked = state.seriesGenres,
                 onCheckedChange = state::onSeriesGenresChange,
-                label = { Text("Genres") }
+                label = { Text(LocalStrings.current.common.genres) }
             )
             HorizontalDivider()
 
             SwitchWithLabel(
                 checked = state.seriesLinks,
                 onCheckedChange = state::onSeriesLinksChange,
-                label = { Text("Links") }
+                label = { Text(LocalStrings.current.common.links) }
             )
             HorizontalDivider()
 
             SwitchWithLabel(
                 checked = state.seriesPublisher,
                 onCheckedChange = state::onSeriesPublisherChange,
-                label = { Text("Publisher") }
+                label = { Text(LocalStrings.current.common.publisher) }
             )
             HorizontalDivider()
 
@@ -493,8 +507,8 @@ private class SeriesMetadataTab(private val state: ProviderConfigState) : Dialog
                 SwitchWithLabel(
                     checked = state.seriesOriginalPublisher,
                     onCheckedChange = state::onSeriesOriginalPublisherChange,
-                    label = { Text("Use Original Publisher") },
-                    supportingText = { Text("Prefer original publisher instead of localizing publisher") }
+                    label = { Text(providerStrings.useOriginalPublisher) },
+                    supportingText = { Text(providerStrings.useOriginalPublisherDescription) }
                 )
                 HorizontalDivider()
             }
@@ -502,50 +516,55 @@ private class SeriesMetadataTab(private val state: ProviderConfigState) : Dialog
             SwitchWithLabel(
                 checked = state.seriesReleaseDate,
                 onCheckedChange = state::onSeriesReleaseDateChange,
-                label = { Text("Release date") }
+                label = { Text(commonStrings.releaseDate) }
             )
             HorizontalDivider()
 
             SwitchWithLabel(
                 checked = state.seriesStatus,
                 onCheckedChange = state::onSeriesStatusChange,
-                label = { Text("Status") }
+                label = { Text(commonStrings.status) }
             )
             HorizontalDivider()
 
             SwitchWithLabel(
                 checked = state.seriesSummary,
                 onCheckedChange = state::onSeriesSummaryChange,
-                label = { Text("Summary") }
+                label = { Text(LocalStrings.current.common.summary) }
             )
             HorizontalDivider()
 
             SwitchWithLabel(
                 checked = state.seriesTags,
                 onCheckedChange = state::onSeriesTagsChange,
-                label = { Text("Tags") }
+                label = { Text(commonStrings.tags) }
             )
             HorizontalDivider()
 
             SwitchWithLabel(
                 checked = state.seriesTitle,
                 onCheckedChange = state::onSeriesTitleChange,
-                label = { Text("Title") }
+                label = { Text(LocalStrings.current.common.title) }
             )
         }
     }
 }
 
-private class BookMetadataTab(private val state: ProviderConfigState) : DialogTab {
-    override fun options() = TabItem(title = "BOOK METADATA")
+private class BookMetadataTab(
+    private val state: ProviderConfigState,
+    private val title: String,
+) : DialogTab {
+    @Composable
+    override fun options() = TabItem(title = title)
 
     @Composable
     override fun Content() {
+        val commonStrings = LocalStrings.current.common
         Column {
             SwitchWithLabel(
                 checked = state.bookEnabled,
                 onCheckedChange = state::onBookEnabledChange,
-                label = { Text("Enabled") }
+                label = { Text(commonStrings.enabled) }
             )
             HorizontalDivider()
 
@@ -553,7 +572,7 @@ private class BookMetadataTab(private val state: ProviderConfigState) : DialogTa
                 enabled = state.bookEnabled,
                 checked = state.bookAuthors,
                 onCheckedChange = state::onBookAuthorsChange,
-                label = { Text("Authors") }
+                label = { Text(LocalStrings.current.common.authors) }
             )
             HorizontalDivider()
 
@@ -561,7 +580,7 @@ private class BookMetadataTab(private val state: ProviderConfigState) : DialogTa
                 enabled = state.bookEnabled,
                 checked = state.bookCover,
                 onCheckedChange = state::onBookCoverChange,
-                label = { Text("Cover") }
+                label = { Text(commonStrings.cover) }
             )
             HorizontalDivider()
 
@@ -569,7 +588,7 @@ private class BookMetadataTab(private val state: ProviderConfigState) : DialogTa
                 enabled = state.bookEnabled,
                 checked = state.bookIsbn,
                 onCheckedChange = state::onBookIsbnChange,
-                label = { Text("ISBN") }
+                label = { Text(LocalStrings.current.common.isbn) }
             )
             HorizontalDivider()
 
@@ -577,7 +596,7 @@ private class BookMetadataTab(private val state: ProviderConfigState) : DialogTa
                 enabled = state.bookEnabled,
                 checked = state.bookLinks,
                 onCheckedChange = state::onBookLinksChange,
-                label = { Text("Links") }
+                label = { Text(LocalStrings.current.common.links) }
             )
             HorizontalDivider()
 
@@ -585,7 +604,7 @@ private class BookMetadataTab(private val state: ProviderConfigState) : DialogTa
                 enabled = state.bookEnabled,
                 checked = state.bookNumber,
                 onCheckedChange = state::onBookNumberChange,
-                label = { Text("Number") }
+                label = { Text(commonStrings.number) }
             )
             HorizontalDivider()
 
@@ -593,7 +612,7 @@ private class BookMetadataTab(private val state: ProviderConfigState) : DialogTa
                 enabled = state.bookEnabled,
                 checked = state.bookReleaseDate,
                 onCheckedChange = state::onBookReleaseDateChange,
-                label = { Text("Release Date") }
+                label = { Text(commonStrings.releaseDate) }
             )
             HorizontalDivider()
 
@@ -601,7 +620,7 @@ private class BookMetadataTab(private val state: ProviderConfigState) : DialogTa
                 enabled = state.bookEnabled,
                 checked = state.bookSummary,
                 onCheckedChange = state::onBookSummaryChange,
-                label = { Text("Summary") }
+                label = { Text(LocalStrings.current.common.summary) }
             )
             HorizontalDivider()
 
@@ -609,32 +628,37 @@ private class BookMetadataTab(private val state: ProviderConfigState) : DialogTa
                 enabled = state.bookEnabled,
                 checked = state.bookTags,
                 onCheckedChange = state::onBookTagsChange,
-                label = { Text("Tags") }
+                label = { Text(commonStrings.tags) }
             )
         }
     }
 }
 
-private class ProviderSettingsTab(private val state: ProviderConfigState) : DialogTab {
-    override fun options() = TabItem(title = "PROVIDER SETTINGS")
+private class ProviderSettingsTab(
+    private val state: ProviderConfigState,
+    private val title: String,
+) : DialogTab {
+    @Composable
+    override fun options() = TabItem(title = title)
 
     @Composable
     override fun Content() {
-
+        val commonStrings = LocalStrings.current.common
+        val providerStrings = LocalStrings.current.komf.providers
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             DropdownChoiceMenu(
                 selectedOption = remember(state.mediaType) {
                     LabeledEntry(
                         state.mediaType,
-                        state.mediaType?.name ?: "Unset"
+                        state.mediaType?.name ?: commonStrings.unset
                     )
                 },
                 options = remember {
-                    listOf(LabeledEntry<KomfMediaType?>(null, "Unset")) +
+                    listOf(LabeledEntry<KomfMediaType?>(null, commonStrings.unset)) +
                             KomfMediaType.entries.map { LabeledEntry(it, it.name) }
                 },
                 onOptionChange = { state.onMediaTypeChange(it.value) },
-                label = { Text("Media Type") },
+                label = { Text(providerStrings.mediaType) },
                 inputFieldModifier = Modifier.fillMaxWidth()
             )
 
@@ -642,15 +666,15 @@ private class ProviderSettingsTab(private val state: ProviderConfigState) : Dial
                 selectedOption = remember(state.nameMatchingMode) {
                     LabeledEntry(
                         state.nameMatchingMode,
-                        state.nameMatchingMode?.name ?: "Unset"
+                        state.nameMatchingMode?.name ?: commonStrings.unset
                     )
                 },
                 options = remember {
-                    listOf(LabeledEntry<KomfNameMatchingMode?>(null, "Unset")) +
+                    listOf(LabeledEntry<KomfNameMatchingMode?>(null, commonStrings.unset)) +
                             KomfNameMatchingMode.entries.map { LabeledEntry(it, it.name) }
                 },
                 onOptionChange = { state.onNameMatchingModeChange(it.value) },
-                label = { Text("Name matching mode") },
+                label = { Text(providerStrings.nameMatchingMode) },
                 inputFieldModifier = Modifier.fillMaxWidth()
             )
 
@@ -658,16 +682,16 @@ private class ProviderSettingsTab(private val state: ProviderConfigState) : Dial
                 selectedOptions = remember(state.authorRoles) { state.authorRoles.map { LabeledEntry(it, it.name) } },
                 options = remember { KomfAuthorRole.entries.map { LabeledEntry(it, it.name) } },
                 onOptionSelect = { state.onAuthorSelect(it.value) },
-                label = { Text("Author Roles") },
-                placeholder = "Unset",
+                label = { Text(providerStrings.authorRoles) },
+                placeholder = commonStrings.unset,
                 inputFieldModifier = Modifier.fillMaxWidth()
             )
             DropdownMultiChoiceMenu(
                 selectedOptions = remember(state.artistRoles) { state.artistRoles.map { LabeledEntry(it, it.name) } },
                 options = remember { KomfAuthorRole.entries.map { LabeledEntry(it, it.name) } },
                 onOptionSelect = { state.onArtistSelect(it.value) },
-                label = { Text("Artist Roles") },
-                placeholder = "Unset",
+                label = { Text(providerStrings.artistRoles) },
+                placeholder = commonStrings.unset,
                 inputFieldModifier = Modifier.fillMaxWidth()
             )
             when (state) {
@@ -682,28 +706,31 @@ private class ProviderSettingsTab(private val state: ProviderConfigState) : Dial
 
     @Composable
     private fun AniListProviderSettings(state: AniListConfigState) {
+        val providerStrings = LocalStrings.current.komf.providers
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             SavableTextField(
                 currentValue = remember(state.tagScoreThreshold) { state.tagScoreThreshold.toString() },
                 onValueSave = { state.onTagScoreThresholdChange(it.toInt()) },
                 valueChangePolicy = { it.toIntOrNull() != null },
-                label = { Text("Tag score threshold") }
+                label = { Text(providerStrings.tagScoreThreshold) }
             )
 
             SavableTextField(
                 currentValue = remember(state.tagSizeLimit) { state.tagSizeLimit.toString() },
                 onValueSave = { state.onTagSizeLimitChange(it.toInt()) },
                 valueChangePolicy = { it.toIntOrNull() != null },
-                label = { Text("Tag size limit") }
+                label = { Text(providerStrings.tagSizeLimit) }
             )
         }
     }
 
     @Composable
     private fun MangaDexProviderSettings(state: MangaDexConfigState) {
+        val commonStrings = LocalStrings.current.common
+        val providerStrings = LocalStrings.current.komf.providers
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             ChipFieldWithSuggestions(
-                label = { Text("Alternative title languages (ISO 639)") },
+                label = { Text(providerStrings.alternativeTitleLanguagesIso639) },
                 values = state.coverLanguages,
                 onValuesChange = state::onCoverLanguagesChange,
                 suggestions = komfLanguageTagsSuggestions
@@ -712,8 +739,8 @@ private class ProviderSettingsTab(private val state: ProviderConfigState) : Dial
                 selectedOptions = state.links.map { LabeledEntry(it, it.name) },
                 options = MangaDexLink.entries.map { LabeledEntry(it, it.name) },
                 onOptionSelect = { state.onLinkSelect(it.value) },
-                label = { Text("Include links") },
-                placeholder = "All",
+                label = { Text(providerStrings.includeLinks) },
+                placeholder = commonStrings.all,
                 inputFieldModifier = Modifier.fillMaxWidth()
             )
         }
@@ -721,6 +748,7 @@ private class ProviderSettingsTab(private val state: ProviderConfigState) : Dial
 
     @Composable
     private fun MangaBakaProviderSettings(state: MangaBakaConfigState) {
+        val providerStrings = LocalStrings.current.komf.providers
         HorizontalDivider()
 
         DropdownChoiceMenu(
@@ -734,9 +762,11 @@ private class ProviderSettingsTab(private val state: ProviderConfigState) : Dial
                 MangaBakaMode.entries.map { LabeledEntry(it, it.name) }
             },
             onOptionChange = { state.onModeChange(it.value) },
-            label = { Text("Datasource type") },
+            label = { Text(providerStrings.datasourceType) },
             inputFieldModifier = Modifier.fillMaxWidth()
         )
     }
 }
+
+
 

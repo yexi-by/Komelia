@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import snd.komelia.formatDecimal
+import snd.komelia.ui.LocalStrings
 
 
 @Composable
@@ -19,6 +20,7 @@ fun UpdateProgressContent(
     completed: Long,
     info: String?
 ) {
+    val topBarStrings = LocalStrings.current.screens.topBar
     Column(
         Modifier.padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -38,7 +40,7 @@ fun UpdateProgressContent(
             val completedMb = remember(completed) {
                 (completed.toFloat() / 1024 / 1024).formatDecimal(2)
             }
-            Text("${completedMb}MiB / ${totalMb}MiB")
+            Text(topBarStrings.downloadProgress(completedMb, totalMb))
         }
     }
 }

@@ -258,7 +258,8 @@ fun ChangesConfirmationPopup(
     onSave: () -> Unit,
     onDiscard: () -> Unit,
 ) {
-
+    val commonStrings = LocalStrings.current.common
+    val settingsStrings = LocalStrings.current.screens.settings
     var showThumbnailRegenerateDialog by remember { mutableStateOf(false) }
     if (showThumbnailRegenerateDialog) {
         ThumbRegenerationDialog(
@@ -282,11 +283,11 @@ fun ChangesConfirmationPopup(
                     modifier = Modifier.padding(10.dp),
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text("You have unsaved changes")
+                    Text(settingsStrings.unsavedChanges)
                     Spacer(Modifier.weight(1f))
 
                     TextButton(onClick = onDiscard) {
-                        Text("Discard")
+                        Text(commonStrings.discard)
                     }
                     Spacer(Modifier.width(20.dp))
 
@@ -296,7 +297,7 @@ fun ChangesConfirmationPopup(
                             onSave()
                         },
                     ) {
-                        Text("Save Changes")
+                        Text(LocalStrings.current.common.saveChanges)
 
                     }
                 }

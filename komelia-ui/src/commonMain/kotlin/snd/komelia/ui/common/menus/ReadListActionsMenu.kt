@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.dialogs.ConfirmationDialog
 import snd.komelia.ui.dialogs.readlistedit.ReadListEditDialog
 import snd.komga.client.readlist.KomgaReadList
@@ -26,12 +27,13 @@ fun ReadListActionsMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
 ) {
+    val menuStrings = LocalStrings.current.menus.readList
     var showDeleteDialog by remember { mutableStateOf(false) }
     if (showDeleteDialog) {
         ConfirmationDialog(
-            title = "Delete Read List",
-            body = "Read list ${readList.name} will be removed from this server. Your media files will not be affected. This cannot be undone. Continue?",
-            confirmText = "Yes, delete read list \"${readList.name}\"",
+            title = menuStrings.deleteReadListTitle,
+            body = menuStrings.deleteReadListBody(readList.name),
+            confirmText = menuStrings.confirmDeleteReadList(readList.name),
             onDialogConfirm = {
                 onReadListDelete()
                 onDismissRequest()
@@ -61,12 +63,12 @@ fun ReadListActionsMenu(
         val deleteIsHovered = deleteInteractionSource.collectIsHoveredAsState()
 
         DropdownMenuItem(
-            text = { Text("Edit") },
+            text = { Text(menuStrings.editLabel) },
             onClick = { showEditDialog = true },
         )
 
         DropdownMenuItem(
-            text = { Text("Delete") },
+            text = { Text(menuStrings.deleteLabel) },
             onClick = { showDeleteDialog = true },
             modifier = Modifier
                 .hoverable(deleteInteractionSource)

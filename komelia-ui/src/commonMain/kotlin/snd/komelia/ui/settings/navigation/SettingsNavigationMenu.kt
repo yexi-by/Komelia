@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import snd.komelia.ui.LocalOfflineMode
 import snd.komelia.ui.LocalPlatform
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.dialogs.ConfirmationDialog
 import snd.komelia.ui.platform.PlatformType.DESKTOP
 import snd.komelia.ui.platform.PlatformType.MOBILE
@@ -69,27 +70,29 @@ fun SettingsNavigationMenu(
     contentColor: Color,
     modifier: Modifier = Modifier
 ) {
+    val commonStrings = LocalStrings.current.common
+    val screenStrings = LocalStrings.current.screens.settings
     val isAdmin = remember(user) { user?.roleAdmin() ?: true }
     Column(
         modifier = modifier.verticalScroll(rememberScrollState())
     ) {
         val isOffline = LocalOfflineMode.current.collectAsState().value
-        Text("App Settings", style = MaterialTheme.typography.titleSmall)
+        Text(screenStrings.appSettings, style = MaterialTheme.typography.titleSmall)
         NavigationButton(
-            label = "Appearance",
+            label = screenStrings.appearance,
             onClick = { onNavigation(AppSettingsScreen()) },
             isSelected = currentScreen is AppSettingsScreen,
             color = contentColor,
         )
         NavigationButton(
-            label = "Image Reader",
+            label = screenStrings.imageReader,
             onClick = { onNavigation(ImageReaderSettingsScreen()) },
             isSelected = currentScreen is ImageReaderSettingsScreen,
             color = contentColor,
         )
         if (webviewIsAvailable()) {
             NavigationButton(
-                label = "Epub Reader",
+                label = screenStrings.epubReaderSettings,
                 onClick = { onNavigation(EpubReaderSettingsScreen()) },
                 isSelected = currentScreen is EpubReaderSettingsScreen,
                 color = contentColor,
@@ -97,7 +100,7 @@ fun SettingsNavigationMenu(
         }
         if (updatesEnabled) {
             NavigationButton(
-                label = "Updates",
+                label = screenStrings.updates,
                 onClick = { onNavigation(AppUpdatesScreen()) },
                 isSelected = currentScreen is AppUpdatesScreen,
                 error = newVersionIsAvailable,
@@ -105,7 +108,7 @@ fun SettingsNavigationMenu(
             )
         }
         NavigationButton(
-            label = "Offline Mode",
+            label = screenStrings.offlineMode,
             onClick = { onNavigation(OfflineSettingsScreen()) },
             isSelected = currentScreen is OfflineSettingsScreen,
             color = contentColor,
@@ -115,16 +118,16 @@ fun SettingsNavigationMenu(
 
 
         if (!isOffline) {
-            Text("User Settings", style = MaterialTheme.typography.titleSmall)
+            Text(screenStrings.userSettings, style = MaterialTheme.typography.titleSmall)
             NavigationButton(
-                label = "My Account",
+                label = screenStrings.myAccount,
                 onClick = { onNavigation(AccountSettingsScreen()) },
                 isSelected = currentScreen is AccountSettingsScreen,
                 color = contentColor,
             )
 
             NavigationButton(
-                label = "My Authentication Activity",
+                label = screenStrings.myAuthenticationActivity,
                 onClick = { onNavigation(AuthenticationActivityScreen(true)) },
                 isSelected = currentScreen is AuthenticationActivityScreen && currentScreen.forMe,
                 color = contentColor,
@@ -132,28 +135,28 @@ fun SettingsNavigationMenu(
 
             HorizontalDivider(Modifier.padding(vertical = 10.dp))
             if (isAdmin) {
-                Text("Server Settings", style = MaterialTheme.typography.titleSmall)
+                Text(screenStrings.serverSettings, style = MaterialTheme.typography.titleSmall)
                 NavigationButton(
-                    label = "General",
+                    label = screenStrings.general,
                     onClick = { onNavigation(ServerSettingsScreen()) },
                     isSelected = currentScreen is ServerSettingsScreen,
                     color = contentColor,
                 )
 
                 NavigationButton(
-                    label = "Users",
+                    label = screenStrings.users,
                     onClick = { onNavigation(UsersScreen()) },
                     isSelected = currentScreen is UsersScreen,
                     color = contentColor,
                 )
                 NavigationButton(
-                    label = "Authentication Activity",
+                    label = screenStrings.authenticationActivity,
                     onClick = { onNavigation(AuthenticationActivityScreen(false)) },
                     isSelected = currentScreen is AuthenticationActivityScreen && !currentScreen.forMe,
                     color = contentColor,
                 )
                 NavigationButton(
-                    label = "Media Management",
+                    label = screenStrings.mediaManagement,
                     onClick = { onNavigation(MediaAnalysisScreen()) },
                     isSelected = currentScreen is MediaAnalysisScreen,
                     error = hasMediaErrors,
@@ -161,7 +164,7 @@ fun SettingsNavigationMenu(
                 )
 
                 NavigationButton(
-                    label = "Announcements",
+                    label = screenStrings.announcements,
                     onClick = { onNavigation(AnnouncementsScreen()) },
                     isSelected = currentScreen is AnnouncementsScreen,
                     color = contentColor,
@@ -170,9 +173,9 @@ fun SettingsNavigationMenu(
             }
 
             if (isAdmin) {
-                Text("Komf Settings", style = MaterialTheme.typography.titleSmall)
+                Text(screenStrings.komfSettings, style = MaterialTheme.typography.titleSmall)
                 NavigationButton(
-                    label = "Connection",
+                    label = commonStrings.connection,
                     onClick = { onNavigation(KomfSettingsScreen()) },
                     isSelected = currentScreen is KomfSettingsScreen,
                     color = contentColor,
@@ -180,25 +183,25 @@ fun SettingsNavigationMenu(
                 AnimatedVisibility(komfEnabled) {
                     Column {
                         NavigationButton(
-                            label = "Processing",
+                            label = commonStrings.processing,
                             onClick = { onNavigation(KomfProcessingSettingsScreen(KOMGA)) },
                             isSelected = currentScreen is KomfProcessingSettingsScreen,
                             color = contentColor,
                         )
                         NavigationButton(
-                            label = "Providers",
+                            label = commonStrings.providers,
                             onClick = { onNavigation(KomfProvidersSettingsScreen()) },
                             isSelected = currentScreen is KomfProvidersSettingsScreen,
                             color = contentColor,
                         )
                         NavigationButton(
-                            label = "Notifications",
+                            label = commonStrings.notifications,
                             onClick = { onNavigation(KomfNotificationSettingsScreen()) },
                             isSelected = currentScreen is KomfNotificationSettingsScreen,
                             color = contentColor,
                         )
                         NavigationButton(
-                            label = "Job History",
+                            label = screenStrings.jobHistory,
                             onClick = { onNavigation(KomfJobsScreen()) },
                             isSelected = currentScreen is KomfJobsScreen,
                             color = contentColor,
@@ -211,16 +214,16 @@ fun SettingsNavigationMenu(
 
         var showLogoutConfirmation by remember { mutableStateOf(false) }
         NavigationButton(
-            label = "Log Out",
+            label = commonStrings.logOut,
             onClick = { showLogoutConfirmation = true },
             isSelected = false,
             color = contentColor,
         )
         if (showLogoutConfirmation) {
             ConfirmationDialog(
-                title = "Log Out",
-                body = "Are you sure you want to logout?",
-                buttonConfirm = "Log Out",
+                title = commonStrings.logOut,
+                body = screenStrings.logOutBody,
+                buttonConfirm = commonStrings.logOut,
                 buttonConfirmColor = MaterialTheme.colorScheme.errorContainer,
 
                 onDialogConfirm = onLogout,

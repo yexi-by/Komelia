@@ -11,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.StateHolder
 import snd.komelia.ui.common.components.LabeledEntry.Companion.stringEntry
 import snd.komelia.ui.common.components.LockableChipTextFieldWithSuggestions
@@ -21,8 +22,9 @@ internal class TagsTab(
     private val vm: SeriesEditMetadataState,
 ) : DialogTab {
 
+    @Composable
     override fun options() = TabItem(
-        title = "TAGS",
+        title = LocalStrings.current.common.tags.uppercase(),
         icon = Icons.Default.LocalOffer
     )
 
@@ -48,11 +50,12 @@ private fun TagsContent(
     allTags: List<String>,
     allGenres: List<String>,
 ) {
+    val commonStrings = LocalStrings.current.common
     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
         LockableChipTextFieldWithSuggestions(
             values = tags.value,
             onValuesChange = { tags.setValue(it) },
-            label = "Tags",
+            label = commonStrings.tags,
             suggestions = remember(allTags) { allTags.map { stringEntry(it) } },
             locked = tagsLock.value,
             onLockChange = { tagsLock.setValue(it) }
@@ -60,7 +63,7 @@ private fun TagsContent(
         LockableChipTextFieldWithSuggestions(
             values = genres.value,
             onValuesChange = { genres.setValue(it) },
-            label = "Genres",
+            label = commonStrings.genres,
             suggestions = remember(allGenres) { allGenres.map { stringEntry(it) } },
             locked = genresLock.value,
             onLockChange = { genresLock.setValue(it) }
@@ -68,3 +71,7 @@ private fun TagsContent(
         Spacer(Modifier.height(30.dp))
     }
 }
+
+
+
+

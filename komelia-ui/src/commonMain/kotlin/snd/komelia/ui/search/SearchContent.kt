@@ -29,6 +29,7 @@ import snd.komelia.ui.platform.VerticalScrollbar
 import snd.komelia.ui.platform.WindowSizeClass
 import snd.komelia.ui.search.SearchViewModel.SearchResultsTab
 import snd.komga.client.series.KomgaSeries
+import snd.komelia.ui.LocalStrings
 
 @Composable
 fun SearchContent(
@@ -125,13 +126,14 @@ fun SearchContent(
 
 @Composable
 private fun EmptySearchResults() {
+    val searchStrings = LocalStrings.current.screens.search
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(100.dp))
-        Text("The search returned no results", style = MaterialTheme.typography.titleLarge)
-        Text("Try searching for something else")
+        Text(searchStrings.noResultsTitle, style = MaterialTheme.typography.titleLarge)
+        Text(searchStrings.noResultsBody)
     }
 }
 
@@ -162,7 +164,7 @@ fun SearchToolBar(
             FilterChip(
                 onClick = { onSearchTypeChange(SearchResultsTab.SERIES) },
                 selected = searchType == SearchResultsTab.SERIES,
-                label = { Text("Series") },
+                label = { Text(LocalStrings.current.common.series) },
                 colors = chipColors,
                 border = null,
             )
@@ -171,11 +173,10 @@ fun SearchToolBar(
             FilterChip(
                 onClick = { onSearchTypeChange(SearchResultsTab.BOOKS) },
                 selected = searchType == SearchResultsTab.BOOKS,
-                label = { Text("Books") },
+                label = { Text(LocalStrings.current.common.books) },
                 colors = chipColors,
                 border = null,
             )
         }
     }
 }
-

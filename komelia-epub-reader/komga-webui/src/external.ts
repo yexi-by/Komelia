@@ -38,6 +38,7 @@ declare global {
         originalFetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 
         getServerUrl: () => Promise<CallbackResponse<string>>
+        getUiLanguageTag?: () => Promise<CallbackResponse<string>>
         getSettings: () => Promise<CallbackResponse<EpubReaderSettings>>
         saveSettings: (settings: EpubReaderSettings) => Promise<CallbackResponse<undefined>>
 
@@ -117,6 +118,12 @@ export default class ExternalFunctions {
 
     async getServerUrl(): Promise<string> {
         return window.getServerUrl().then((value) => value.result)
+    }
+
+    async getUiLanguageTag(): Promise<string | null> {
+        const fn = window.getUiLanguageTag
+        if (!fn) return null
+        return fn().then((value) => value.result).catch(() => null)
     }
 
     async isFullscreenAvailable(): Promise<boolean> {

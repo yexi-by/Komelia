@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import snd.komelia.ui.LoadState
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.LocalViewModelFactory
 import snd.komelia.ui.common.components.LoadingMaxSizeIndicator
 import snd.komelia.ui.error.formatExceptionMessage
@@ -23,7 +24,7 @@ class KomfNotificationSettingsScreen : Screen {
         val komfConfigLoadError = vm.komfConfig.configError.collectAsState().value
         LaunchedEffect(Unit) { vm.initialize() }
 
-        SettingsScreenContainer(title = "Notification Settings") {
+        SettingsScreenContainer(title = LocalStrings.current.screens.settings.notificationSettings) {
 
             if (komfConfigLoadError != null) {
                 Text(formatExceptionMessage(komfConfigLoadError))

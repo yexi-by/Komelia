@@ -16,3 +16,7 @@ build/
 /output
 /.kotlin
 /cmake/build*
+/audit-ui-strings-report.txt
+/audit-i18n-bypass-report.txt
+/local-release.jks
+/gradle/gradle-daemon-jvm.properties

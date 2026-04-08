@@ -53,6 +53,7 @@ import snd.komelia.image.ReaderImageResult
 import snd.komelia.settings.model.ContinuousReadingDirection.LEFT_TO_RIGHT
 import snd.komelia.settings.model.ContinuousReadingDirection.RIGHT_TO_LEFT
 import snd.komelia.settings.model.ContinuousReadingDirection.TOP_TO_BOTTOM
+import snd.komelia.ui.LocalStrings
 import snd.komelia.ui.reader.image.PageMetadata
 import snd.komelia.ui.reader.image.ScreenScaleState
 import snd.komelia.ui.reader.image.common.ContinuousReaderHelpDialog
@@ -60,6 +61,7 @@ import snd.komelia.ui.reader.image.common.ReaderControlsOverlay
 import snd.komelia.ui.reader.image.common.ReaderImageContent
 import snd.komelia.ui.reader.image.common.ScalableContainer
 import snd.komelia.ui.reader.image.continuous.ContinuousReaderState.BookPagesInterval
+import snd.komelia.ui.strings.ReaderStrings
 
 @Composable
 fun BoxScope.ContinuousReaderContent(
@@ -156,27 +158,31 @@ fun BoxScope.ContinuousReaderContent(
 private fun ReaderPages(state: ContinuousReaderState) {
     val pageIntervals = state.pageIntervals.collectAsState().value
     if (pageIntervals.isEmpty()) return
+    val readerStrings = LocalStrings.current.reader
     val sidePadding = with(LocalDensity.current) { state.sidePaddingPx.collectAsState().value.toDp() }
     val readingDirection = state.readingDirection.collectAsState().value
     when (readingDirection) {
         TOP_TO_BOTTOM -> VerticalLayout(
             state = state,
             pageIntervals = pageIntervals,
-            sidePadding = sidePadding
+            sidePadding = sidePadding,
+            readerStrings = readerStrings,
         )
 
         LEFT_TO_RIGHT -> HorizontalLayout(
             state = state,
             pageIntervals = pageIntervals,
             sidePadding = sidePadding,
-            reversed = false
+            reversed = false,
+            readerStrings = readerStrings,
         )
 
         RIGHT_TO_LEFT -> HorizontalLayout(
             state = state,
             pageIntervals = pageIntervals,
             sidePadding = sidePadding,
-            reversed = true
+            reversed = true,
+            readerStrings = readerStrings,
         )
     }
 }
@@ -185,14 +191,15 @@ private fun ReaderPages(state: ContinuousReaderState) {
 private fun VerticalLayout(
     state: ContinuousReaderState,
     pageIntervals: List<BookPagesInterval>,
-    sidePadding: Dp
+    sidePadding: Dp,
+    readerStrings: ReaderStrings,
 ) {
     LazyColumn(
         state = state.lazyListState,
         contentPadding = PaddingValues(start = sidePadding, end = sidePadding),
         userScrollEnabled = false,
     ) {
-        continuousPagesLayout(pageIntervals) { page ->
+        continuousPagesLayout(pageIntervals, readerStrings) { page ->
             var displaySize by remember { mutableStateOf(state.guessPageDisplaySize(page)) }
             LaunchedEffect(Unit) {
                 state.getPageDisplaySize(page).collect { displaySize = it }
@@ -223,7 +230,8 @@ private fun HorizontalLayout(
     state: ContinuousReaderState,
     pageIntervals: List<BookPagesInterval>,
     sidePadding: Dp,
-    reversed: Boolean
+    reversed: Boolean,
+    readerStrings: ReaderStrings,
 ) {
     LazyRow(
         state = state.lazyListState,
@@ -231,7 +239,7 @@ private fun HorizontalLayout(
         userScrollEnabled = false,
         reverseLayout = reversed
     ) {
-        continuousPagesLayout(pageIntervals) { page ->
+        continuousPagesLayout(pageIntervals, readerStrings) { page ->
             var displaySize by remember { mutableStateOf(state.guessPageDisplaySize(page)) }
             LaunchedEffect(Unit) {
                 state.getPageDisplaySize(page).collect { displaySize = it }
@@ -259,6 +267,7 @@ private fun HorizontalLayout(
 
 private fun LazyListScope.continuousPagesLayout(
     pageIntervals: List<BookPagesInterval>,
+    readerStrings: ReaderStrings,
     pageContent: @Composable (PageMetadata) -> Unit,
 ) {
     item {
@@ -266,7 +275,7 @@ private fun LazyListScope.continuousPagesLayout(
             modifier = Modifier.sizeIn(minHeight = 300.dp, minWidth = 300.dp).fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text("Reached the start of the series", style = MaterialTheme.typography.titleLarge)
+            Text(readerStrings.reachedStartOfSeries, style = MaterialTheme.typography.titleLarge)
         }
     }
     pageIntervals.forEachIndexed { index, interval ->
@@ -279,7 +288,7 @@ private fun LazyListScope.continuousPagesLayout(
                 ) {
                     pageIntervals.getOrNull(index - 1)?.let { previous ->
                         Column {
-                            Text("Previous:", style = MaterialTheme.typography.bodyMedium)
+                            Text(readerStrings.previous, style = MaterialTheme.typography.bodyMedium)
                             Text(
                                 previous.book.metadata.title,
                                 style = MaterialTheme.typography.titleLarge
@@ -288,7 +297,7 @@ private fun LazyListScope.continuousPagesLayout(
                     }
                     Spacer(Modifier.size(50.dp))
                     Column {
-                        Text("Current:", style = MaterialTheme.typography.bodyMedium)
+                        Text(readerStrings.current, style = MaterialTheme.typography.bodyMedium)
                         Text(
                             interval.book.metadata.title,
                             style = MaterialTheme.typography.titleLarge
@@ -304,7 +313,7 @@ private fun LazyListScope.continuousPagesLayout(
         Box(
             modifier = Modifier.sizeIn(minHeight = 300.dp, minWidth = 300.dp).fillMaxSize(),
             contentAlignment = Alignment.Center
-        ) { Text("Reached the end of the series", style = MaterialTheme.typography.titleLarge) }
+        ) { Text(readerStrings.reachedEndOfSeries, style = MaterialTheme.typography.titleLarge) }
     }
 
 }
