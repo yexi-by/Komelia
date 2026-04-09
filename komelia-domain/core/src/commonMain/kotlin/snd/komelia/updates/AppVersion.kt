@@ -17,15 +17,17 @@ data class AppVersion(
 ) : Comparable<AppVersion> {
 
     companion object {
-        val current = AppVersion(0, 18, 4)
+        private val versionRegex = Regex("""^[^\d]*?(\d+)\.(\d+)(?:\.(\d+))?(?:[-+].*)?$""")
+
+        val current = AppVersion(0, 18, 5)
 
         fun fromString(value: String): AppVersion {
-            val version = value.split(".")
-            return when (version.size) {
-                3 -> AppVersion(version[0].toInt(), version[1].toInt(), version[2].toInt())
-                2 -> AppVersion(version[0].toInt(), version[1].toInt(), 0)
-                else -> error("Can't parse version number")
-            }
+            val match = versionRegex.matchEntire(value.trim())
+                ?: error("Can't parse version number: '$value'")
+            val major = match.groupValues[1].toInt()
+            val minor = match.groupValues[2].toInt()
+            val patch = match.groupValues[3].ifBlank { "0" }.toInt()
+            return AppVersion(major, minor, patch)
         }
     }
 

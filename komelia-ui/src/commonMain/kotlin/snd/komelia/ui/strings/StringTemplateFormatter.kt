@@ -1,7 +1,7 @@
 package snd.komelia.ui.strings
 
 private const val escapedPercentSentinel = "\u0000komelia_percent\u0000"
-private val namedPlaceholderRegex = Regex("\\{([A-Za-z0-9_]+)}")
+private val namedPlaceholderRegex = Regex("\\{([A-Za-z0-9_]+)\\}")
 
 internal fun String.formatTemplate(vararg arguments: Pair<String, Any?>): String {
     val values = arguments.associate { (name, value) -> name to (value?.toString() ?: "") }

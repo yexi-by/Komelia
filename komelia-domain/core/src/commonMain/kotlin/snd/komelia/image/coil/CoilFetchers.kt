@@ -36,13 +36,29 @@ abstract class CoilFetcher(
     }
 }
 
-class KomgaBookDefaultThumbnailFetcher(
+class KomgaBookSelectedThumbnailFetcher(
     private val bookApi: KomgaBookApi,
     private val bookId: KomgaBookId,
     decoder: CoilAwareDecoder,
     options: Options,
 ) : CoilFetcher(decoder, options) {
-    override suspend fun fetchBytes() = bookApi.getDefaultThumbnail(bookId)
+    override suspend fun fetchBytes(): ByteArray? {
+        val selectedThumbnail = bookApi.getThumbnails(bookId).firstOrNull { it.selected }
+        val selectedThumbnailWidth = selectedThumbnail?.width
+        val selectedThumbnailHeight = selectedThumbnail?.height
+        val usesGeneratedLandscapeThumbnail = selectedThumbnail != null &&
+            selectedThumbnail.type == "GENERATED" &&
+            selectedThumbnailWidth != null &&
+            selectedThumbnailHeight != null &&
+            selectedThumbnailWidth > selectedThumbnailHeight
+
+        if (usesGeneratedLandscapeThumbnail) {
+            val firstPageNumber = bookApi.getBookPages(bookId).firstOrNull()?.number ?: 1
+            return bookApi.getPage(bookId, firstPageNumber)
+        }
+
+        return selectedThumbnail?.let { bookApi.getThumbnail(bookId, it.id) } ?: bookApi.getDefaultThumbnail(bookId)
+    }
 }
 
 class KomgaBookThumbnailFetcher(

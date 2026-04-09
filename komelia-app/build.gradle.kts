@@ -1,9 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.plugin.extraProperties
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
@@ -18,20 +12,20 @@ version = libs.versions.app.version.get()
 kotlin {
     jvmToolchain(17) // max version https://developer.android.com/build/releases/gradle-plugin#compatibility
     androidTarget {
-        compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
+        compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) }
     }
 
     jvm {
-        compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
+        compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) }
     }
 
-    @OptIn(ExperimentalWasmDsl::class)
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
     wasmJs {
         outputModuleName = "komelia-app"
         browser {
             commonWebpackConfig {
                 outputFileName = "komelia-app.js"
-                devServer = (devServer ?: KotlinWebpackConfig.DevServer())
+                devServer = (devServer ?: org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.DevServer())
             }
         }
         browser()
@@ -88,7 +82,7 @@ enum class AndroidVariant {
 
 val androidVariant = runCatching {
     AndroidVariant.valueOf(
-        (project.extraProperties["snd.android.variant"] as String).uppercase()
+        (project.extensions.extraProperties["snd.android.variant"] as String).uppercase()
     )
 }.getOrDefault(AndroidVariant.STANDALONE)
 
@@ -124,7 +118,7 @@ android {
         applicationId = "io.github.snd_r.komelia"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 18
+        versionCode = 19
         versionName = libs.versions.app.version.get()
         if (requestedAndroidAbi != null) {
             ndk {
@@ -194,7 +188,10 @@ compose.desktop {
         )
 
         nativeDistributions {
-            targetFormats(TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(
+                org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi,
+                org.jetbrains.compose.desktop.application.dsl.TargetFormat.Deb
+            )
             packageName = "Komelia"
             packageVersion = libs.versions.app.version.get()
             description = "Komga media client"

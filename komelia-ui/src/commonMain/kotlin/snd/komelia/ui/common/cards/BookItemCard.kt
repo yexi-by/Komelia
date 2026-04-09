@@ -103,7 +103,7 @@ fun BookImageCard(
                     BookThumbnail(
                         book.id,
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Fit,
                     )
                 }
             }
@@ -129,7 +129,7 @@ fun BookSimpleImageCard(
                 BookThumbnail(
                     book.id,
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Fit,
                 )
             }
         }

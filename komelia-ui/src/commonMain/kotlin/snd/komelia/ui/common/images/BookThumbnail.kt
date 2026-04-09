@@ -9,10 +9,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import kotlinx.coroutines.flow.filterIsInstance
-import snd.komelia.image.coil.BookDefaultThumbnailRequest
+import snd.komelia.image.coil.BookSelectedThumbnailRequest
 import snd.komelia.ui.LocalKomgaEvents
 import snd.komga.client.book.KomgaBookId
 import snd.komga.client.sse.KomgaEvent.ThumbnailBookEvent
+
+private const val bookThumbnailCacheVersion = "book-thumbnail-v4"
 
 @Composable
 fun BookThumbnail(
@@ -21,19 +23,19 @@ fun BookThumbnail(
     contentScale: ContentScale = ContentScale.Fit,
 ) {
     val komgaEvents = LocalKomgaEvents.current
-    var requestData by remember(bookId) { mutableStateOf(BookDefaultThumbnailRequest(bookId)) }
+    var requestData by remember(bookId) { mutableStateOf(BookSelectedThumbnailRequest(bookId)) }
 
     LaunchedEffect(bookId) {
         komgaEvents.filterIsInstance<ThumbnailBookEvent>().collect {
             if (bookId == it.bookId) {
-                requestData = BookDefaultThumbnailRequest(bookId)
+                requestData = BookSelectedThumbnailRequest(bookId)
             }
         }
     }
 
     ThumbnailImage(
         data = requestData,
-        cacheKey = bookId.value,
+        cacheKey = "$bookThumbnailCacheVersion:${bookId.value}",
         contentScale = contentScale,
         modifier = modifier
     )

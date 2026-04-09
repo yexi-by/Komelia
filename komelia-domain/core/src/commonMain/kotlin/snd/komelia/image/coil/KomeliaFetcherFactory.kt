@@ -23,7 +23,7 @@ class KomeliaFetcherFactory(
         imageLoader: ImageLoader
     ): Fetcher? {
         return when (data) {
-            is BookDefaultThumbnailRequest -> KomgaBookDefaultThumbnailFetcher(
+            is BookSelectedThumbnailRequest -> KomgaBookSelectedThumbnailFetcher(
                 bookApi = komgaApi.value.bookApi,
                 bookId = data.bookId,
                 decoder = decoder,
@@ -97,7 +97,7 @@ class KomeliaFetcherFactory(
 
 }
 
-data class BookDefaultThumbnailRequest(
+data class BookSelectedThumbnailRequest(
     val bookId: KomgaBookId,
     val requestCache: Int = Random.nextInt()
 )

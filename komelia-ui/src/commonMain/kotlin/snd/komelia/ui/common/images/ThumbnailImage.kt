@@ -23,7 +23,7 @@ fun ThumbnailImage(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalPlatformContext.current
-    val request = remember(data, cacheKey) {
+    val request = remember(data, cacheKey, contentScale) {
         ImageRequest.Builder(context)
             .data(data)
             .memoryCacheKey(cacheKey)
