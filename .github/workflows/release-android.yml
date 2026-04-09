@@ -71,6 +71,20 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x gradlew
 
+      - name: Validate release version inputs
+        run: |
+          APP_VERSION=$(grep '^app-version = "' gradle/libs.versions.toml | sed -E 's/app-version = "([^"]+)"/\1/')
+          APP_VERSION_CODE=$(grep '^app-version-code = "' gradle/libs.versions.toml | sed -E 's/app-version-code = "([^"]+)"/\1/')
+          EXPECTED_TAG="v${APP_VERSION}"
+          if [ "${{ inputs.tag }}" != "${EXPECTED_TAG}" ]; then
+            echo "Release tag ${{ inputs.tag }} does not match app-version ${APP_VERSION}" >&2
+            exit 1
+          fi
+          if ! [[ "${APP_VERSION_CODE}" =~ ^[0-9]+$ ]]; then
+            echo "Invalid app-version-code: ${APP_VERSION_CODE}" >&2
+            exit 1
+          fi
+
       - name: Decode release keystore
         env:
           KOMELIA_RELEASE_KEYSTORE_BASE64: ${{ secrets.KOMELIA_RELEASE_KEYSTORE_BASE64 }}
@@ -104,6 +118,21 @@ jobs:
         run: |
           mkdir -p build/verified-apks
           cp komelia-app/build/outputs/apk/release/komelia-app-release.apk "build/verified-apks/${APK_NAME}"
+
+      - name: Validate built APK version
+        run: |
+          APP_VERSION=$(grep '^app-version = "' gradle/libs.versions.toml | sed -E 's/app-version = "([^"]+)"/\1/')
+          APP_VERSION_CODE=$(grep '^app-version-code = "' gradle/libs.versions.toml | sed -E 's/app-version-code = "([^"]+)"/\1/')
+          BUILT_VERSION=$(grep '"versionName"' komelia-app/build/outputs/apk/release/output-metadata.json | sed -E 's/.*"versionName": "([^"]+)".*/\1/')
+          BUILT_VERSION_CODE=$(grep '"versionCode"' komelia-app/build/outputs/apk/release/output-metadata.json | sed -E 's/.*"versionCode": ([0-9]+).*/\1/')
+          if [ "${BUILT_VERSION}" != "${APP_VERSION}" ]; then
+            echo "Built APK version ${BUILT_VERSION} does not match app-version ${APP_VERSION}" >&2
+            exit 1
+          fi
+          if [ "${BUILT_VERSION_CODE}" != "${APP_VERSION_CODE}" ]; then
+            echo "Built APK versionCode ${BUILT_VERSION_CODE} does not match app-version-code ${APP_VERSION_CODE}" >&2
+            exit 1
+          fi
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4

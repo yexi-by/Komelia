@@ -118,7 +118,7 @@ android {
         applicationId = "io.github.snd_r.komelia"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 20
+        versionCode = libs.versions.app.version.code.get().toInt()
         versionName = libs.versions.app.version.get()
         if (requestedAndroidAbi != null) {
             ndk {
