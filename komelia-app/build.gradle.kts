@@ -7,8 +7,11 @@ plugins {
 }
 
 group = "io.github.snd-r.komelia"
-val appVersionName = libs.versions.appVersion.get()
-val appVersionCode = libs.versions.appVersionCode.get().toInt()
+val versionCatalog = extensions
+    .getByType(org.gradle.api.artifacts.VersionCatalogsExtension::class.java)
+    .named("libs")
+val appVersionName = versionCatalog.findVersion("app-version").get().requiredVersion
+val appVersionCode = versionCatalog.findVersion("app-version-code").get().requiredVersion.toInt()
 version = appVersionName
 
 kotlin {
