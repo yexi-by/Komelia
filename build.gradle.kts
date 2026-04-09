@@ -428,6 +428,12 @@ tasks.register("komeliaBuildNonJvmDependencies") {
 }
 
 gradle.projectsEvaluated {
+    project(":komelia-ui").tasks.matching {
+        it.name == "copyNonXmlValueResourcesForCommonMain"
+    }.configureEach {
+        dependsOn(":buildWebui")
+    }
+
     project(":komelia-app").tasks.named("preBuild") {
         if (!skipAndroidJniVerification) {
             dependsOn(":verifyAndroidJniLibs")

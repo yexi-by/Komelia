@@ -280,7 +280,7 @@
     "save_changes": "保存更改",
     "series": "系列 | 系列",
     "settings": "设置",
-    "sidecars": "边车",
+    "sidecars": "附属文件",
     "tags": "标签",
     "ui": "用户界面",
     "unavailable": "不可用",
@@ -758,7 +758,7 @@
     "series_status": {
       "ABANDONED": "已放弃",
       "ENDED": "已完结",
-      "HIATUS": "有生之年",
+      "HIATUS": "休载",
       "ONGOING": "连载中"
     },
     "thumbnail_size": {
