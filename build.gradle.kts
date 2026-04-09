@@ -1,3 +1,4 @@
+import groovy.json.JsonSlurper
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.file.DuplicatesStrategy.EXCLUDE
 import java.util.regex.Pattern
@@ -38,6 +39,7 @@ val resourcesDir = "$projectDir/komelia-infra/jni/src/jvmMain/resources/"
 val androidJniLibsDir = "$projectDir/komelia-infra/jni/src/androidMain/jniLibs"
 val composeDistroResourcesDir = "$projectDir/komelia-app/desktopUnpackedResources"
 val composeCommonResources = "$projectDir/komelia-ui/src/commonMain/composeResources/files"
+val composeWebuiResources = "$composeCommonResources/webui"
 
 val epubReader = "$rootDir/komelia-epub-reader"
 val epubReaderKomga = "$epubReader/komga-webui"
@@ -370,7 +372,7 @@ tasks.register<Sync>("buildWebui") {
 
     from("$epubReaderKomga/dist/")
     from("$epubReaderTtsu/dist/")
-    into(composeCommonResources)
+    into(composeWebuiResources)
 }
 
 tasks.register<Exec>("cmakeSystemDepsConfigure") {
@@ -493,13 +495,42 @@ val i18nBypassAuditRoots = listOf(
 
 val i18nBypassPatterns = listOf(
     "import\\s+snd\\.komelia\\.ui\\.strings\\.EnStrings",
+    "import\\s+snd\\.komelia\\.ui\\.strings\\.ZhHansStrings",
     "import\\s+snd\\.komelia\\.strings\\.EnExtensionStrings",
+    "import\\s+snd\\.komelia\\.strings\\.ZhHansExtensionStrings",
     "EnStrings\\.",
+    "ZhHansStrings\\.",
     "EnExtensionStrings\\.",
+    "ZhHansExtensionStrings\\.",
     "enEpubStrings",
+    "zhHansEpubStrings",
     "locale:\\s*['\"]en['\"]",
     "fallbackLocale:\\s*['\"]en['\"]",
 ).map(Pattern::compile)
+
+data class LocaleAssetScope(
+    val name: String,
+    val english: String,
+    val simplifiedChinese: String,
+)
+
+val localeAssetScopes = listOf(
+    LocaleAssetScope(
+        name = "main-app",
+        english = "komelia-ui/src/commonMain/composeResources/files/i18n/en.json",
+        simplifiedChinese = "komelia-ui/src/commonMain/composeResources/files/i18n/zh-Hans.json",
+    ),
+    LocaleAssetScope(
+        name = "extension",
+        english = "komelia-komf-extension/app/src/wasmJsMain/resources/i18n/en.json",
+        simplifiedChinese = "komelia-komf-extension/app/src/wasmJsMain/resources/i18n/zh-Hans.json",
+    ),
+    LocaleAssetScope(
+        name = "ttu-ebook-reader",
+        english = "komelia-epub-reader/ttu-ebook-reader/src/lib/i18n/locales/en.json",
+        simplifiedChinese = "komelia-epub-reader/ttu-ebook-reader/src/lib/i18n/locales/zh-Hans.json",
+    ),
+)
 
 fun loadUiStringsWhitelist(): Set<String> {
     val whitelistFile = rootProject.file("config/ui-strings-audit-whitelist.txt")
@@ -572,6 +603,94 @@ fun collectI18nBypassMatches(): List<String> {
     return matches
 }
 
+fun flattenLocaleAsset(value: Any?, path: String = ""): Map<String, String> {
+    return when (value) {
+        is Map<*, *> -> value.entries
+            .flatMap { (key, nestedValue) ->
+                val segment = key?.toString() ?: error("Locale asset key must not be null")
+                val nestedPath = if (path.isEmpty()) segment else "$path.$segment"
+                flattenLocaleAsset(nestedValue, nestedPath).entries
+            }
+            .associate { it.toPair() }
+
+        is List<*> -> value.withIndex()
+            .flatMap { (index, nestedValue) ->
+                val nestedPath = "$path[$index]"
+                flattenLocaleAsset(nestedValue, nestedPath).entries
+            }
+            .associate { it.toPair() }
+
+        is String -> mapOf(path to value)
+        null -> mapOf(path to "null")
+        else -> mapOf(path to value.toString())
+    }
+}
+
+fun extractLocalePlaceholders(value: String): Set<String> {
+    val placeholders = mutableSetOf<String>()
+    Regex("\\{([A-Za-z0-9_]+)}")
+        .findAll(value)
+        .forEach { placeholders += it.groupValues[1] }
+    return placeholders
+}
+
+fun collectLocaleAssetAuditMatches(): List<String> {
+    val matches = mutableListOf<String>()
+    val parser = JsonSlurper()
+
+    localeAssetScopes.forEach { scope ->
+        val englishFile = rootProject.file(scope.english)
+        val simplifiedChineseFile = rootProject.file(scope.simplifiedChinese)
+
+        if (!englishFile.exists()) {
+            matches += "${scope.name}: missing ${scope.english}"
+            return@forEach
+        }
+        if (!simplifiedChineseFile.exists()) {
+            matches += "${scope.name}: missing ${scope.simplifiedChinese}"
+            return@forEach
+        }
+
+        val englishMap = flattenLocaleAsset(parser.parse(englishFile))
+        val simplifiedChineseMap = flattenLocaleAsset(parser.parse(simplifiedChineseFile))
+
+        val englishKeys = englishMap.keys
+        val simplifiedChineseKeys = simplifiedChineseMap.keys
+        (englishKeys - simplifiedChineseKeys)
+            .sorted()
+            .forEach { matches += "${scope.name}: zh-Hans.json missing key '$it'" }
+        (simplifiedChineseKeys - englishKeys)
+            .sorted()
+            .forEach { matches += "${scope.name}: en.json missing key '$it'" }
+
+        (englishKeys intersect simplifiedChineseKeys)
+            .sorted()
+            .forEach { key ->
+                val englishValue = englishMap.getValue(key)
+                val simplifiedChineseValue = simplifiedChineseMap.getValue(key)
+                if (Regex("(?<!%)%(s|d)").containsMatchIn(englishValue)) {
+                    matches += "${scope.name}: en.json contains legacy positional placeholder for '$key'"
+                }
+                if (Regex("(?<!%)%(s|d)").containsMatchIn(simplifiedChineseValue)) {
+                    matches += "${scope.name}: zh-Hans.json contains legacy positional placeholder for '$key'"
+                }
+                val englishPlaceholders = extractLocalePlaceholders(englishValue)
+                val simplifiedChinesePlaceholders = extractLocalePlaceholders(simplifiedChineseValue)
+                if (englishPlaceholders != simplifiedChinesePlaceholders) {
+                    matches += buildString {
+                        append("${scope.name}: placeholder mismatch for '$key' -> ")
+                        append("en=")
+                        append(englishPlaceholders.sorted())
+                        append(", zh-Hans=")
+                        append(simplifiedChinesePlaceholders.sorted())
+                    }
+                }
+            }
+    }
+
+    return matches
+}
+
 tasks.register("auditUiStringsReport") {
     group = "verification"
     description = "列出运行时 UI 中疑似仍为硬编码的用户可见文案。"
@@ -629,6 +748,38 @@ tasks.register("auditI18nBypass") {
             error(
                 buildString {
                     appendLine("Found i18n bypasses in scoped runtime sources.")
+                    matches.forEach { appendLine(it) }
+                }
+            )
+        }
+    }
+}
+
+tasks.register("auditLocaleAssetsReport") {
+    group = "verification"
+    description = "列出 JSON 语言资产中结构或占位符不一致的问题。"
+    notCompatibleWithConfigurationCache("审计任务会直接读取脚本级扫描配置。")
+    doLast {
+        val matches = collectLocaleAssetAuditMatches()
+        if (matches.isEmpty()) {
+            logger.lifecycle("All locale assets are structurally aligned.")
+        } else {
+            logger.lifecycle("Found ${matches.size} locale asset issues:")
+            matches.forEach { logger.lifecycle(it) }
+        }
+    }
+}
+
+tasks.register("auditLocaleAssets") {
+    group = "verification"
+    description = "校验 JSON 语言资产的 key 路径和占位符集合完全一致。"
+    notCompatibleWithConfigurationCache("审计任务会直接读取脚本级扫描配置。")
+    doLast {
+        val matches = collectLocaleAssetAuditMatches()
+        if (matches.isNotEmpty()) {
+            error(
+                buildString {
+                    appendLine("Found locale asset mismatches.")
                     matches.forEach { appendLine(it) }
                 }
             )

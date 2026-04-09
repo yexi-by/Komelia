@@ -14,11 +14,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.snd_r.komelia.ui.LoadState
-import io.github.snd_r.komelia.ui.common.LoadingMaxSizeIndicator
-import io.github.snd_r.komelia.ui.dialogs.tabs.DialogTab
-import io.github.snd_r.komelia.ui.dialogs.tabs.TabItem
-import io.github.snd_r.komelia.ui.settings.komf.general.KomfSettingsContent
+import snd.komelia.ui.LoadState
+import snd.komelia.ui.common.components.LoadingMaxSizeIndicator
+import snd.komelia.ui.dialogs.tabs.DialogTab
+import snd.komelia.ui.dialogs.tabs.TabItem
+import snd.komelia.ui.settings.komf.general.KomfSettingsContent
 import snd.komelia.LocalKomfViewModelFactory
 import snd.komelia.strings.ExtensionLanguageMode
 import snd.komelia.strings.LocalExtensionStrings
@@ -81,6 +81,8 @@ class ConnectionTab(private val mediaServer: MediaServer) : DialogTab {
         }
     }
 }
+
+
 
 
 

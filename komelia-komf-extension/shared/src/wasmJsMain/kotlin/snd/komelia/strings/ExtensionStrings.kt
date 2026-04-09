@@ -1,20 +1,26 @@
 package snd.komelia.strings
 
 import androidx.compose.runtime.staticCompositionLocalOf
+import chrome.runtime.getURL
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.await
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.serialization.json.Json
+import org.w3c.fetch.Response
 
+@kotlinx.serialization.Serializable
 data class ExtensionStrings(
     val popup: PopupStrings,
     val content: ContentStrings,
 )
 
+@kotlinx.serialization.Serializable
 data class PopupStrings(
     val add: String,
     val addNewOrigin: String,
@@ -30,6 +36,7 @@ data class PopupStrings(
     val placeholder: String,
 )
 
+@kotlinx.serialization.Serializable
 data class ContentStrings(
     val autoIdentifyBody: String,
     val autoIdentifyTitle: String,
@@ -60,18 +67,29 @@ enum class ExtensionLanguageMode {
 }
 
 private const val extensionLanguageModeKey = "komelia.languageMode"
+private val extensionStringsJson = Json { ignoreUnknownKeys = false }
+private val extensionStringsCache = mutableMapOf<String, ExtensionStrings>()
 
 private fun currentBrowserLanguageTag(): String? = window.navigator.language
 
-private fun ExtensionLanguageMode.resolveExtensionStrings(): ExtensionStrings {
+private fun ExtensionLanguageMode.resolveLanguageTag(): String {
     return when (this) {
-        ExtensionLanguageMode.SYSTEM -> {
-            if (currentBrowserLanguageTag()?.lowercase()?.startsWith("zh") == true) ZhHansExtensionStrings
-            else EnExtensionStrings
-        }
+        ExtensionLanguageMode.SYSTEM ->
+            if (currentBrowserLanguageTag()?.lowercase()?.startsWith("zh") == true) "zh-Hans" else "en"
 
-        ExtensionLanguageMode.ENGLISH -> EnExtensionStrings
-        ExtensionLanguageMode.SIMPLIFIED_CHINESE -> ZhHansExtensionStrings
+        ExtensionLanguageMode.ENGLISH -> "en"
+        ExtensionLanguageMode.SIMPLIFIED_CHINESE -> "zh-Hans"
+    }
+}
+
+private suspend fun loadExtensionStrings(languageTag: String): ExtensionStrings {
+    extensionStringsCache[languageTag]?.let { return it }
+    val url = getURL("i18n/$languageTag.json")
+    val response = window.fetch(url).await<Response>()
+    check(response.ok) { "Failed to load extension locale asset '$languageTag' from $url" }
+    val body = response.text().await<String>()
+    return extensionStringsJson.decodeFromString<ExtensionStrings>(body).also {
+        extensionStringsCache[languageTag] = it
     }
 }
 
@@ -86,8 +104,8 @@ class ExtensionStringsProvider(scope: CoroutineScope) {
 
     val languageMode: StateFlow<ExtensionLanguageMode> = currentLanguageMode.asStateFlow()
     val strings: StateFlow<ExtensionStrings> = currentLanguageMode
-        .map { it.resolveExtensionStrings() }
-        .stateIn(scope, SharingStarted.Eagerly, currentLanguageMode.value.resolveExtensionStrings())
+        .mapLatest { loadExtensionStrings(it.resolveLanguageTag()) }
+        .stateIn(scope, SharingStarted.Eagerly, PlaceholderExtensionStrings)
 
     fun updateLanguageMode(mode: ExtensionLanguageMode) {
         window.localStorage.setItem(extensionLanguageModeKey, mode.name)
@@ -96,7 +114,7 @@ class ExtensionStringsProvider(scope: CoroutineScope) {
 }
 
 object RuntimeExtensionStrings {
-    private val currentStrings = MutableStateFlow<ExtensionStrings>(EnExtensionStrings)
+    private val currentStrings = MutableStateFlow(PlaceholderExtensionStrings)
 
     val strings: StateFlow<ExtensionStrings> = currentStrings.asStateFlow()
 
@@ -105,81 +123,42 @@ object RuntimeExtensionStrings {
     }
 }
 
-val EnExtensionStrings = ExtensionStrings(
+val PlaceholderExtensionStrings = ExtensionStrings(
     popup = PopupStrings(
-        add = "Add",
-        addNewOrigin = "Add New Origin",
-        allowedOrigins = "Allowed Origins",
-        firefoxPortHint = "Firefox does not support port matching in url, enter hostname without port",
-        firefoxRestartHint = "Due to unresolved issue with Firefox, a browser restart might be required for host permissions to apply",
-        appLanguage = "App Language",
-        system = "System",
-        english = "English",
-        simplifiedChinese = "Simplified Chinese",
-        komgaUrl = "Komga url",
-        permissionSettings = "Permission Settings",
-        placeholder = "https://demo.komga.org/*",
+        add = "",
+        addNewOrigin = "",
+        allowedOrigins = "",
+        firefoxPortHint = "",
+        firefoxRestartHint = "",
+        appLanguage = "",
+        system = "",
+        english = "",
+        simplifiedChinese = "",
+        komgaUrl = "",
+        permissionSettings = "",
+        placeholder = "",
     ),
     content = ContentStrings(
-        autoIdentifyBody = "Launch auto identification job for entire library? This action might take a long time for big libraries\nContinue?",
-        autoIdentifyTitle = "Auto-Identify",
-        connectionTab = "Connection",
-        identifyTitle = "Identify",
-        jobsTab = "Job History",
-        kavitaIdentifyTitle = "Komf Identify",
-        kavitaSettingsTitle = "Komf Settings",
-        notificationsTab = "Notifications",
-        processingTab = "Processing",
-        providersTab = "Providers",
-        resetMetadataTitle = "Reset Metadata",
-        libraryIdNotFound = "Failed to find library ID",
-        seriesIdNotFound = "Failed to find series ID",
-        seriesTitleNotFound = "Failed to find series title",
-        appLanguage = "App Language",
-        system = "System",
-        english = "English",
-        simplifiedChinese = "Simplified Chinese",
-        settingsClose = "Close",
-        settingsTitle = "Komf Settings",
-    ),
-)
-
-val ZhHansExtensionStrings = ExtensionStrings(
-    popup = PopupStrings(
-        add = "添加",
-        addNewOrigin = "添加新来源",
-        allowedOrigins = "允许的来源",
-        firefoxPortHint = "Firefox 不支持 URL 端口匹配，请输入不带端口的主机名",
-        firefoxRestartHint = "由于 Firefox 的已知问题，主机权限生效前可能需要重启浏览器",
-        appLanguage = "应用语言",
-        system = "跟随系统",
-        english = "英语",
-        simplifiedChinese = "简体中文",
-        komgaUrl = "Komga 地址",
-        permissionSettings = "权限设置",
-        placeholder = "https://demo.komga.org/*",
-    ),
-    content = ContentStrings(
-        autoIdentifyBody = "要为整个图书馆启动自动识别任务吗？大型图书馆可能需要较长时间。\n是否继续？",
-        autoIdentifyTitle = "自动识别",
-        connectionTab = "连接",
-        identifyTitle = "识别",
-        jobsTab = "任务历史",
-        kavitaIdentifyTitle = "Komf 识别",
-        kavitaSettingsTitle = "Komf 设置",
-        notificationsTab = "通知",
-        processingTab = "处理",
-        providersTab = "数据源",
-        resetMetadataTitle = "重置元数据",
-        libraryIdNotFound = "未找到图书馆 ID",
-        seriesIdNotFound = "未找到系列 ID",
-        seriesTitleNotFound = "未找到系列标题",
-        appLanguage = "应用语言",
-        system = "跟随系统",
-        english = "英语",
-        simplifiedChinese = "简体中文",
-        settingsClose = "关闭",
-        settingsTitle = "Komf 设置",
+        autoIdentifyBody = "",
+        autoIdentifyTitle = "",
+        connectionTab = "",
+        identifyTitle = "",
+        jobsTab = "",
+        kavitaIdentifyTitle = "",
+        kavitaSettingsTitle = "",
+        notificationsTab = "",
+        processingTab = "",
+        providersTab = "",
+        resetMetadataTitle = "",
+        libraryIdNotFound = "",
+        seriesIdNotFound = "",
+        seriesTitleNotFound = "",
+        appLanguage = "",
+        system = "",
+        english = "",
+        simplifiedChinese = "",
+        settingsClose = "",
+        settingsTitle = "",
     ),
 )
 

@@ -1,5 +1,6 @@
 package snd.komelia.ui.strings
 
+@kotlinx.serialization.Serializable
 data class ToastStrings(
     val launchedBookAnalysis: String,
     val launchedBookMetadataRefresh: String,
@@ -19,6 +20,6 @@ data class ToastStrings(
     val tasksCancelledTemplate: String,
     val updatedServerSettings: String,
 ) {
-    fun presetDoesNotExist(presetName: String): String = presetDoesNotExistTemplate.format(presetName)
-    fun tasksCancelled(count: Int): String = tasksCancelledTemplate.format(count)
+    fun presetDoesNotExist(presetName: String): String = presetDoesNotExistTemplate.formatTemplate("presetName" to presetName)
+    fun tasksCancelled(count: Int): String = tasksCancelledTemplate.formatTemplate("count" to count)
 }

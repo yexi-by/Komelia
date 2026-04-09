@@ -1,5 +1,6 @@
 package snd.komelia.ui.strings
 
+@kotlinx.serialization.Serializable
 data class CommonStrings(
     val add: String,
     val addCustomRole: String,
@@ -181,12 +182,12 @@ data class CommonStrings(
     val readList: String,
     val writers: String,
 ) {
-    fun editItem(name: String): String = editItemTemplate.format(name)
-    fun editCountItems(count: Int, label: String): String = editCountItemsTemplate.format(count, label)
-    fun itemsCount(count: Int, label: String): String = itemsCountTemplate.format(count, label)
-    fun labelWithColon(label: String): String = labelWithColonTemplate.format(label)
-    fun labeledValue(label: String, value: String): String = labeledValueTemplate.format(label, value)
-    fun rolesFor(value: String): String = rolesForTemplate.format(value)
-    fun thumbnailDimensions(width: Int, height: Int): String = thumbnailDimensionsTemplate.format(width, height)
-    fun thumbnailFileSize(sizeInKb: String): String = thumbnailFileSizeTemplate.format(sizeInKb)
+    fun editItem(name: String): String = editItemTemplate.formatTemplate("name" to name)
+    fun editCountItems(count: Int, label: String): String = editCountItemsTemplate.formatTemplate("count" to count, "label" to label)
+    fun itemsCount(count: Int, label: String): String = itemsCountTemplate.formatTemplate("count" to count, "label" to label)
+    fun labelWithColon(label: String): String = labelWithColonTemplate.formatTemplate("label" to label)
+    fun labeledValue(label: String, value: String): String = labeledValueTemplate.formatTemplate("label" to label, "value" to value)
+    fun rolesFor(value: String): String = rolesForTemplate.formatTemplate("value" to value)
+    fun thumbnailDimensions(width: Int, height: Int): String = thumbnailDimensionsTemplate.formatTemplate("width" to width, "height" to height)
+    fun thumbnailFileSize(sizeInKb: String): String = thumbnailFileSizeTemplate.formatTemplate("sizeInKb" to sizeInKb)
 }

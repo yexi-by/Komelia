@@ -18,7 +18,7 @@ import io.github.snd_r.komelia.image.coil.KomgaSeriesMapper
 import io.github.snd_r.komelia.image.coil.KomgaSeriesThumbnailMapper
 import io.github.snd_r.komelia.image.processing.ColorCorrectionStep
 import io.github.snd_r.komelia.image.processing.ImageProcessingPipeline
-import io.github.snd_r.komelia.settings.CookieStoreSecretsRepository
+import snd.komelia.settings.CookieStoreSecretsRepository
 import io.github.snd_r.komelia.settings.ImageReaderSettingsRepository
 import io.ktor.client.*
 import io.ktor.client.engine.js.*

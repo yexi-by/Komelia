@@ -1,5 +1,6 @@
 package snd.komelia.ui.strings
 
+@kotlinx.serialization.Serializable
 data class MenuStrings(
     val book: BookMenuStrings,
     val library: LibraryMenuStrings,
@@ -9,6 +10,7 @@ data class MenuStrings(
     val bulk: BulkMenuStrings,
 )
 
+@kotlinx.serialization.Serializable
 data class BookMenuStrings(
     val confirmDeleteBookTemplate: String,
     val deleteBookTitle: String,
@@ -23,19 +25,20 @@ data class BookMenuStrings(
     val markAsRead: String,
     val markAsUnread: String,
 ) {
-    fun deleteBookBody(bookTitle: String): String = deleteBookBodyTemplate.format(bookTitle)
-    fun confirmDeleteBook(bookTitle: String): String = confirmDeleteBookTemplate.format(bookTitle)
+    fun deleteBookBody(bookTitle: String): String = deleteBookBodyTemplate.formatTemplate("bookTitle" to bookTitle)
+    fun confirmDeleteBook(bookTitle: String): String = confirmDeleteBookTemplate.formatTemplate("bookTitle" to bookTitle)
     fun deleteDownloadedBookBody(bookTitle: String, deviceOnly: Boolean): String {
         return if (deviceOnly) {
-            deviceOnlyDeleteDownloadedBookBodyTemplate.format(bookTitle)
+            deviceOnlyDeleteDownloadedBookBodyTemplate.formatTemplate("bookTitle" to bookTitle)
         } else {
-            deleteDownloadedBookBodyTemplate.format(bookTitle)
+            deleteDownloadedBookBodyTemplate.formatTemplate("bookTitle" to bookTitle)
         }
     }
 
-    fun downloadTitle(bookTitle: String): String = downloadTitleTemplate.format(bookTitle)
+    fun downloadTitle(bookTitle: String): String = downloadTitleTemplate.formatTemplate("bookTitle" to bookTitle)
 }
 
+@kotlinx.serialization.Serializable
 data class SeriesMenuStrings(
     val addToCollection: String,
     val confirmDeleteSeriesTemplate: String,
@@ -49,12 +52,13 @@ data class SeriesMenuStrings(
     val markAsRead: String,
     val markAsUnread: String,
 ) {
-    fun deleteSeriesBody(seriesTitle: String): String = deleteSeriesBodyTemplate.format(seriesTitle)
-    fun confirmDeleteSeries(seriesTitle: String): String = confirmDeleteSeriesTemplate.format(seriesTitle)
-    fun deleteDownloadedSeriesBody(seriesTitle: String): String = deleteDownloadedSeriesBodyTemplate.format(seriesTitle)
-    fun downloadTitle(seriesTitle: String): String = downloadTitleTemplate.format(seriesTitle)
+    fun deleteSeriesBody(seriesTitle: String): String = deleteSeriesBodyTemplate.formatTemplate("seriesTitle" to seriesTitle)
+    fun confirmDeleteSeries(seriesTitle: String): String = confirmDeleteSeriesTemplate.formatTemplate("seriesTitle" to seriesTitle)
+    fun deleteDownloadedSeriesBody(seriesTitle: String): String = deleteDownloadedSeriesBodyTemplate.formatTemplate("seriesTitle" to seriesTitle)
+    fun downloadTitle(seriesTitle: String): String = downloadTitleTemplate.formatTemplate("seriesTitle" to seriesTitle)
 }
 
+@kotlinx.serialization.Serializable
 data class OneshotMenuStrings(
     val addToCollection: String,
     val addToReadList: String,
@@ -62,6 +66,7 @@ data class OneshotMenuStrings(
     val deleteLabel: String,
 )
 
+@kotlinx.serialization.Serializable
 data class ReadListMenuStrings(
     val confirmDeleteReadListTemplate: String,
     val deleteReadListBodyTemplate: String,
@@ -69,10 +74,11 @@ data class ReadListMenuStrings(
     val deleteLabel: String,
     val editLabel: String,
 ) {
-    fun deleteReadListBody(readListName: String): String = deleteReadListBodyTemplate.format(readListName)
-    fun confirmDeleteReadList(readListName: String): String = confirmDeleteReadListTemplate.format(readListName)
+    fun deleteReadListBody(readListName: String): String = deleteReadListBodyTemplate.formatTemplate("readListName" to readListName)
+    fun confirmDeleteReadList(readListName: String): String = confirmDeleteReadListTemplate.formatTemplate("readListName" to readListName)
 }
 
+@kotlinx.serialization.Serializable
 data class LibraryMenuStrings(
     val analyzeTitle: String,
     val autoIdentifyKomf: String,
@@ -89,11 +95,12 @@ data class LibraryMenuStrings(
     val emptyTrashBody: String,
     val refreshBody: String,
 ) {
-    fun deleteLibraryBody(libraryName: String): String = deleteLibraryBodyTemplate.format(libraryName)
-    fun confirmDeleteLibrary(libraryName: String): String = confirmDeleteLibraryTemplate.format(libraryName)
-    fun deleteDownloadedLibraryBody(libraryName: String): String = deleteDownloadedLibraryBodyTemplate.format(libraryName)
+    fun deleteLibraryBody(libraryName: String): String = deleteLibraryBodyTemplate.formatTemplate("libraryName" to libraryName)
+    fun confirmDeleteLibrary(libraryName: String): String = confirmDeleteLibraryTemplate.formatTemplate("libraryName" to libraryName)
+    fun deleteDownloadedLibraryBody(libraryName: String): String = deleteDownloadedLibraryBodyTemplate.formatTemplate("libraryName" to libraryName)
 }
 
+@kotlinx.serialization.Serializable
 data class BulkMenuStrings(
     val addToCollection: String,
     val addToReadList: String,
@@ -129,23 +136,23 @@ data class BulkMenuStrings(
     val seriesAutoIdentifyBodyTemplate: String,
 ) {
     fun confirmDeleteBooks(count: Int): String =
-        if (count == 1) confirmDeleteBooksSingle else confirmDeleteBooksMultiTemplate.format(count)
+        if (count == 1) confirmDeleteBooksSingle else confirmDeleteBooksMultiTemplate.formatTemplate("count" to count)
 
     fun deleteBooksBody(count: Int): String =
-        if (count == 1) deleteBooksBodySingleTemplate else deleteBooksBodyMultiTemplate.format(count)
+        if (count == 1) deleteBooksBodySingleTemplate else deleteBooksBodyMultiTemplate.formatTemplate("count" to count)
 
     fun deleteDownloadedBooksBody(count: Int, title: String): String =
-        if (count == 1) deleteDownloadedBooksBodySingleTemplate.format(title) else deleteDownloadedBooksBodyMultiTemplate.format(count)
+        if (count == 1) deleteDownloadedBooksBodySingleTemplate.formatTemplate("title" to title) else deleteDownloadedBooksBodyMultiTemplate.formatTemplate("count" to count)
 
-    fun deleteDownloadedSeriesBody(count: Int): String = deleteDownloadedSeriesBodyTemplate.format(count)
-    fun deleteSeriesBody(count: Int): String = deleteSeriesBodyTemplate.format(count)
-    fun confirmDeleteSeries(count: Int): String = confirmDeleteSeriesTemplate.format(count)
+    fun deleteDownloadedSeriesBody(count: Int): String = deleteDownloadedSeriesBodyTemplate.formatTemplate("count" to count)
+    fun deleteSeriesBody(count: Int): String = deleteSeriesBodyTemplate.formatTemplate("count" to count)
+    fun confirmDeleteSeries(count: Int): String = confirmDeleteSeriesTemplate.formatTemplate("count" to count)
     fun downloadBooksBody(count: Int, title: String): String =
-        if (count == 1) downloadBooksSingleTemplate.format(title) else downloadBooksMultiTemplate.format(count)
+        if (count == 1) downloadBooksSingleTemplate.formatTemplate("title" to title) else downloadBooksMultiTemplate.formatTemplate("count" to count)
 
     fun downloadSeriesBody(count: Int, title: String): String =
-        if (count == 1) downloadSeriesSingleTemplate.format(title) else downloadSeriesMultiTemplate.format(count)
+        if (count == 1) downloadSeriesSingleTemplate.formatTemplate("title" to title) else downloadSeriesMultiTemplate.formatTemplate("count" to count)
 
-    fun selectedCount(count: Int): String = selectedCountTemplate.format(count)
-    fun seriesAutoIdentifyBody(count: Int): String = seriesAutoIdentifyBodyTemplate.format(count)
+    fun selectedCount(count: Int): String = selectedCountTemplate.formatTemplate("count" to count)
+    fun seriesAutoIdentifyBody(count: Int): String = seriesAutoIdentifyBodyTemplate.formatTemplate("count" to count)
 }

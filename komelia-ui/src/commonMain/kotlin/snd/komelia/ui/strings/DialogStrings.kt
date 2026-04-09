@@ -1,5 +1,6 @@
 package snd.komelia.ui.strings
 
+@kotlinx.serialization.Serializable
 data class DialogStrings(
     val collectionAdd: CollectionAddDialogStrings,
     val collectionEdit: CollectionEditDialogStrings,
@@ -13,48 +14,56 @@ data class DialogStrings(
     val user: UserDialogStrings,
 )
 
+@kotlinx.serialization.Serializable
 data class CollectionAddDialogStrings(
     val create: String,
     val searchOrCreateCollection: String,
     val title: String,
 )
 
+@kotlinx.serialization.Serializable
 data class CollectionEditDialogStrings(
     val titleTemplate: String,
     val generalTabTitle: String,
     val manualOrdering: String,
     val manualOrderingDescription: String,
 ) {
-    fun title(collectionName: String): String = titleTemplate.format(collectionName)
+    fun title(collectionName: String): String = titleTemplate.formatTemplate("collectionName" to collectionName)
 }
 
+@kotlinx.serialization.Serializable
 data class ReadListAddDialogStrings(
     val searchOrCreateReadList: String,
 )
 
+@kotlinx.serialization.Serializable
 data class ReadListEditDialogStrings(
     val generalTabTitle: String,
     val manualOrdering: String,
     val manualOrderingDescription: String,
     val titleTemplate: String,
 ) {
-    fun title(name: String): String = titleTemplate.format(name)
+    fun title(name: String): String = titleTemplate.formatTemplate("name" to name)
 }
 
+@kotlinx.serialization.Serializable
 data class PasswordChangeDialogStrings(
     val newPassword: String,
     val repeatNewPassword: String,
 )
 
+@kotlinx.serialization.Serializable
 data class UserDialogStrings(
     val administrator: String,
 )
 
+@kotlinx.serialization.Serializable
 data class LinksDialogStrings(
     val label: String,
     val url: String,
 )
 
+@kotlinx.serialization.Serializable
 data class KomfDialogStrings(
     val autoIdentifyBody: String,
     val autoIdentifyTitle: String,
@@ -68,9 +77,10 @@ data class KomfDialogStrings(
     val resetMetadataTitle: String,
     val runInBackground: String,
 ) {
-    fun retrievingBookData(current: Int, total: Int): String = retrievingBookDataTemplate.format(current, total)
+    fun retrievingBookData(current: Int, total: Int): String = retrievingBookDataTemplate.formatTemplate("current" to current, "total" to total)
 }
 
+@kotlinx.serialization.Serializable
 data class UpdateDialogStrings(
     val dismiss: String,
     val newVersionAvailable: String,
@@ -78,6 +88,7 @@ data class UpdateDialogStrings(
     val updating: String,
 )
 
+@kotlinx.serialization.Serializable
 data class LibraryEditDialogStrings(
     val addTitle: String,
     val bookMetadata: String,

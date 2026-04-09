@@ -1,0 +1,38 @@
+{
+  "popup": {
+    "add": "Add",
+    "addNewOrigin": "Add New Origin",
+    "allowedOrigins": "Allowed Origins",
+    "firefoxPortHint": "Firefox does not support port matching in url, enter hostname without port",
+    "firefoxRestartHint": "Due to unresolved issue with Firefox, a browser restart might be required for host permissions to apply",
+    "appLanguage": "App Language",
+    "system": "System",
+    "english": "English",
+    "simplifiedChinese": "Simplified Chinese",
+    "komgaUrl": "Komga url",
+    "permissionSettings": "Permission Settings",
+    "placeholder": "https://demo.komga.org/*"
+  },
+  "content": {
+    "autoIdentifyBody": "Launch auto identification job for entire library? This action might take a long time for big libraries\nContinue?",
+    "autoIdentifyTitle": "Auto-Identify",
+    "connectionTab": "Connection",
+    "identifyTitle": "Identify",
+    "jobsTab": "Job History",
+    "kavitaIdentifyTitle": "Komf Identify",
+    "kavitaSettingsTitle": "Komf Settings",
+    "notificationsTab": "Notifications",
+    "processingTab": "Processing",
+    "providersTab": "Providers",
+    "resetMetadataTitle": "Reset Metadata",
+    "libraryIdNotFound": "Failed to find library ID",
+    "seriesIdNotFound": "Failed to find series ID",
+    "seriesTitleNotFound": "Failed to find series title",
+    "appLanguage": "App Language",
+    "system": "System",
+    "english": "English",
+    "simplifiedChinese": "Simplified Chinese",
+    "settingsClose": "Close",
+    "settingsTitle": "Komf Settings"
+  }
+}

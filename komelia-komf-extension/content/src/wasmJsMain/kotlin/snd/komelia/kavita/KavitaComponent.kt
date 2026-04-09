@@ -1,7 +1,7 @@
 package snd.komelia.kavita
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.github.snd_r.komelia.ui.common.AppTheme
+import snd.komelia.settings.model.AppTheme
 import kotlinx.browser.document
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.w3c.dom.HTMLDivElement
@@ -70,4 +70,6 @@ class KavitaComponent(
         return mounted
     }
 }
+
+
 

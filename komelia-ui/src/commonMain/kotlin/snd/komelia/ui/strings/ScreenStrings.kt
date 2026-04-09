@@ -2,6 +2,7 @@ package snd.komelia.ui.strings
 
 import snd.komelia.homefilters.HomeScreenDefaultFilterKind
 
+@kotlinx.serialization.Serializable
 data class ScreenStrings(
     val book: BookScreenStrings,
     val color: ColorScreenStrings,
@@ -18,6 +19,7 @@ data class ScreenStrings(
     val settings: SettingsScreenStrings,
 )
 
+@kotlinx.serialization.Serializable
 data class BookScreenStrings(
     val bookPagesTemplate: String,
     val deleteDownloaded: String,
@@ -39,16 +41,17 @@ data class BookScreenStrings(
     val size: String,
     val unavailable: String,
 ) {
-    fun bookPages(number: String, pagesCount: Int): String = bookPagesTemplate.format(number, pagesCount)
-    fun downloadBody(bookName: String): String = downloadBodyTemplate.format(bookName)
+    fun bookPages(number: String, pagesCount: Int): String = bookPagesTemplate.formatTemplate("number" to number, "pagesCount" to pagesCount)
+    fun downloadBody(bookName: String): String = downloadBodyTemplate.formatTemplate("bookName" to bookName)
     fun readProgressStatus(percentage: Int, pagesLeft: Int): String =
         if (pagesLeft == 1) {
-            readProgressStatusSingularTemplate.format(percentage, pagesLeft)
+            readProgressStatusSingularTemplate.formatTemplate("percentage" to percentage, "pagesLeft" to pagesLeft)
         } else {
-            readProgressStatusPluralTemplate.format(percentage, pagesLeft)
+            readProgressStatusPluralTemplate.formatTemplate("percentage" to percentage, "pagesLeft" to pagesLeft)
         }
 }
 
+@kotlinx.serialization.Serializable
 data class CollectionScreenStrings(
     val collectionLabel: String,
     val deleteCollectionBodyTemplate: String,
@@ -58,11 +61,12 @@ data class CollectionScreenStrings(
     val seriesCountTemplate: String,
     val unorderedSelectionHint: String,
 ) {
-    fun deleteCollectionBody(name: String): String = deleteCollectionBodyTemplate.format(name)
-    fun deleteCollectionConfirm(name: String): String = deleteCollectionConfirmTemplate.format(name)
-    fun seriesCount(count: Int): String = seriesCountTemplate.format(count)
+    fun deleteCollectionBody(name: String): String = deleteCollectionBodyTemplate.formatTemplate("name" to name)
+    fun deleteCollectionConfirm(name: String): String = deleteCollectionConfirmTemplate.formatTemplate("name" to name)
+    fun seriesCount(count: Int): String = seriesCountTemplate.formatTemplate("count" to count)
 }
 
+@kotlinx.serialization.Serializable
 data class ErrorScreenStrings(
     val copyStacktrace: String,
     val copiedToClipboard: String,
@@ -72,9 +76,10 @@ data class ErrorScreenStrings(
     val restart: String,
     val unrecoverableErrorTemplate: String,
 ) {
-    fun unrecoverableError(exceptionName: String): String = unrecoverableErrorTemplate.format(exceptionName)
+    fun unrecoverableError(exceptionName: String): String = unrecoverableErrorTemplate.formatTemplate("exceptionName" to exceptionName)
 }
 
+@kotlinx.serialization.Serializable
 data class HomeScreenStrings(
     val all: String,
     val allOfConditions: String,
@@ -133,7 +138,7 @@ data class HomeScreenStrings(
     val sortUnsorted: String,
     val descending: String,
 ) {
-    fun deleteNamedItem(name: String): String = deleteNamedItemTemplate.format(name)
+    fun deleteNamedItem(name: String): String = deleteNamedItemTemplate.formatTemplate("name" to name)
     fun defaultFilterLabel(kind: HomeScreenDefaultFilterKind): String =
         when (kind) {
             HomeScreenDefaultFilterKind.KEEP_READING -> keepReading
@@ -146,6 +151,7 @@ data class HomeScreenStrings(
         }
 }
 
+@kotlinx.serialization.Serializable
 data class LibraryScreenStrings(
     val allLibraries: String,
     val collectionsCountPluralTemplate: String,
@@ -158,24 +164,25 @@ data class LibraryScreenStrings(
     val series: String,
 ) {
     fun collectionsCount(count: Int): String = if (count == 1) {
-        collectionsCountSingularTemplate.format(count)
+        collectionsCountSingularTemplate.formatTemplate("count" to count)
     } else {
-        collectionsCountPluralTemplate.format(count)
+        collectionsCountPluralTemplate.formatTemplate("count" to count)
     }
 
     fun readListsCount(count: Int): String = if (count == 1) {
-        readListsCountSingularTemplate.format(count)
+        readListsCountSingularTemplate.formatTemplate("count" to count)
     } else {
-        readListsCountPluralTemplate.format(count)
+        readListsCountPluralTemplate.formatTemplate("count" to count)
     }
 
     fun seriesCount(count: Int): String = if (count == 1) {
-        seriesCountSingularTemplate.format(count)
+        seriesCountSingularTemplate.formatTemplate("count" to count)
     } else {
-        seriesCountPluralTemplate.format(count)
+        seriesCountPluralTemplate.formatTemplate("count" to count)
     }
 }
 
+@kotlinx.serialization.Serializable
 data class LoginScreenStrings(
     val backToOnline: String,
     val cancelledLoginAttempt: String,
@@ -195,18 +202,20 @@ data class LoginScreenStrings(
     val unexpectedResponseForUrlTemplate: String,
     val username: String,
 ) {
-    fun unexpectedResponseForUrl(url: String): String = unexpectedResponseForUrlTemplate.format(url)
+    fun unexpectedResponseForUrl(url: String): String = unexpectedResponseForUrlTemplate.formatTemplate("url" to url)
 }
 
+@kotlinx.serialization.Serializable
 data class ReadListScreenStrings(
     val booksCountTemplate: String,
     val orderedSelectionHint: String,
     val typeLabel: String,
     val unorderedSelectionHint: String,
 ) {
-    fun booksCount(count: Int): String = booksCountTemplate.format(count)
+    fun booksCount(count: Int): String = booksCountTemplate.formatTemplate("count" to count)
 }
 
+@kotlinx.serialization.Serializable
 data class SearchScreenStrings(
     val inLibraryTemplate: String,
     val noResultsBody: String,
@@ -214,9 +223,10 @@ data class SearchScreenStrings(
     val searchAll: String,
     val searchPlaceholder: String,
 ) {
-    fun inLibrary(name: String): String = inLibraryTemplate.format(name)
+    fun inLibrary(name: String): String = inLibraryTemplate.formatTemplate("name" to name)
 }
 
+@kotlinx.serialization.Serializable
 data class SeriesScreenStrings(
     val ageRatingTemplate: String,
     val alternativeTitles: String,
@@ -231,20 +241,21 @@ data class SeriesScreenStrings(
     val summaryFromBookTemplate: String,
     val unavailable: String,
 ) {
-    fun ageRating(age: Int): String = ageRatingTemplate.format(age)
+    fun ageRating(age: Int): String = ageRatingTemplate.formatTemplate("age" to age)
     fun booksCount(count: Int, totalCount: Int?): String {
         val label = if ((totalCount ?: count) == 1) bookSingular else bookPlural
         return if (totalCount != null) {
-            booksCountWithTotalTemplate.format(count, totalCount, label)
+            booksCountWithTotalTemplate.formatTemplate("count" to count, "totalCount" to totalCount, "label" to label)
         } else {
-            booksCountTemplate.format(count, label)
+            booksCountTemplate.formatTemplate("count" to count, "label" to label)
         }
     }
 
-    fun releaseYear(year: Int): String = releaseYearTemplate.format(year)
-    fun summaryFromBook(bookNumber: String, summary: String): String = summaryFromBookTemplate.format(bookNumber, summary)
+    fun releaseYear(year: Int): String = releaseYearTemplate.formatTemplate("year" to year)
+    fun summaryFromBook(bookNumber: String, summary: String): String = summaryFromBookTemplate.formatTemplate("bookNumber" to bookNumber, "summary" to summary)
 }
 
+@kotlinx.serialization.Serializable
 data class TopBarStrings(
     val clearAll: String,
     val downloadProgressTemplate: String,
@@ -259,20 +270,22 @@ data class TopBarStrings(
     val taskQueueItemTemplate: String,
     val unavailable: String,
 ) {
-    fun downloadProgress(completed: String, total: String): String = downloadProgressTemplate.format(completed, total)
-    fun pendingTasks(count: Int): String = pendingTasksTemplate.format(count)
-    fun taskQueueItem(task: String, count: Int): String = taskQueueItemTemplate.format(task, count)
+    fun downloadProgress(completed: String, total: String): String = downloadProgressTemplate.formatTemplate("completed" to completed, "total" to total)
+    fun pendingTasks(count: Int): String = pendingTasksTemplate.formatTemplate("count" to count)
+    fun taskQueueItem(task: String, count: Int): String = taskQueueItemTemplate.formatTemplate("task" to task, "count" to count)
 }
 
+@kotlinx.serialization.Serializable
 data class UsersScreenStrings(
     val editUser: String,
     val latestActivityTemplate: String,
     val noRecentActivity: String,
     val rolesHeading: String,
 ) {
-    fun latestActivity(dateTime: String): String = latestActivityTemplate.format(dateTime)
+    fun latestActivity(dateTime: String): String = latestActivityTemplate.formatTemplate("dateTime" to dateTime)
 }
 
+@kotlinx.serialization.Serializable
 data class SettingsScreenStrings(
     val accountSettings: String,
     val announcements: String,
@@ -353,15 +366,16 @@ data class SettingsScreenStrings(
     val volumeKeysNavigation: String,
     val clearImageCache: String,
 ) {
-    fun checkedAt(date: String): String = checkedAtTemplate.format(date)
-    fun currentServer(server: String): String = currentServerTemplate.format(server)
-    fun currentStatus(status: String): String = currentStatusTemplate.format(status)
-    fun currentUser(user: String): String = currentUserTemplate.format(user)
-    fun releaseDate(date: String): String = releaseDateTemplate.format(date)
-    fun deleteUserBody(email: String): String = deleteUserBodyTemplate.format(email)
-    fun deleteUserConfirm(email: String): String = deleteUserConfirmTemplate.format(email)
+    fun checkedAt(date: String): String = checkedAtTemplate.formatTemplate("date" to date)
+    fun currentServer(server: String): String = currentServerTemplate.formatTemplate("server" to server)
+    fun currentStatus(status: String): String = currentStatusTemplate.formatTemplate("status" to status)
+    fun currentUser(user: String): String = currentUserTemplate.formatTemplate("user" to user)
+    fun releaseDate(date: String): String = releaseDateTemplate.formatTemplate("date" to date)
+    fun deleteUserBody(email: String): String = deleteUserBodyTemplate.formatTemplate("email" to email)
+    fun deleteUserConfirm(email: String): String = deleteUserConfirmTemplate.formatTemplate("email" to email)
 }
 
+@kotlinx.serialization.Serializable
 data class ColorScreenStrings(
     val black: String,
     val channel: String,
@@ -384,5 +398,5 @@ data class ColorScreenStrings(
     val overrideExistingPreset: String,
     val curvePointerPositionTemplate: String,
 ) {
-    fun curvePointerPosition(x: Int, y: Int): String = curvePointerPositionTemplate.format(x, y)
+    fun curvePointerPosition(x: Int, y: Int): String = curvePointerPositionTemplate.formatTemplate("x" to x, "y" to y)
 }

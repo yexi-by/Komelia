@@ -83,6 +83,9 @@ tasks.register<Sync>("assembleExtension") {
         "$resourceFolder/icons",
         "$resourceFolder/html",
     )
+    from("$resourceFolder/i18n") {
+        into("i18n")
+    }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     into(extensionFolder)
 
@@ -128,6 +131,9 @@ tasks.register<Sync>("assembleExtensionDev") {
         "$resourceFolder/icons",
         "$resourceFolder/html",
     )
+    from("$resourceFolder/i18n") {
+        into("i18n")
+    }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     into(extensionFolderDev)
 

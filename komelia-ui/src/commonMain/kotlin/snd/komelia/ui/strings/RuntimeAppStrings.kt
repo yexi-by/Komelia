@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object RuntimeAppStrings {
-    private val currentStrings = MutableStateFlow<AppStrings>(EnStrings)
+    private val currentStrings = MutableStateFlow<AppStrings>(StringsResolver.placeholder)
 
     val strings: StateFlow<AppStrings> = currentStrings.asStateFlow()
 

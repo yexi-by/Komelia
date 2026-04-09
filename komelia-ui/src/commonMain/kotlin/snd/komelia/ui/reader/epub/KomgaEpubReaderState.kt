@@ -73,7 +73,7 @@ class KomgaEpubReaderState(
 
         state.value = LoadState.Loading
         notifications.runCatchingToNotifications {
-            Res.getUri("files/komga.html")
+            Res.getUri("files/webui/komga.html")
             if (book.value == null) book.value = bookApi.getOne(bookId.value)
             state.value = LoadState.Success(Unit)
         }.onFailure {
@@ -187,8 +187,8 @@ class KomgaEpubReaderState(
         webview.registerRequestInterceptor { request ->
             runCatching {
                 when (val urlString = request.url.toString()) {
-                    "http://komelia/komga.html" -> {
-                        val bytes = Res.readBytes("files/komga.html")
+                    "http://komelia/webui/komga.html" -> {
+                        val bytes = Res.readBytes("files/webui/komga.html")
                         ResourceLoadResult(data = bytes, contentType = "text/html")
                     }
 
@@ -198,7 +198,7 @@ class KomgaEpubReaderState(
             }.onFailure { logger.catching(it) }.getOrNull()
         }
 
-        webview.navigate("http://komelia/komga.html")
+        webview.navigate("http://komelia/webui/komga.html")
         webview.start()
     }
 

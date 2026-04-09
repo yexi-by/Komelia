@@ -27,6 +27,7 @@ external interface ExtensionMessageEvent : JsAny {
 }
 
 external fun sendMessage(message: JsAny): Promise<JsAny> = definedExternally
+external fun getURL(path: String): String = definedExternally
 
 external fun sendMessage(
     extensionId: JsString?,

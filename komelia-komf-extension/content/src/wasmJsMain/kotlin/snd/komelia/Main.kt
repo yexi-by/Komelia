@@ -3,7 +3,7 @@
 package snd.komelia
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.github.snd_r.komelia.AppNotifications
+import snd.komelia.AppNotifications
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.js.*
@@ -110,4 +110,5 @@ private fun createKtorClient(): HttpClient {
         }
     }
 }
+
 

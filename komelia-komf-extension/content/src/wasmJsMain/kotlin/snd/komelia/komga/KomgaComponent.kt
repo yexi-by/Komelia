@@ -1,6 +1,6 @@
 package snd.komelia.komga
 
-import io.github.snd_r.komelia.ui.common.AppTheme
+import snd.komelia.settings.model.AppTheme
 import kotlinx.browser.document
 import kotlinx.browser.localStorage
 import kotlinx.browser.window
@@ -104,3 +104,5 @@ class KomgaComponent(
         }
     }
 }
+
+

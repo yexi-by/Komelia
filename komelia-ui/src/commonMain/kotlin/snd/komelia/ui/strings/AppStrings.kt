@@ -53,6 +53,7 @@ import snd.komga.client.settings.KomgaThumbnailSize.LARGE
 import snd.komga.client.settings.KomgaThumbnailSize.MEDIUM
 import snd.komga.client.settings.KomgaThumbnailSize.XLARGE
 
+@kotlinx.serialization.Serializable
 data class AppStrings(
     val common: CommonStrings,
     val dialogs: DialogStrings,
@@ -77,6 +78,7 @@ data class AppStrings(
     val validation: ValidationStrings,
 )
 
+@kotlinx.serialization.Serializable
 data class KomfStrings(
     val navigation: KomfNavigationStrings,
     val general: KomfGeneralStrings,
@@ -87,12 +89,14 @@ data class KomfStrings(
     val providers: KomfProvidersUiStrings,
 )
 
+@kotlinx.serialization.Serializable
 data class KomfNavigationStrings(
     val komgaWebui: String,
     val komgaProcessing: String,
     val kavitaProcessing: String,
 )
 
+@kotlinx.serialization.Serializable
 data class KomfGeneralStrings(
     val enableIntegration: String,
     val integrationDescription: String,
@@ -115,19 +119,21 @@ data class KomfGeneralStrings(
     val unknownLibraryTemplate: String,
 ) {
     fun formatConnectionError(message: String?): String =
-        message?.let { connectionErrorWithMessageTemplate.format(it) } ?: connectionError
+        message?.let { connectionErrorWithMessageTemplate.formatTemplate("message" to it) } ?: connectionError
 
-    fun unknownLibrary(libraryId: String): String = unknownLibraryTemplate.format(libraryId)
+    fun unknownLibrary(libraryId: String): String = unknownLibraryTemplate.formatTemplate("libraryId" to libraryId)
 }
 
+@kotlinx.serialization.Serializable
 data class KomfJobsStrings(
     val deleteHistoryBody: String,
     val durationTemplate: String,
     val unknownSeries: String,
 ) {
-    fun duration(duration: String): String = durationTemplate.format(duration)
+    fun duration(duration: String): String = durationTemplate.formatTemplate("duration" to duration)
 }
 
+@kotlinx.serialization.Serializable
 data class KomfNotificationStrings(
     val noConfiguredAppriseUrls: String,
     val noConfiguredDiscordWebhooks: String,
@@ -142,6 +148,7 @@ data class KomfNotificationStrings(
     val discord: KomfDiscordStrings,
 )
 
+@kotlinx.serialization.Serializable
 data class KomfAppriseStrings(
     val urls: String,
     val addUrl: String,
@@ -151,6 +158,7 @@ data class KomfAppriseStrings(
     val appriseGithubPage: String,
 )
 
+@kotlinx.serialization.Serializable
 data class KomfNotificationContextStrings(
     val previewContext: String,
     val pathLabelTemplate: String,
@@ -163,12 +171,13 @@ data class KomfNotificationContextStrings(
     val valueItemTemplate: String,
     val addValueTemplate: String,
 ) {
-    fun pathLabel(name: String, path: String): String = pathLabelTemplate.format(name, path)
-    fun book(index: Int): String = bookItemTemplate.format(index)
-    fun valueItem(name: String, index: Int): String = valueItemTemplate.format(name, index)
-    fun addValue(name: String): String = addValueTemplate.format(name)
+    fun pathLabel(name: String, path: String): String = pathLabelTemplate.formatTemplate("name" to name, "path" to path)
+    fun book(index: Int): String = bookItemTemplate.formatTemplate("index" to index)
+    fun valueItem(name: String, index: Int): String = valueItemTemplate.formatTemplate("name" to name, "index" to index)
+    fun addValue(name: String): String = addValueTemplate.formatTemplate("name" to name)
 }
 
+@kotlinx.serialization.Serializable
 data class KomfDiscordStrings(
     val webhooks: String,
     val addWebhook: String,
@@ -187,9 +196,10 @@ data class KomfDiscordStrings(
     val inline: String,
     val fieldValueMax1024: String,
 ) {
-    fun field(index: Int): String = fieldItemTemplate.format(index)
+    fun field(index: Int): String = fieldItemTemplate.formatTemplate("index" to index)
 }
 
+@kotlinx.serialization.Serializable
 data class KomfProcessingStrings(
     val updateModes: String,
     val libraryTypeDescription: String,
@@ -223,6 +233,7 @@ data class KomfProcessingStrings(
     val defaultSeriesLanguage: String,
 )
 
+@kotlinx.serialization.Serializable
 data class KomfProvidersUiStrings(
     val settingsTitle: String,
     val addProvider: String,
@@ -250,11 +261,12 @@ data class KomfProvidersUiStrings(
     val includeLinks: String,
     val datasourceType: String,
 ) {
-    fun downloadDate(date: String): String = downloadDateTemplate.format(date)
-    fun checksum(checksum: String): String = checksumTemplate.format(checksum)
-    fun editProvider(providerName: String): String = editProviderTemplate.format(providerName)
+    fun downloadDate(date: String): String = downloadDateTemplate.formatTemplate("date" to date)
+    fun checksum(checksum: String): String = checksumTemplate.formatTemplate("checksum" to checksum)
+    fun editProvider(providerName: String): String = editProviderTemplate.formatTemplate("providerName" to providerName)
 }
 
+@kotlinx.serialization.Serializable
 data class KomfProviderSettingsStrings(
     val providerAniList: String,
     val providerBangumi: String,
@@ -294,6 +306,7 @@ data class KomfProviderSettingsStrings(
 }
 
 
+@kotlinx.serialization.Serializable
 data class SeriesViewStrings(
     val statusEnded: String,
     val statusOngoing: String,
@@ -325,6 +338,7 @@ data class SeriesViewStrings(
 
 }
 
+@kotlinx.serialization.Serializable
 data class SeriesEditStrings(
     val title: String,
     val sortTitle: String,
@@ -372,6 +386,7 @@ data class SeriesEditStrings(
     }
 }
 
+@kotlinx.serialization.Serializable
 data class BookEditStrings(
     val title: String,
     val number: String,
@@ -384,6 +399,7 @@ data class BookEditStrings(
     val bulkTagsWarning: String,
 )
 
+@kotlinx.serialization.Serializable
 data class LibraryEditStrings(
     val emptyTrashAfterScan: String,
     val scanForceModifiedTime: String,
@@ -433,6 +449,7 @@ data class LibraryEditStrings(
     }
 }
 
+@kotlinx.serialization.Serializable
 data class UserEditStrings(
     val contentRestrictions: String,
     val age: String,
@@ -452,6 +469,7 @@ data class UserEditStrings(
     }
 }
 
+@kotlinx.serialization.Serializable
 data class ReaderStrings(
     val atBeginningOfBook: String,
     val closeBook: String,
@@ -514,14 +532,15 @@ data class ReaderStrings(
         }
     }
 
-    fun zoomLine(zoomPercentage: Int): String = zoomTemplate.format(zoomPercentage)
-    fun pageNumberLine(pageNumber: Int): String = pageNumberTemplate.format(pageNumber)
-    fun pageDisplaySizeLine(width: Int, height: Int): String = pageDisplaySizeTemplate.format(width, height)
-    fun pageOriginalSizeLine(width: Int, height: Int): String = pageOriginalSizeTemplate.format(width, height)
-    fun modeWithDirection(mode: String, direction: String): String = modeWithDirectionTemplate.format(mode, direction)
+    fun zoomLine(zoomPercentage: Int): String = zoomTemplate.formatTemplate("zoomPercentage" to zoomPercentage)
+    fun pageNumberLine(pageNumber: Int): String = pageNumberTemplate.formatTemplate("pageNumber" to pageNumber)
+    fun pageDisplaySizeLine(width: Int, height: Int): String = pageDisplaySizeTemplate.formatTemplate("width" to width, "height" to height)
+    fun pageOriginalSizeLine(width: Int, height: Int): String = pageOriginalSizeTemplate.formatTemplate("width" to width, "height" to height)
+    fun modeWithDirection(mode: String, direction: String): String = modeWithDirectionTemplate.formatTemplate("mode" to mode, "direction" to direction)
 
 }
 
+@kotlinx.serialization.Serializable
 data class PagedReaderStrings(
     val scaleType: String,
     val scaleScreen: String,
@@ -564,6 +583,7 @@ data class PagedReaderStrings(
     }
 }
 
+@kotlinx.serialization.Serializable
 data class ContinuousReaderStrings(
     val sidePadding: String,
     val sidePaddingValueTemplate: String,
@@ -584,10 +604,11 @@ data class ContinuousReaderStrings(
         }
     }
 
-    fun sidePaddingValue(percentage: Int): String = sidePaddingValueTemplate.format(percentage)
-    fun pageSpacingValue(spacing: Int): String = pageSpacingValueTemplate.format(spacing)
+    fun sidePaddingValue(percentage: Int): String = sidePaddingValueTemplate.formatTemplate("percentage" to percentage)
+    fun pageSpacingValue(spacing: Int): String = pageSpacingValueTemplate.formatTemplate("spacing" to spacing)
 }
 
+@kotlinx.serialization.Serializable
 data class SettingsStrings(
     val serverSettings: String,
     val thumbnailSize: String,
@@ -666,9 +687,10 @@ data class SettingsStrings(
         }
     }
 
-    fun mediaAnalysisMedia(mediaType: String, size: String): String = mediaAnalysisMediaTemplate.format(mediaType, size)
+    fun mediaAnalysisMedia(mediaType: String, size: String): String = mediaAnalysisMediaTemplate.formatTemplate("mediaType" to mediaType, "size" to size)
 }
 
+@kotlinx.serialization.Serializable
 data class FilterStrings(
     val anyValue: String,
     val excludeSummaryTemplate: String,
@@ -692,13 +714,10 @@ data class FilterStrings(
 ) {
     fun summary(include: List<String>, exclude: List<String>, fallback: String = anyValue): String {
         return when {
-            include.isNotEmpty() && exclude.isNotEmpty() -> includeAndExcludeSummaryTemplate.format(
-                include.joinToString(),
-                exclude.joinToString()
-            )
+            include.isNotEmpty() && exclude.isNotEmpty() -> includeAndExcludeSummaryTemplate.formatTemplate("include" to include.joinToString(), "exclude" to exclude.joinToString())
 
-            include.isNotEmpty() -> includeSummaryTemplate.format(include.joinToString())
-            exclude.isNotEmpty() -> excludeSummaryTemplate.format(exclude.joinToString())
+            include.isNotEmpty() -> includeSummaryTemplate.formatTemplate("include" to include.joinToString())
+            exclude.isNotEmpty() -> excludeSummaryTemplate.formatTemplate("exclude" to exclude.joinToString())
             else -> fallback
         }
     }
@@ -714,6 +733,7 @@ data class FilterStrings(
     }
 }
 
+@kotlinx.serialization.Serializable
 data class SeriesFilterStrings(
     val resetFilters: String,
     val hideFilters: String,
@@ -791,6 +811,7 @@ data class SeriesFilterStrings(
 
 }
 
+@kotlinx.serialization.Serializable
 data class BookFilterStrings(
     val sort: String,
     val sortNumberAsc: String,
@@ -831,6 +852,7 @@ data class BookFilterStrings(
 }
 
 
+@kotlinx.serialization.Serializable
 data class ErrorCodes(
     val err1000: String,
     val err1001: String,
@@ -909,6 +931,7 @@ data class ErrorCodes(
     fun getMessageForCode(code: String) = codeMap[code] ?: "Unknown error: $code"
 }
 
+@kotlinx.serialization.Serializable
 data class ImageSettingsStrings(
     val active: String,
     val browse: String,
@@ -1024,15 +1047,15 @@ data class ImageSettingsStrings(
         }
     }
 
-    fun flashDurationValue(durationMs: Long): String = flashDurationValueTemplate.format(durationMs)
+    fun flashDurationValue(durationMs: Long): String = flashDurationValueTemplate.formatTemplate("durationMs" to durationMs)
     fun flashEveryValue(pages: Int): String = if (pages == 1) {
-        flashEveryPageSingularTemplate.format(pages)
+        flashEveryPageSingularTemplate.formatTemplate("pages" to pages)
     } else {
-        flashEveryPagePluralTemplate.format(pages)
+        flashEveryPagePluralTemplate.formatTemplate("pages" to pages)
     }
 
-    fun installationError(error: String): String = installationErrorTemplate.format(error)
-    fun onnxRuntimeLoadError(error: String): String = onnxRuntimeLoadErrorTemplate.format(error)
-    fun onnxRuntimeProvider(provider: String): String = onnxRuntimeProviderTemplate.format(provider)
-    fun deviceLabel(name: String, memoryGb: String): String = deviceLabelTemplate.format(name, memoryGb)
+    fun installationError(error: String): String = installationErrorTemplate.formatTemplate("error" to error)
+    fun onnxRuntimeLoadError(error: String): String = onnxRuntimeLoadErrorTemplate.formatTemplate("error" to error)
+    fun onnxRuntimeProvider(provider: String): String = onnxRuntimeProviderTemplate.formatTemplate("provider" to provider)
+    fun deviceLabel(name: String, memoryGb: String): String = deviceLabelTemplate.formatTemplate("name" to name, "memoryGb" to memoryGb)
 }

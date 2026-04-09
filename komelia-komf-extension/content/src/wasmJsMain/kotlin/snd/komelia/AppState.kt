@@ -15,15 +15,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeViewport
-import io.github.snd_r.komelia.platform.PlatformType
-import io.github.snd_r.komelia.platform.WindowSizeClass
-import io.github.snd_r.komelia.ui.AppNotifications
-import io.github.snd_r.komelia.ui.LocalKeyEvents
-import io.github.snd_r.komelia.ui.LocalPlatform
-import io.github.snd_r.komelia.ui.LocalTheme
-import io.github.snd_r.komelia.ui.LocalWindowHeight
-import io.github.snd_r.komelia.ui.LocalWindowWidth
-import io.github.snd_r.komelia.ui.common.AppTheme
+import snd.komelia.ui.AppNotifications
+import snd.komelia.ui.LocalKeyEvents
+import snd.komelia.ui.LocalPlatform
+import snd.komelia.ui.LocalStrings
+import snd.komelia.ui.LocalTheme
+import snd.komelia.ui.LocalWindowHeight
+import snd.komelia.ui.LocalWindowWidth
+import snd.komelia.ui.Theme.Companion.toTheme
+import snd.komelia.ui.platform.PlatformType
+import snd.komelia.ui.platform.WindowSizeClass
+import snd.komelia.settings.model.AppTheme
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
@@ -32,8 +34,11 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import org.w3c.dom.AddEventListenerOptions
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -49,10 +54,14 @@ import snd.komelia.dialogs.ResetSeriesMetadataDialog
 import snd.komelia.dialogs.SettingsDialog
 import snd.komelia.kavita.KavitaComponent
 import snd.komelia.komga.KomgaComponent
+import snd.komelia.strings.ExtensionLanguageMode
 import snd.komelia.strings.ExtensionStringsProvider
 import snd.komelia.strings.LocalExtensionStrings
 import snd.komelia.strings.LocalExtensionStringsProvider
 import snd.komelia.strings.RuntimeExtensionStrings
+import snd.komelia.ui.strings.AppLanguage
+import snd.komelia.ui.strings.RuntimeAppStrings
+import snd.komelia.ui.strings.StringsResolver
 import snd.komf.api.KomfServerLibraryId
 import snd.komf.api.KomfServerSeriesId
 import snd.komf.api.MediaServer
@@ -156,12 +165,24 @@ class AppState(
     @OptIn(ExperimentalComposeUiApi::class)
     private fun startDialogContentApp() {
         val stringsProvider = ExtensionStringsProvider(coroutineScope)
+        val appStringsFlow = stringsProvider.languageMode
+            .mapLatest { languageMode -> StringsResolver.resolve(languageMode.toAppLanguage()) }
+            .stateIn(
+                coroutineScope,
+                SharingStarted.Eagerly,
+                StringsResolver.placeholder
+            )
         ComposeViewport(viewportContainerId = komfAppMountElement.id) {
             val extensionStrings = stringsProvider.strings.collectAsState().value
+            val appStrings = appStringsFlow.collectAsState().value
             LaunchedEffect(extensionStrings) {
                 RuntimeExtensionStrings.update(extensionStrings)
             }
+            LaunchedEffect(appStrings) {
+                RuntimeAppStrings.update(appStrings)
+            }
             val theme = this.theme.collectAsState().value
+            val uiTheme = theme.toTheme()
             Box(
                 modifier = Modifier
                     .drawBehind {
@@ -172,12 +193,13 @@ class AppState(
                         )
                     }.sizeIn(minWidth = 100.dp, minHeight = 100.dp).fillMaxSize()
             ) {
-                MaterialTheme(colorScheme = theme.colorScheme) {
+                MaterialTheme(colorScheme = uiTheme.colorScheme) {
 
                     CompositionLocalProvider(
                         LocalKeyEvents provides keyEvents,
                         LocalPlatform provides PlatformType.WEB_KOMF,
-                        LocalTheme provides theme,
+                        LocalStrings provides appStrings,
+                        LocalTheme provides uiTheme,
                         LocalWindowWidth provides windowWidth.collectAsState().value,
                         LocalWindowHeight provides windowHeight.collectAsState().value,
                         LocalKomfViewModelFactory provides viewModelFactory,
@@ -233,13 +255,21 @@ class AppState(
 
                         AppNotifications(
                             appNotifications = viewModelFactory.appNotifications,
-                            theme = theme,
+                            theme = uiTheme,
                             showCloseButton = false
                         )
                     }
                 }
             }
         }
+    }
+}
+
+private fun ExtensionLanguageMode.toAppLanguage(): AppLanguage {
+    return when (this) {
+        ExtensionLanguageMode.SYSTEM -> AppLanguage.fromLanguageTag(window.navigator.language)
+        ExtensionLanguageMode.ENGLISH -> AppLanguage.ENGLISH
+        ExtensionLanguageMode.SIMPLIFIED_CHINESE -> AppLanguage.SIMPLIFIED_CHINESE
     }
 }
 
@@ -274,3 +304,5 @@ sealed interface KomfActiveDialog {
 fun mutationObserverConfig(): MutationObserverInit {
     js("return { childList: true, subtree: true };")
 }
+
+

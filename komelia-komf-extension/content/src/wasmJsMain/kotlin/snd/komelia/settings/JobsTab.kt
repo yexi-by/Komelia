@@ -7,11 +7,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import io.github.snd_r.komelia.ui.LoadState
-import io.github.snd_r.komelia.ui.dialogs.tabs.DialogTab
-import io.github.snd_r.komelia.ui.dialogs.tabs.TabItem
-import io.github.snd_r.komelia.ui.error.formatExceptionMessage
-import io.github.snd_r.komelia.ui.settings.komf.jobs.KomfJobsContent
+import snd.komelia.ui.LoadState
+import snd.komelia.ui.dialogs.tabs.DialogTab
+import snd.komelia.ui.dialogs.tabs.TabItem
+import snd.komelia.ui.error.formatExceptionMessage
+import snd.komelia.ui.settings.komf.jobs.KomfJobsContent
 import snd.komelia.LocalKomfViewModelFactory
 import snd.komelia.strings.LocalExtensionStrings
 
@@ -48,6 +48,7 @@ class JobsTab : DialogTab {
 
     }
 }
+
 
 
 

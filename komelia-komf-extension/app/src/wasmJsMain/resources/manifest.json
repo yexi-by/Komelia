@@ -27,7 +27,9 @@
         "<all_urls>"
       ],
       "resources": [
-        @wasmFiles@
+        @wasmFiles@,
+        "i18n/en.json",
+        "i18n/zh-Hans.json"
       ]
     }
   ],

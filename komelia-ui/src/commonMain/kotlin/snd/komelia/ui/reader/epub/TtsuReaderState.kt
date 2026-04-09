@@ -99,7 +99,7 @@ class TtsuReaderState(
 
         state.value = LoadState.Loading
         notifications.runCatchingToNotifications {
-            Res.getUri("files/ttsu.html")
+            Res.getUri("files/webui/ttsu.html")
 
             if (book.value == null) book.value = bookApi.getOne(bookId.value)
             coroutineScope.launch {
@@ -239,8 +239,8 @@ class TtsuReaderState(
             runCatching {
                 val urlString = request.url.toString()
                 when {
-                    urlString == "http://komelia/ttsu.html" -> {
-                        val bytes = Res.readBytes("files/ttsu.html")
+                    urlString == "http://komelia/webui/ttsu.html" -> {
+                        val bytes = Res.readBytes("files/webui/ttsu.html")
                         ResourceLoadResult(data = bytes, contentType = "text/html")
                     }
 
@@ -263,7 +263,7 @@ class TtsuReaderState(
             }.onFailure { logger.catching(it) }.getOrNull()
         }
 
-        webview.navigate("http://komelia/ttsu.html")
+        webview.navigate("http://komelia/webui/ttsu.html")
         webview.start()
     }
 

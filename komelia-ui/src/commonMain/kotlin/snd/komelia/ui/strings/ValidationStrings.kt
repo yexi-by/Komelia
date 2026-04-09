@@ -1,5 +1,6 @@
 package snd.komelia.ui.strings
 
+@kotlinx.serialization.Serializable
 data class ValidationStrings(
     val alreadyContainsBook: String,
     val alreadyContainsSeries: String,
