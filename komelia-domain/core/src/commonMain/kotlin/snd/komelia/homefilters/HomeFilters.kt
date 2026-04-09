@@ -9,22 +9,36 @@ import snd.komga.client.search.KomgaSearchCondition
 import snd.komga.client.search.allOfBooks
 import kotlin.time.Duration.Companion.days
 
+@Serializable
+enum class HomeScreenDefaultFilterKind(val legacyLabel: String) {
+    KEEP_READING("Keep reading"),
+    ON_DECK("On deck"),
+    RECENTLY_RELEASED_BOOKS("Recently released books"),
+    RECENTLY_ADDED_BOOKS("Recently added books"),
+    RECENTLY_ADDED_SERIES("Recently added series"),
+    RECENTLY_UPDATED_SERIES("Recently updated series"),
+    RECENTLY_READ_BOOKS("Recently read books"),
+}
+
 val keepReadingHomeScreenFilter = BooksHomeScreenFilter.CustomFilter(
     order = 1,
-    label = "Keep reading",
+    label = "",
+    defaultKind = HomeScreenDefaultFilterKind.KEEP_READING,
     filter = allOfBooks { readStatus { isEqualTo(KomgaReadStatus.IN_PROGRESS) } }.toBookCondition(),
     pageRequest = KomgaPageRequest(sort = KomgaSort.KomgaBooksSort.byReadDateDesc())
 )
 
 val onDeckHomeScreenFilter = BooksHomeScreenFilter.OnDeck(
     order = 2,
-    label = "On deck",
+    label = "",
+    defaultKind = HomeScreenDefaultFilterKind.ON_DECK,
     pageSize = 20,
 )
 
 val recentlyReleasedBooksHomeScreenFilter = BooksHomeScreenFilter.CustomFilter(
     order = 3,
-    label = "Recently released books",
+    label = "",
+    defaultKind = HomeScreenDefaultFilterKind.RECENTLY_RELEASED_BOOKS,
     filter = allOfBooks { releaseDate { isInLast(30.days) } }.toBookCondition(),
     pageRequest = KomgaPageRequest(
         sort = KomgaSort.KomgaBooksSort.byReleaseDateDesc(),
@@ -33,7 +47,8 @@ val recentlyReleasedBooksHomeScreenFilter = BooksHomeScreenFilter.CustomFilter(
 
 val recentlyAddedBooksHomeScreenFilter = BooksHomeScreenFilter.CustomFilter(
     order = 4,
-    label = "Recently added books",
+    label = "",
+    defaultKind = HomeScreenDefaultFilterKind.RECENTLY_ADDED_BOOKS,
     filter = allOfBooks {}.toBookCondition(),
     pageRequest = KomgaPageRequest(
         sort = KomgaSort.KomgaBooksSort.byCreatedDateDesc(),
@@ -43,19 +58,22 @@ val recentlyAddedBooksHomeScreenFilter = BooksHomeScreenFilter.CustomFilter(
 
 val recentlyAddedSeriesHomeScreenFilter = SeriesHomeScreenFilter.RecentlyAdded(
     order = 5,
-    label = "Recently added series",
+    label = "",
+    defaultKind = HomeScreenDefaultFilterKind.RECENTLY_ADDED_SERIES,
     pageSize = 20,
 )
 
 val recentlyUpdatedSeriesHomeScreenFilter = SeriesHomeScreenFilter.RecentlyUpdated(
     order = 6,
-    label = "Recently updated series",
+    label = "",
+    defaultKind = HomeScreenDefaultFilterKind.RECENTLY_UPDATED_SERIES,
     pageSize = 20,
 )
 
 val recentlyReadBooksHomeScreenFilter = BooksHomeScreenFilter.CustomFilter(
     order = 7,
-    label = "Recently read books",
+    label = "",
+    defaultKind = HomeScreenDefaultFilterKind.RECENTLY_READ_BOOKS,
     filter = allOfBooks {
         readStatus { isEqualTo(KomgaReadStatus.READ) }
     }.toBookCondition(),
@@ -72,27 +90,51 @@ val homeScreenDefaultFilters = listOf(
     recentlyReadBooksHomeScreenFilter,
 ).sortedBy { it.order }
 
-enum class HomeScreenDefaultFilterKind {
-    KEEP_READING,
-    ON_DECK,
-    RECENTLY_RELEASED_BOOKS,
-    RECENTLY_ADDED_BOOKS,
-    RECENTLY_ADDED_SERIES,
-    RECENTLY_UPDATED_SERIES,
-    RECENTLY_READ_BOOKS,
+fun HomeScreenFilter.defaultKind(): HomeScreenDefaultFilterKind? =
+    defaultKind
+
+fun HomeScreenDefaultFilterKind.toFilter(): HomeScreenFilter =
+    when (this) {
+        HomeScreenDefaultFilterKind.KEEP_READING -> keepReadingHomeScreenFilter
+        HomeScreenDefaultFilterKind.ON_DECK -> onDeckHomeScreenFilter
+        HomeScreenDefaultFilterKind.RECENTLY_RELEASED_BOOKS -> recentlyReleasedBooksHomeScreenFilter
+        HomeScreenDefaultFilterKind.RECENTLY_ADDED_BOOKS -> recentlyAddedBooksHomeScreenFilter
+        HomeScreenDefaultFilterKind.RECENTLY_ADDED_SERIES -> recentlyAddedSeriesHomeScreenFilter
+        HomeScreenDefaultFilterKind.RECENTLY_UPDATED_SERIES -> recentlyUpdatedSeriesHomeScreenFilter
+        HomeScreenDefaultFilterKind.RECENTLY_READ_BOOKS -> recentlyReadBooksHomeScreenFilter
+    }
+
+fun HomeScreenFilter.matchedDefaultKind(): HomeScreenDefaultFilterKind? =
+    HomeScreenDefaultFilterKind.entries.firstOrNull { matchesDefaultFilter(it.toFilter()) }
+
+fun HomeScreenFilter.withDefaultKind(kind: HomeScreenDefaultFilterKind?): HomeScreenFilter =
+    when (this) {
+        is BooksHomeScreenFilter.CustomFilter -> copy(defaultKind = kind)
+        is BooksHomeScreenFilter.OnDeck -> copy(defaultKind = kind)
+        is SeriesHomeScreenFilter.CustomFilter -> copy(defaultKind = kind)
+        is SeriesHomeScreenFilter.RecentlyAdded -> copy(defaultKind = kind)
+        is SeriesHomeScreenFilter.RecentlyUpdated -> copy(defaultKind = kind)
+    }
+
+fun HomeScreenFilter.withLabel(label: String): HomeScreenFilter =
+    when (this) {
+        is BooksHomeScreenFilter.CustomFilter -> copy(label = label)
+        is BooksHomeScreenFilter.OnDeck -> copy(label = label)
+        is SeriesHomeScreenFilter.CustomFilter -> copy(label = label)
+        is SeriesHomeScreenFilter.RecentlyAdded -> copy(label = label)
+        is SeriesHomeScreenFilter.RecentlyUpdated -> copy(label = label)
+    }
+
+fun HomeScreenFilter.normalizeForPersistence(): HomeScreenFilter {
+    val kind = defaultKind ?: matchedDefaultKind()
+    if (kind == null) return withDefaultKind(null)
+    if (!matchesDefaultFilter(kind.toFilter())) return withDefaultKind(null)
+
+    val normalizedLabel = if (label.isBlank() || label == kind.legacyLabel) "" else label
+    return withDefaultKind(kind).withLabel(normalizedLabel)
 }
 
-fun HomeScreenFilter.defaultKind(): HomeScreenDefaultFilterKind? =
-    when {
-        matchesDefaultFilter(keepReadingHomeScreenFilter) -> HomeScreenDefaultFilterKind.KEEP_READING
-        matchesDefaultFilter(onDeckHomeScreenFilter) -> HomeScreenDefaultFilterKind.ON_DECK
-        matchesDefaultFilter(recentlyReleasedBooksHomeScreenFilter) -> HomeScreenDefaultFilterKind.RECENTLY_RELEASED_BOOKS
-        matchesDefaultFilter(recentlyAddedBooksHomeScreenFilter) -> HomeScreenDefaultFilterKind.RECENTLY_ADDED_BOOKS
-        matchesDefaultFilter(recentlyAddedSeriesHomeScreenFilter) -> HomeScreenDefaultFilterKind.RECENTLY_ADDED_SERIES
-        matchesDefaultFilter(recentlyUpdatedSeriesHomeScreenFilter) -> HomeScreenDefaultFilterKind.RECENTLY_UPDATED_SERIES
-        matchesDefaultFilter(recentlyReadBooksHomeScreenFilter) -> HomeScreenDefaultFilterKind.RECENTLY_READ_BOOKS
-        else -> null
-    }
+fun List<HomeScreenFilter>.normalizeForPersistence(): List<HomeScreenFilter> = map { it.normalizeForPersistence() }
 
 private fun HomeScreenFilter.matchesDefaultFilter(default: HomeScreenFilter): Boolean =
     when {
@@ -118,6 +160,7 @@ private fun HomeScreenFilter.matchesDefaultFilter(default: HomeScreenFilter): Bo
 sealed interface HomeScreenFilter {
     val order: Int
     val label: String
+    val defaultKind: HomeScreenDefaultFilterKind?
 
     fun withOrder(newOrder: Int): HomeScreenFilter
 }
@@ -131,6 +174,7 @@ sealed interface SeriesHomeScreenFilter : HomeScreenFilter {
     data class RecentlyAdded(
         override val order: Int,
         override val label: String,
+        override val defaultKind: HomeScreenDefaultFilterKind? = null,
         val pageSize: Int,
     ) : SeriesHomeScreenFilter {
         override fun withOrder(newOrder: Int) = this.copy(order = newOrder)
@@ -141,6 +185,7 @@ sealed interface SeriesHomeScreenFilter : HomeScreenFilter {
     data class RecentlyUpdated(
         override val order: Int,
         override val label: String,
+        override val defaultKind: HomeScreenDefaultFilterKind? = null,
         val pageSize: Int,
     ) : SeriesHomeScreenFilter {
         override fun withOrder(newOrder: Int) = this.copy(order = newOrder)
@@ -151,6 +196,7 @@ sealed interface SeriesHomeScreenFilter : HomeScreenFilter {
     data class CustomFilter(
         override val order: Int,
         override val label: String,
+        override val defaultKind: HomeScreenDefaultFilterKind? = null,
         val filter: KomgaSearchCondition.SeriesCondition? = null,
         val textSearch: String? = null,
         val pageRequest: KomgaPageRequest? = null,
@@ -168,6 +214,7 @@ sealed interface BooksHomeScreenFilter : HomeScreenFilter {
     data class OnDeck(
         override val order: Int,
         override val label: String,
+        override val defaultKind: HomeScreenDefaultFilterKind? = null,
         val pageSize: Int,
     ) : BooksHomeScreenFilter {
         override fun withOrder(newOrder: Int) = this.copy(order = newOrder)
@@ -178,6 +225,7 @@ sealed interface BooksHomeScreenFilter : HomeScreenFilter {
     data class CustomFilter(
         override val order: Int,
         override val label: String,
+        override val defaultKind: HomeScreenDefaultFilterKind? = null,
         val filter: KomgaSearchCondition.BookCondition? = null,
         val textSearch: String? = null,
         val pageRequest: KomgaPageRequest? = null,

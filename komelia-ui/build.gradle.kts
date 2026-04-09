@@ -132,6 +132,10 @@ kotlin {
             api(libs.ktor.client.js)
             implementation(projects.komeliaInfra.imageDecoder.wasmImageWorker)
         }
+
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
     }
 
     targets.configureEach {

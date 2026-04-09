@@ -19,6 +19,9 @@ import kotlinx.coroutines.flow.update
 import snd.komelia.AppNotifications
 import snd.komelia.homefilters.BooksHomeScreenFilter
 import snd.komelia.homefilters.HomeScreenFilter
+import snd.komelia.homefilters.matchedDefaultKind
+import snd.komelia.homefilters.withDefaultKind
+import snd.komelia.homefilters.withLabel
 import snd.komelia.komga.api.KomgaBookApi
 import snd.komelia.komga.api.KomgaReadListApi
 import snd.komelia.komga.api.KomgaSeriesApi
@@ -96,7 +99,7 @@ class BookFilterEditState(
     }.stateIn(coroutineScope, SharingStarted.Eagerly, FilterType.Custom)
 
     override fun toFilter(order: Int): HomeScreenFilter {
-        return when (val editState = filter.value) {
+        val rawFilter = when (val editState = filter.value) {
             is BookCustomFilterState -> BooksHomeScreenFilter.CustomFilter(
                 order = order,
                 label = label.value,
@@ -114,6 +117,12 @@ class BookFilterEditState(
                 pageSize = editState.pageSize.value
             )
         }
+
+        val defaultKind = rawFilter.matchedDefaultKind() ?: return rawFilter.withDefaultKind(null)
+        val defaultLabel = RuntimeAppStrings.strings.value.screens.home.defaultFilterLabel(defaultKind)
+        val persistedLabel = if (label.value.isBlank() || label.value == defaultLabel) "" else label.value
+
+        return rawFilter.withDefaultKind(defaultKind).withLabel(persistedLabel)
     }
 
     fun onTypeChange(type: FilterType) {
