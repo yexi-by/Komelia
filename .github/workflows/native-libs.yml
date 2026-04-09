@@ -1,0 +1,104 @@
+name: Build Android Native Libraries
+
+on:
+  workflow_dispatch:
+    inputs:
+      arch:
+        description: Target architecture used by cmake/android-build.sh
+        required: true
+        default: x86_64
+        type: choice
+        options:
+          - x86_64
+          - aarch64
+          - armv7a
+          - x86
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-libs-${{ inputs.arch }}
+  cancel-in-progress: false
+
+jobs:
+  build-native-libs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK components
+        run: |
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+
+      - name: Build Android Docker image
+        run: docker build -t komelia-build-android . -f ./cmake/android.Dockerfile
+
+      - name: Build native libraries inside Docker
+        run: docker run --rm -v "${PWD}:/build" komelia-build-android "${{ inputs.arch }}"
+
+      - name: Resolve ABI metadata
+        id: abi
+        run: |
+          case "${{ inputs.arch }}" in
+            x86_64)
+              echo "copy_task=android-x86_64_copyJniLibs" >> "$GITHUB_OUTPUT"
+              echo "abi_dir=x86_64" >> "$GITHUB_OUTPUT"
+              echo "cmake_dir=cmake/build-android-x86_64" >> "$GITHUB_OUTPUT"
+              ;;
+            aarch64)
+              echo "copy_task=android-arm64_copyJniLibs" >> "$GITHUB_OUTPUT"
+              echo "abi_dir=arm64-v8a" >> "$GITHUB_OUTPUT"
+              echo "cmake_dir=cmake/build-android-aarch64" >> "$GITHUB_OUTPUT"
+              ;;
+            armv7a)
+              echo "copy_task=android-armv7a_copyJniLibs" >> "$GITHUB_OUTPUT"
+              echo "abi_dir=armeabi-v7a" >> "$GITHUB_OUTPUT"
+              echo "cmake_dir=cmake/build-android-armv7a" >> "$GITHUB_OUTPUT"
+              ;;
+            x86)
+              echo "copy_task=android-x86_copyJniLibs" >> "$GITHUB_OUTPUT"
+              echo "abi_dir=x86" >> "$GITHUB_OUTPUT"
+              echo "cmake_dir=cmake/build-android-x86" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "Unsupported architecture: ${{ inputs.arch }}" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Copy JNI libraries into Android resources
+        run: |
+          ./gradlew "${{ steps.abi.outputs.copy_task }}" \
+            --no-configuration-cache \
+            --no-daemon \
+            --console=plain
+
+      - name: Upload native library artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-native-libs-${{ inputs.arch }}
+          if-no-files-found: error
+          path: |
+            ${{ steps.abi.outputs.cmake_dir }}/install/lib/**
+            komelia-infra/jni/src/androidMain/jniLibs/${{ steps.abi.outputs.abi_dir }}/**
+            komelia-infra/database/sqlite/src/androidMain/jniLibs/${{ steps.abi.outputs.abi_dir }}/**

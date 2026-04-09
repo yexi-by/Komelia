@@ -178,6 +178,41 @@ $zip.Dispose()
 - `x86_64` 包只包含 `lib/x86_64/*.so`
 - `arm64-v8a` 包只包含 `lib/arm64-v8a/*.so`
 
+## GitHub Actions 自动化
+
+如果你不想每次都手工在本地重复整套构建流程，可以直接使用仓库内置的 GitHub Actions。
+
+当前有 3 个工作流：
+
+- `CI`
+  用于日常校验，会自动执行：
+  - `auditLocaleAssets`
+  - `auditUiStrings`
+  - `auditI18nBypass`
+  - `:komelia-ui:compileKotlinJvm`
+  - `buildWebui`
+  - `:komelia-komf-extension:app:assembleExtension`
+  - `npm --prefix komelia-epub-reader/ttu-ebook-reader run check`
+- `Release Android APK`
+  用于手动发布 Android APK，当前默认发布 `arm64-v8a release`
+- `Build Android Native Libraries`
+  用于按指定 ABI 手动重建 Android 原生依赖，并把产物上传成 workflow artifact
+
+### 发版工作流 secrets
+
+`Release Android APK` 需要以下 repository secrets：
+
+- `KOMELIA_RELEASE_KEYSTORE_BASE64`
+- `KOMELIA_RELEASE_STORE_PASSWORD`
+- `KOMELIA_RELEASE_KEY_ALIAS`
+- `KOMELIA_RELEASE_KEY_PASSWORD`
+
+说明：
+
+- `KOMELIA_RELEASE_KEYSTORE_BASE64` 是你签名 keystore 文件的 base64 文本
+- 工作流运行时会把它恢复为临时文件，再写入 `KOMELIA_RELEASE_STORE_FILE`
+- 也就是说，GitHub Actions 里不需要额外配置 `KOMELIA_RELEASE_STORE_FILE` 这个 secret
+
 ### 2. 模拟器验证建议
 
 Windows `x86_64` 主机上，只能稳定验证：

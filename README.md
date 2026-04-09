@@ -98,3 +98,28 @@ Then choose app build option:
 
 run`./gradlew :komelia-komf-extension:app:packageExtension` \
 output archive will be in `./komelia-komf-extension/app/build/distributions`
+
+## GitHub Actions
+
+This fork ships three GitHub Actions workflows:
+
+- `CI`:
+  runs audits and build validation on every push to `main` and every pull request
+- `Release Android APK`:
+  manual workflow that signs and publishes an `arm64-v8a` Android release APK
+- `Build Android Native Libraries`:
+  manual workflow that rebuilds Android native libraries for a selected ABI and uploads the results as workflow artifacts
+
+### Release workflow secrets
+
+To use `Release Android APK`, configure the following repository secrets:
+
+- `KOMELIA_RELEASE_KEYSTORE_BASE64`
+- `KOMELIA_RELEASE_STORE_PASSWORD`
+- `KOMELIA_RELEASE_KEY_ALIAS`
+- `KOMELIA_RELEASE_KEY_PASSWORD`
+
+Notes:
+
+- `KOMELIA_RELEASE_KEYSTORE_BASE64` must be the base64 content of your `.jks` or `.keystore` file
+- the workflow reconstructs the keystore into a temporary file and maps it to `KOMELIA_RELEASE_STORE_FILE` at runtime

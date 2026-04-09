@@ -49,6 +49,31 @@ Android APK 的推荐构建说明已经整理在：
 4. 执行 `buildWebui`
 5. 再构建 `debug` 或 `release` APK
 
+## GitHub Actions
+
+当前 fork 已经补上 3 个 GitHub Actions 工作流：
+
+- `CI`
+  每次推送到 `main` 或提交 PR 时自动跑审计和构建校验
+- `Release Android APK`
+  手动触发，自动签名并发布 `arm64-v8a` Android APK
+- `Build Android Native Libraries`
+  手动触发，按指定 ABI 重新构建 Android 原生库，并把结果作为工作流产物上传
+
+### 发版工作流需要的 secrets
+
+如果要使用 `Release Android APK`，需要在仓库里配置这些 secrets：
+
+- `KOMELIA_RELEASE_KEYSTORE_BASE64`
+- `KOMELIA_RELEASE_STORE_PASSWORD`
+- `KOMELIA_RELEASE_KEY_ALIAS`
+- `KOMELIA_RELEASE_KEY_PASSWORD`
+
+说明：
+
+- `KOMELIA_RELEASE_KEYSTORE_BASE64` 需要填 keystore 文件的 base64 内容
+- 工作流会在运行时把它还原成临时文件，并映射给 `KOMELIA_RELEASE_STORE_FILE`
+
 ## 上游说明
 
 本仓库并不否认上游来源，后续维护会在以下原则下进行：
