@@ -1,5 +1,6 @@
 package snd.komelia.db.repository
 
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -70,6 +71,14 @@ class SettingsRepositoryWrapper(
 
     override suspend fun putAppLanguageMode(mode: AppLanguageMode) {
         wrapper.transform { it.copy(languageMode = mode) }
+    }
+
+    override fun getLogExportDirectory(): Flow<PlatformFile?> {
+        return wrapper.state.map { it.logExportDirectory }.distinctUntilChanged()
+    }
+
+    override suspend fun putLogExportDirectory(directory: PlatformFile?) {
+        wrapper.transform { it.copy(logExportDirectory = directory) }
     }
 
     override fun getCheckForUpdatesOnStartup(): Flow<Boolean> {

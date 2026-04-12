@@ -42,6 +42,7 @@ class SettingsNavigationViewModel(
     private val latestVersion: Flow<AppVersion?>,
     private val platformType: PlatformType,
     val updatesEnabled: Boolean,
+    val logsEnabled: Boolean,
     val user: StateFlow<KomgaUser?>,
     komfEnabled: Flow<Boolean>,
 ) : ScreenModel {

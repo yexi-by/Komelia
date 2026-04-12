@@ -57,6 +57,7 @@ import snd.komelia.offline.OfflineRepositories
 import snd.komelia.onnxruntime.OnnxRuntime
 import snd.komelia.settings.ImageReaderSettingsRepository
 import snd.komelia.ui.DependencyContainer
+import snd.komelia.ui.settings.logs.AppLogsService
 import snd.komelia.ui.strings.StringsProvider
 import snd.komelia.updates.AppUpdater
 import snd.komelia.updates.OnnxModelDownloader
@@ -229,6 +230,7 @@ abstract class AppModule {
             komgaSharedState = komgaSharedState,
             komgaEvents = komgaEvents,
             appUpdater = createAppUpdater(updateClient),
+            appLogsService = createAppLogsService(),
 
             coilContext = androidContext,
             coilImageLoader = coil,
@@ -346,6 +348,7 @@ abstract class AppModule {
     protected abstract fun createKtorClientWithoutCache(): HttpClient
 
     protected abstract fun createAppUpdater(updateClient: UpdateClient): AppUpdater?
+    protected open fun createAppLogsService(): AppLogsService? = null
 
     protected abstract fun createImageDecoder(): KomeliaImageDecoder
     protected abstract suspend fun createReaderImageFactory(

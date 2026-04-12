@@ -78,7 +78,7 @@ class OfflineSettingsScreen : Screen {
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                         Icon(Icons.Default.Cached, null)
-                        Text(settingsStrings.logs)
+                        Text(settingsStrings.offlineLogs)
                     }
                 }
             }

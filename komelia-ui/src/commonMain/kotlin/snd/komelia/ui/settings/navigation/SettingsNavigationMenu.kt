@@ -49,6 +49,7 @@ import snd.komelia.ui.settings.komf.jobs.KomfJobsScreen
 import snd.komelia.ui.settings.komf.notifications.KomfNotificationSettingsScreen
 import snd.komelia.ui.settings.komf.processing.KomfProcessingSettingsScreen
 import snd.komelia.ui.settings.komf.providers.KomfProvidersSettingsScreen
+import snd.komelia.ui.settings.logs.AppLogsScreen
 import snd.komelia.ui.settings.offline.OfflineSettingsScreen
 import snd.komelia.ui.settings.server.ServerSettingsScreen
 import snd.komelia.ui.settings.updates.AppUpdatesScreen
@@ -62,6 +63,7 @@ fun SettingsNavigationMenu(
     hasMediaErrors: Boolean,
     komfEnabled: Boolean,
     updatesEnabled: Boolean,
+    logsEnabled: Boolean,
     newVersionIsAvailable: Boolean,
     currentScreen: Screen,
     onNavigation: (Screen) -> Unit = {},
@@ -104,6 +106,14 @@ fun SettingsNavigationMenu(
                 onClick = { onNavigation(AppUpdatesScreen()) },
                 isSelected = currentScreen is AppUpdatesScreen,
                 error = newVersionIsAvailable,
+                color = contentColor,
+            )
+        }
+        if (logsEnabled) {
+            NavigationButton(
+                label = screenStrings.logs,
+                onClick = { onNavigation(AppLogsScreen()) },
+                isSelected = currentScreen is AppLogsScreen,
                 color = contentColor,
             )
         }

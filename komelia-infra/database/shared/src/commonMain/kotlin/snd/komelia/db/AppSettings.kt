@@ -1,5 +1,6 @@
 package snd.komelia.db
 
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.serialization.Serializable
 import snd.komelia.settings.model.AppLanguageMode
 import snd.komelia.settings.model.AppTheme
@@ -18,6 +19,7 @@ data class AppSettings(
     val bookListLayout: BooksLayout = BooksLayout.GRID,
     val appTheme: AppTheme = AppTheme.DARK,
     val languageMode: AppLanguageMode = AppLanguageMode.SYSTEM,
+    val logExportDirectory: PlatformFile? = null,
 
     val checkForUpdatesOnStartup: Boolean = true,
     val updateLastCheckedTimestamp: Instant? = null,

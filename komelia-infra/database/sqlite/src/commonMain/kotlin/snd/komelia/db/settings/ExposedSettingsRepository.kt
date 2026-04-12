@@ -1,5 +1,9 @@
 package snd.komelia.db.settings
 
+import io.github.vinceglb.filekit.PlatformFile
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.selectAll
@@ -12,6 +16,8 @@ import snd.komelia.settings.model.AppTheme
 import snd.komelia.settings.model.BooksLayout
 import snd.komelia.updates.AppVersion
 import kotlin.time.Instant
+
+private val appSettingsJson = Json
 
 class ExposedSettingsRepository(database: Database) : ExposedRepository(database) {
 
@@ -36,6 +42,9 @@ class ExposedSettingsRepository(database: Database) : ExposedRepository(database
                 it[bookListLayout] = settings.bookListLayout.name
                 it[appTheme] = settings.appTheme.name
                 it[languageMode] = settings.languageMode.name
+                it[logExportDirectory] = settings.logExportDirectory?.let { directory ->
+                    appSettingsJson.encodeToString(directory)
+                }
 
                 it[checkForUpdatesOnStartup] = settings.checkForUpdatesOnStartup
                 it[updateLastCheckedTimestamp] = settings.updateLastCheckedTimestamp?.toString()
@@ -55,6 +64,9 @@ class ExposedSettingsRepository(database: Database) : ExposedRepository(database
             bookListLayout = BooksLayout.valueOf(get(AppSettingsTable.bookListLayout)),
             appTheme = AppTheme.valueOf(get(AppSettingsTable.appTheme)),
             languageMode = get(AppSettingsTable.languageMode).let(AppLanguageMode::valueOf),
+            logExportDirectory = get(AppSettingsTable.logExportDirectory)?.let { encoded ->
+                appSettingsJson.decodeFromString<PlatformFile>(encoded)
+            },
             checkForUpdatesOnStartup = get(AppSettingsTable.checkForUpdatesOnStartup),
             updateLastCheckedTimestamp = get(AppSettingsTable.updateLastCheckedTimestamp)?.let {
                 runCatching { Instant.parse(it) }.getOrNull()

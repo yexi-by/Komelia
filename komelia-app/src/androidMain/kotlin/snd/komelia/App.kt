@@ -10,11 +10,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import snd.komelia.logs.AndroidAppLogs
 import snd.komelia.offline.sync.downloadChannelId
 import snd.komelia.ui.DependencyContainer
 
 val dependencies = MutableStateFlow<DependencyContainer?>(null)
 class App : Application() {
+    override fun attachBaseContext(base: android.content.Context?) {
+        super.attachBaseContext(base)
+        requireNotNull(base) { "Application base context can't be null" }
+        AndroidAppLogs.initialize(base)
+    }
+
     override fun onCreate() {
         super.onCreate()
         GlobalExceptionHandler.initialize(applicationContext)

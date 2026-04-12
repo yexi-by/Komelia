@@ -20,6 +20,7 @@ import snd.komelia.onnxruntime.OnnxRuntime
 import snd.komelia.settings.model.AppLanguageMode
 import snd.komelia.ui.strings.AppLanguage
 import snd.komelia.ui.strings.AppStrings
+import snd.komelia.ui.settings.logs.AppLogsService
 import snd.komelia.updates.AppUpdater
 import snd.komelia.updates.OnnxModelDownloader
 import snd.komelia.updates.OnnxRuntimeInstaller
@@ -38,6 +39,7 @@ data class DependencyContainer(
     val komgaSharedState: KomgaAuthenticationState,
     val komgaEvents: ManagedKomgaEvents,
     val appUpdater: AppUpdater?,
+    val appLogsService: AppLogsService?,
 
     val coilContext: PlatformContext,
     val coilImageLoader: ImageLoader,

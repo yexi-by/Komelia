@@ -56,6 +56,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.appcompat)
             implementation(libs.androidx.core.ktx)
+            implementation(libs.androidx.documentfile)
             implementation(libs.androidx.window)
             implementation(libs.androidx.workManager)
             implementation(libs.androidx.workManager.ktx)

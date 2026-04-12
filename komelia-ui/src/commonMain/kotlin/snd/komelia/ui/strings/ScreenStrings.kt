@@ -326,6 +326,9 @@ data class SettingsScreenStrings(
     val komfSettings: String,
     val latestCheckedVersion: String,
     val logs: String,
+    val appLogs: String,
+    val crashLogs: String,
+    val offlineLogs: String,
     val logOutBody: String,
     val mediaAnalysis: String,
     val mediaManagement: String,
@@ -355,6 +358,13 @@ data class SettingsScreenStrings(
     val shutDownServerDescription: String,
     val sourcePrefix: String,
     val storageLocation: String,
+    val exportDirectory: String,
+    val currentExportDirectoryTemplate: String,
+    val noExportDirectoryConfigured: String,
+    val chooseExportDirectory: String,
+    val exportLogs: String,
+    val exportLogsSuccessTemplate: String,
+    val exportLogsFailureTemplate: String,
     val successful: String,
     val emptyTrashAllLibrariesDescription: String,
     val cancelAllTasks: String,
@@ -371,8 +381,11 @@ data class SettingsScreenStrings(
     fun currentStatus(status: String): String = currentStatusTemplate.formatTemplate("status" to status)
     fun currentUser(user: String): String = currentUserTemplate.formatTemplate("user" to user)
     fun releaseDate(date: String): String = releaseDateTemplate.formatTemplate("date" to date)
+    fun currentExportDirectory(directory: String): String = currentExportDirectoryTemplate.formatTemplate("directory" to directory)
     fun deleteUserBody(email: String): String = deleteUserBodyTemplate.formatTemplate("email" to email)
     fun deleteUserConfirm(email: String): String = deleteUserConfirmTemplate.formatTemplate("email" to email)
+    fun exportLogsSuccess(directoryName: String): String = exportLogsSuccessTemplate.formatTemplate("directoryName" to directoryName)
+    fun exportLogsFailure(reason: String): String = exportLogsFailureTemplate.formatTemplate("reason" to reason)
 }
 
 @kotlinx.serialization.Serializable

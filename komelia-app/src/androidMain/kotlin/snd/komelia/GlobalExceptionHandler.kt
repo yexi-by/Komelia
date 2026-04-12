@@ -6,6 +6,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import snd.komelia.logs.AndroidAppLogs
 import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger {}
@@ -29,6 +30,12 @@ class GlobalExceptionHandler private constructor(
                 exceptionName = exception::class.simpleName ?: "Unknown Error",
                 message = exception.message,
                 stacktrace = exception.stackTraceToString()
+            )
+            AndroidAppLogs.writeCrashLog(
+                context = applicationContext,
+                exceptionName = exceptionData.exceptionName,
+                message = exceptionData.message,
+                stacktrace = exceptionData.stacktrace,
             )
             val intent = Intent(applicationContext, CrashActivity::class.java).apply {
                 putExtra(INTENT_EXTRA, Json.encodeToString(exceptionData))

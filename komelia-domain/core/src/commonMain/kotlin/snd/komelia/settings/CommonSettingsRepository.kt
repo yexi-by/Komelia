@@ -1,5 +1,6 @@
 package snd.komelia.settings
 
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.flow.Flow
 import snd.komelia.settings.model.AppLanguageMode
 import snd.komelia.settings.model.AppTheme
@@ -28,6 +29,9 @@ interface CommonSettingsRepository {
 
     fun getAppLanguageMode(): Flow<AppLanguageMode>
     suspend fun putAppLanguageMode(mode: AppLanguageMode)
+
+    fun getLogExportDirectory(): Flow<PlatformFile?>
+    suspend fun putLogExportDirectory(directory: PlatformFile?)
 
     fun getCheckForUpdatesOnStartup(): Flow<Boolean>
     suspend fun putCheckForUpdatesOnStartup(check: Boolean)

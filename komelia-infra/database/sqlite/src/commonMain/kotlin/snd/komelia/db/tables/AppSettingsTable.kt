@@ -13,6 +13,7 @@ object AppSettingsTable : Table("AppSettings") {
     val bookListLayout = text("book_list_layout")
     val appTheme = text("app_theme")
     val languageMode = text("language_mode")
+    val logExportDirectory = text("log_export_directory").nullable()
 
     val checkForUpdatesOnStartup = bool("check_for_updates_on_startup")
 

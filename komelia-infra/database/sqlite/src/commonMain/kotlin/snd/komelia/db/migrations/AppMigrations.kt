@@ -20,6 +20,7 @@ class AppMigrations : MigrationResourcesProvider() {
         "V11__home_filters.sql",
         "V12__offline_mode.sql",
         "V13__app_language_mode.sql",
+        "V14__log_export_directory.sql",
     )
 
     override suspend fun getMigration(name: String): ByteArray? {

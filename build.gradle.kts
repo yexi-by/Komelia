@@ -1,8 +1,3 @@
-import groovy.json.JsonSlurper
-import org.apache.tools.ant.taskdefs.condition.Os
-import org.gradle.api.file.DuplicatesStrategy.EXCLUDE
-import java.util.regex.Pattern
-
 plugins {
     // this is necessary to avoid the plugins to be loaded multiple times
     // in each subproject's classloader
@@ -79,13 +74,13 @@ val linuxCommonLibs = setOf(
     "libkomelia_vips.so",
     "libkomelia_onnxruntime.so",
 )
-val androidLibs = linuxCommonLibs + setOf(
+val androidCommonLibs = linuxCommonLibs - "libpng.so"
+val androidLibs = androidCommonLibs + setOf(
     "libkomelia_android_bitmap.so",
     "libiconv.so",
     "libomp.so",
     "libpng16.so",
     "libonnxruntime.so",
-    "libonnxruntime_providers_shared.so",
 )
 val androidAbiToTask = mapOf(
     "arm64-v8a" to "android-arm64_copyJniLibs",
@@ -267,7 +262,7 @@ tasks.register<Delete>("cleanJni") {
 tasks.register<Sync>("windows-x86_64_copyJniLibs") {
     group = "jni"
 
-    duplicatesStrategy = EXCLUDE
+    duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.EXCLUDE
     from("$windowsBuildDir/sysroot/bin/")
     into(resourcesDir)
     val dependencies = windowsLibs
@@ -285,7 +280,7 @@ tasks.register<Sync>("windows-x86_64_copyJniLibs") {
 tasks.register<Sync>("windows-x86_64_copyJniLibsComposeResources") {
     group = "jni"
 
-    duplicatesStrategy = EXCLUDE
+    duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.EXCLUDE
     from("$windowsBuildDir/sysroot/bin/")
     into("$composeDistroResourcesDir/windows")
     val dependencies = windowsLibs
@@ -307,7 +302,7 @@ tasks.register<Exec>("komgaNpmInstall") {
     inputs.file("$epubReaderKomga/package.json")
     outputs.dir("$epubReaderKomga/node_modules")
     commandLine(
-        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        if (org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS)) {
             "npm.cmd"
         } else {
             "npm"
@@ -323,7 +318,7 @@ tasks.register<Exec>("komgaNpmBuild") {
     inputs.dir(epubReaderKomga)
     outputs.dir("$epubReaderKomga/dist")
     commandLine(
-        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        if (org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS)) {
             "npm.cmd"
         } else {
             "npm"
@@ -339,7 +334,7 @@ tasks.register<Exec>("ttsuNpmInstall") {
     inputs.file("$epubReaderTtsu/package.json")
     outputs.dir("$epubReaderTtsu/node_modules")
     commandLine(
-        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        if (org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS)) {
             "npm.cmd"
         } else {
             "npm"
@@ -355,7 +350,7 @@ tasks.register<Exec>("ttsuNpmBuild") {
     inputs.dir(epubReaderTtsu)
     outputs.dir("$epubReaderTtsu/dist")
     commandLine(
-        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        if (org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS)) {
             "npm.cmd"
         } else {
             "npm"
@@ -471,19 +466,19 @@ val kotlinAuditPatterns = listOf(
     "confirmText = \"[^\"]+\"",
     "message = \"[^\"]+\"",
     "\\.title = \"[^\"]+\"",
-).map(Pattern::compile)
+).map(java.util.regex.Pattern::compile)
 
 val svelteAuditPatterns = listOf(
     "title=\"[^\"]+\"",
     "placeholder=\"[^\"]+\"",
     ">\\s*[A-Za-z][^<{]*\\s*<",
-).map(Pattern::compile)
+).map(java.util.regex.Pattern::compile)
 
 val vueAuditPatterns = listOf(
     "title=\"[^\"]+\"",
     "placeholder=\"[^\"]+\"",
     ">\\s*[A-Za-z][^<{]*\\s*<",
-).map(Pattern::compile)
+).map(java.util.regex.Pattern::compile)
 
 val i18nBypassAuditRoots = listOf(
     "komelia-ui/src/commonMain/kotlin",
@@ -512,7 +507,7 @@ val i18nBypassPatterns = listOf(
     "zhHansEpubStrings",
     "locale:\\s*['\"]en['\"]",
     "fallbackLocale:\\s*['\"]en['\"]",
-).map(Pattern::compile)
+).map(java.util.regex.Pattern::compile)
 
 data class LocaleAssetScope(
     val name: String,
@@ -642,7 +637,7 @@ fun extractLocalePlaceholders(value: String): Set<String> {
 
 fun collectLocaleAssetAuditMatches(): List<String> {
     val matches = mutableListOf<String>()
-    val parser = JsonSlurper()
+    val parser = groovy.json.JsonSlurper()
 
     localeAssetScopes.forEach { scope ->
         val englishFile = rootProject.file(scope.english)

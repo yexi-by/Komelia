@@ -69,6 +69,7 @@ data class CommonStrings(
     val genres: String,
     val group: String,
     val id: String,
+    val inkers: String,
     val identifyKomf: String,
     val images: String,
     val input: String,
@@ -100,6 +101,7 @@ data class CommonStrings(
     val parent: String,
     val password: String,
     val parody: String,
+    val colorists: String,
     val pencillers: String,
     val itemsCountTemplate: String,
     val options: String,
@@ -121,6 +123,7 @@ data class CommonStrings(
     val resetMetadataKomf: String,
     val restart: String,
     val roles: String,
+    val editors: String,
     val running: String,
     val rolesForTemplate: String,
     val save: String,
@@ -142,6 +145,7 @@ data class CommonStrings(
     val summary: String,
     val showPassword: String,
     val tags: String,
+    val translators: String,
     val title: String,
     val titleSort: String,
     val falseValue: String,
@@ -181,6 +185,7 @@ data class CommonStrings(
     val labeledValueTemplate: String,
     val readList: String,
     val writers: String,
+    val letterers: String,
 ) {
     fun editItem(name: String): String = editItemTemplate.formatTemplate("name" to name)
     fun editCountItems(count: Int, label: String): String = editCountItemsTemplate.formatTemplate("count" to count, "label" to label)

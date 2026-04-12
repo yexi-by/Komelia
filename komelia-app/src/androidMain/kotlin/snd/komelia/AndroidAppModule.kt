@@ -72,6 +72,7 @@ import snd.komelia.image.UpsamplingMode
 import snd.komelia.image.VipsImageDecoder
 import snd.komelia.image.VipsSharedLibrariesLoader
 import snd.komelia.image.processing.ImageProcessingPipeline
+import snd.komelia.logs.AndroidAppLogsService
 import snd.komelia.offline.AndroidOfflineModule
 import snd.komelia.offline.OfflineModule
 import snd.komelia.offline.OfflineRepositories
@@ -88,6 +89,7 @@ import snd.komelia.updates.AndroidOnnxModelDownloader
 import snd.komelia.updates.AppUpdater
 import snd.komelia.updates.OnnxModelDownloader
 import snd.komelia.updates.UpdateClient
+import snd.komelia.ui.settings.logs.AppLogsService
 import snd.komga.client.KomgaClientFactory
 import snd.komga.client.user.KomgaUser
 import java.util.concurrent.TimeUnit
@@ -255,6 +257,10 @@ class AndroidAppModule(
     override fun createAppUpdater(updateClient: UpdateClient): AppUpdater? {
         @Suppress("KotlinConstantConditions")
         return if (BuildConfig.ENABLE_SELF_UPDATES) AndroidAppUpdater(updateClient, context) else null
+    }
+
+    override fun createAppLogsService(): AppLogsService {
+        return AndroidAppLogsService(context)
     }
 
     override fun createImageDecoder() = VipsImageDecoder()

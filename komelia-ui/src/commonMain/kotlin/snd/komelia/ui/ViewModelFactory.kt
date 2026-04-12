@@ -62,6 +62,7 @@ import snd.komelia.ui.settings.komf.jobs.KomfJobsViewModel
 import snd.komelia.ui.settings.komf.notifications.KomfNotificationSettingsViewModel
 import snd.komelia.ui.settings.komf.processing.KomfProcessingSettingsViewModel
 import snd.komelia.ui.settings.komf.providers.KomfProvidersSettingsViewModel
+import snd.komelia.ui.settings.logs.AppLogsViewModel
 import snd.komelia.ui.settings.navigation.SettingsNavigationViewModel
 import snd.komelia.ui.settings.offline.OfflineSettingsViewModel
 import snd.komelia.ui.settings.server.ServerSettingsViewModel
@@ -460,7 +461,18 @@ class ViewModelFactory(
             komfEnabled = appRepositories.komfSettingsRepository.getKomfEnabled(),
             platformType = platformType,
             updatesEnabled = dependencies.appUpdater != null,
+            logsEnabled = dependencies.appLogsService != null,
             user = dependencies.komgaSharedState.authenticatedUser,
+        )
+    }
+
+    fun getAppLogsViewModel(): AppLogsViewModel {
+        return AppLogsViewModel(
+            appNotifications = dependencies.appNotifications,
+            settingsRepository = appRepositories.settingsRepository,
+            logJournalRepository = dependencies.offlineDependencies.repositories.logJournalRepository,
+            appLogsService = requireNotNull(dependencies.appLogsService),
+            appStrings = dependencies.appStrings,
         )
     }
 

@@ -38,26 +38,7 @@ import snd.komelia.ui.common.components.LabeledEntry.Companion.stringEntry
 import snd.komelia.ui.library.SeriesScreenFilter
 import snd.komga.client.common.KomgaAuthor
 import snd.komga.client.common.KomgaWebLink
-import snd.komga.client.common.coloristRole
-import snd.komga.client.common.coverRole
-import snd.komga.client.common.editorRole
-import snd.komga.client.common.inkerRole
-import snd.komga.client.common.lettererRole
-import snd.komga.client.common.pencillerRole
-import snd.komga.client.common.translatorRole
-import snd.komga.client.common.writerRole
 import kotlin.math.roundToInt
-
-private val authorsOrder = listOf(
-    writerRole,
-    pencillerRole,
-    inkerRole,
-    coloristRole,
-    lettererRole,
-    coverRole,
-    editorRole,
-    translatorRole
-)
 
 @Composable
 fun BookInfoColumn(
@@ -72,6 +53,7 @@ fun BookInfoColumn(
     fileUrl: String,
     onFilterClick: (SeriesScreenFilter) -> Unit,
 ) {
+    val commonStrings = LocalStrings.current.common
     val bookStrings = LocalStrings.current.screens.book
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         if (!publisher.isNullOrBlank()) {
@@ -107,13 +89,14 @@ fun BookInfoColumn(
         )
 
         Spacer(Modifier.size(0.dp))
-        val authorEntries = remember(authors) {
+        val authorEntries = remember(authors, commonStrings) {
             authors
                 .groupBy { it.role }
+                .toList()
+                .sortedBy { (role, _) -> authorRoleSortIndex(role) }
                 .map { (role, authors) ->
-                    role.replaceFirstChar { it.uppercase() } to authors.map { LabeledEntry(it, it.name) }
+                    resolveAuthorRoleLabel(role, commonStrings) to authors.map { LabeledEntry(it, it.name) }
                 }
-                .sortedBy { (role, _) -> authorsOrder.indexOf(role.lowercase()) }
         }
         authorEntries.forEach { (role, authors) ->
             DescriptionChips(

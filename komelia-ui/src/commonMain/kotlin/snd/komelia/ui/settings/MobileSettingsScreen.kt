@@ -67,6 +67,7 @@ class MobileSettingsScreen : Screen {
                     hasMediaErrors = vm.hasMediaErrors,
                     komfEnabled = vm.komfEnabledFlow.collectAsState().value,
                     updatesEnabled = vm.updatesEnabled,
+                    logsEnabled = vm.logsEnabled,
                     newVersionIsAvailable = vm.newVersionIsAvailable,
                     onLogout = vm::logout,
                     user = vm.user.collectAsState().value,

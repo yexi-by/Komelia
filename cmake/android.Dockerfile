@@ -1,4 +1,4 @@
-FROM ubuntu:25.10
+FROM ubuntu:24.04
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     openjdk-17-jdk-headless \
@@ -46,6 +46,8 @@ RUN ${ANDROID_SDK_PATH}/cmdline-tools/latest/bin/sdkmanager --install \
 RUN curl -Lo node.tar.gz https://nodejs.org/dist/v24.8.0/node-v24.8.0-linux-x64.tar.gz \
       && echo "daf68404b478b4c3616666580d02500a24148c0f439e4d0134d65ce70e90e655 node.tar.gz" | sha256sum -c - \
       && tar xzf node.tar.gz --strip-components=1 -C /usr/local/
+
+RUN python3 -m pip install --break-system-packages "meson>=1.4.0,<2"
 
 RUN mkdir /.npm && chown -R 1000:1000 /.npm
 

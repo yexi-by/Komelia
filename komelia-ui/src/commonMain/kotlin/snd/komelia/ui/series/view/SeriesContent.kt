@@ -58,6 +58,8 @@ import snd.komelia.ui.common.components.AppFilterChipDefaults
 import snd.komelia.ui.common.components.DescriptionChips
 import snd.komelia.ui.common.components.LabeledEntry
 import snd.komelia.ui.common.components.LabeledEntry.Companion.stringEntry
+import snd.komelia.ui.book.authorRoleSortIndex
+import snd.komelia.ui.book.resolveAuthorRoleLabel
 import snd.komelia.ui.common.images.SeriesThumbnail
 import snd.komelia.ui.common.menus.SeriesActionsMenu
 import snd.komelia.ui.common.menus.SeriesMenuActions
@@ -424,29 +426,23 @@ fun SeriesChipTags(
 
         Spacer(Modifier.height(2.dp))
 
-        series.booksMetadata.authors
-            .filter { it.role == "writer" }
-            .groupBy { it.role }
-            .forEach { (_, author) ->
-                DescriptionChips(
-                    label = commonStrings.writers,
-                    chipValues = author.map { LabeledEntry(it, it.name) },
-                    onChipClick = { onFilterClick(SeriesScreenFilter(authors = listOf(it))) },
-                    modifier = Modifier.cursorForHand()
-                )
-            }
-
-        series.booksMetadata.authors
-            .filter { it.role == "penciller" }
-            .groupBy { it.role }
-            .forEach { (_, author) ->
-                DescriptionChips(
-                    label = commonStrings.pencillers,
-                    chipValues = author.map { LabeledEntry(it, it.name) },
-                    onChipClick = { onFilterClick(SeriesScreenFilter(authors = listOf(it))) },
-                    modifier = Modifier.cursorForHand()
-                )
-            }
+        val authorEntries = remember(series.booksMetadata.authors, commonStrings) {
+            series.booksMetadata.authors
+                .groupBy { it.role }
+                .toList()
+                .sortedBy { (role, _) -> authorRoleSortIndex(role) }
+                .map { (role, authors) ->
+                    resolveAuthorRoleLabel(role, commonStrings) to authors.map { LabeledEntry(it, it.name) }
+                }
+        }
+        authorEntries.forEach { (role, authors) ->
+            DescriptionChips(
+                label = role,
+                chipValues = authors,
+                onChipClick = { onFilterClick(SeriesScreenFilter(authors = listOf(it))) },
+                modifier = Modifier.cursorForHand()
+            )
+        }
         Spacer(Modifier.height(2.dp))
     }
 }
