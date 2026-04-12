@@ -33,7 +33,10 @@ class AndroidAppUpdater(
 
     override fun updateTo(release: AppRelease): Flow<UpdateProgress>? {
         if (!inProgress.compareAndSet(false, true)) return null
-        if (release.assetUrl == null) return null
+        val assetUrl = release.assetUrl ?: run {
+            inProgress.set(false)
+            error("No compatible APK asset found for supported ABIs: ${Build.SUPPORTED_ABIS.joinToString()}")
+        }
 
         return flow {
             emit(UpdateProgress(0, 0))
@@ -41,19 +44,21 @@ class AndroidAppUpdater(
             val packageInstaller = context.packageManager.packageInstaller
             val sessionId = packageInstaller.createSession(sessionParams)
             val session = packageInstaller.openSession(sessionId)
+            try {
+                githubClient.streamFile(assetUrl) { response -> streamToSession(response, session) }
 
-            githubClient.streamFile(release.assetUrl) { response -> streamToSession(response, session) }
-
-            val receiverIntent = Intent(context, PackageInstallerStatusReceiver::class.java)
-            val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            } else {
-                PendingIntent.FLAG_UPDATE_CURRENT
+                val receiverIntent = Intent(context, PackageInstallerStatusReceiver::class.java)
+                val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                } else {
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                }
+                val receiverPendingIntent = PendingIntent.getBroadcast(context, 0, receiverIntent, flags)
+                session.commit(receiverPendingIntent.intentSender)
+            } finally {
+                session.close()
+                inProgress.set(false)
             }
-            val receiverPendingIntent = PendingIntent.getBroadcast(context, 0, receiverIntent, flags)
-            session.commit(receiverPendingIntent.intentSender)
-            session.close()
-            inProgress.set(false)
         }
     }
 
@@ -81,7 +86,7 @@ class AndroidAppUpdater(
     }
 
     private fun GithubRelease.toAppRelease(): AppRelease {
-        val asset = assets.firstOrNull { it.name.endsWith(".apk") }
+        val asset = findCompatibleApkAsset(assets)
 
         return AppRelease(
             version = AppVersion.fromString(tagName),
@@ -91,6 +96,21 @@ class AndroidAppUpdater(
             assetName = asset?.name,
             assetUrl = asset?.browserDownloadUrl
         )
+    }
+
+    private fun findCompatibleApkAsset(assets: List<GithubReleaseAsset>): GithubReleaseAsset? {
+        val apkAssets = assets.filter { it.name.endsWith(".apk", ignoreCase = true) }
+        if (apkAssets.isEmpty()) return null
+
+        val supportedAbis = Build.SUPPORTED_ABIS.map { it.lowercase() }
+        supportedAbis.forEach { abi ->
+            apkAssets.firstOrNull { asset -> asset.name.lowercase().contains(abi) }?.let { return it }
+        }
+
+        return apkAssets.firstOrNull { asset ->
+            val lowerName = asset.name.lowercase()
+            "universal" in lowerName || "all" in lowerName
+        }
     }
 }
 

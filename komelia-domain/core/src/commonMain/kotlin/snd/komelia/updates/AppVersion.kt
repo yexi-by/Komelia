@@ -19,7 +19,7 @@ data class AppVersion(
     companion object {
         private val versionRegex = Regex("""^[^\d]*?(\d+)\.(\d+)(?:\.(\d+))?(?:[-+].*)?$""")
 
-        val current = AppVersion(0, 18, 6)
+        val current = fromString(CURRENT_APP_VERSION)
 
         fun fromString(value: String): AppVersion {
             val match = versionRegex.matchEntire(value.trim())

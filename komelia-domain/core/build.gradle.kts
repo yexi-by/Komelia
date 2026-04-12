@@ -2,6 +2,7 @@ import com.google.protobuf.gradle.id
 import com.google.protobuf.gradle.proto
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.nio.charset.StandardCharsets
 
 
 plugins {
@@ -15,6 +16,27 @@ plugins {
 
 group = "io.github.snd-r.komelia.domain.core"
 version = "unspecified"
+val versionCatalog = extensions
+    .getByType(org.gradle.api.artifacts.VersionCatalogsExtension::class.java)
+    .named("libs")
+val appVersionName = versionCatalog.findVersion("app-version").get().requiredVersion
+val generatedAppVersionDir = layout.buildDirectory.dir("generated/source/appVersion/commonMain/kotlin")
+val generateAppVersionSource = tasks.register("generateAppVersionSource") {
+    val outputDir = generatedAppVersionDir
+    outputs.dir(outputDir)
+    doLast {
+        val outputFile = outputDir.get().file("snd/komelia/updates/GeneratedAppVersion.kt").asFile
+        outputFile.parentFile.mkdirs()
+        outputFile.writeText(
+            """
+            package snd.komelia.updates
+
+            internal const val CURRENT_APP_VERSION = "$appVersionName"
+            """.trimIndent() + "\n",
+            StandardCharsets.UTF_8
+        )
+    }
+}
 
 kotlin {
     jvmToolchain(17)
@@ -99,6 +121,15 @@ kotlin {
         }
     }
 }
+
+kotlin.sourceSets.named("commonMain") {
+    kotlin.srcDir(generatedAppVersionDir)
+}
+
+tasks.matching { it.name.contains("compile", ignoreCase = true) && it.name.contains("Kotlin") }
+    .configureEach {
+        dependsOn(generateAppVersionSource)
+    }
 
 android {
     namespace = "io.github.snd_r.komelia.domain.core"
